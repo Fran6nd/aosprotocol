@@ -57,6 +57,22 @@ The client can omit any extensions that the server does not support from its
 reply, but this is not necessary as the server can simply ignore them itself.
 
 
+# HAS_PACKETS Packets
+* [Player Properties](#player-properties)
+
+## Player Properties
+
+Sends additional player attributes from the server to the client.
+
+| ---------: |-----|
+| Packet ID: | 64  |
+| Version:   | 1   |
+
+| Sub ID | Name              | Direction        | Size |
+|--------|-------------------|------------------|------|
+| 0      | Player Properties | Server -> Client | 12   |
+
+
 # Packetless Packets
 * [Player Limit](#player-limit)
 * [Message Types](#message-types)
@@ -97,3 +113,13 @@ kicking a player out of the server.
 | ---------: |-----|
 | Packet ID: | 194 |
 | Version:   | 1   |
+
+# Other Extensions
+* [UTF-8 Chat](#utf-8-chat)
+
+## UTF-8 Chat
+
+Has no registered extension id. A [Chat Message](protocol075.html#chat-message)
+whose data starts with a `0xff` byte is encoded in UTF-8 instead of Code Page
+437. Messages without the prefix are interpreted as Code Page 437 as in the
+base protocol.
