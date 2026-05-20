@@ -134,7 +134,11 @@ kicking a player out of the server.
 
 | ---------: |-----|
 | Packet ID: | 194 |
-| Version:   | 1   |
+
+| Version | Notes                                                                                                                                                                                       |
+|--------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|       1 | Sent only after the player has fully joined the game.                                                                                                                                       |
+|       2 | May also be sent during the handshake or the map transfer. Wire format is identical to v1; a v2-aware client MUST accept this packet in any connection state and use its payload as the disconnect reason. |
 
 # Other Extensions
 * [UTF-8 Chat](#utf-8-chat)
