@@ -84,12 +84,12 @@ includes the Packet ID and Sub Packet ID as described in the
 | Packet ID     | UByte      | `64`    | Always `64`.                                                                                              |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.                                                                           |
 | Player ID     | UByte      | `0`     | The id of the player these stats describe.                                                                |
-| HP            | UByte      | `100`   | Health, `0`..`100`. `0` indicates the player is dead.                                                     |
+| HP            | UByte      | `100`   | Health. A `UByte`, so the wire range is `0`..`255`; vanilla servers use `0`..`100`. Whether `0` HP marks the player as dead is client-specific (betterspades does not — the kill packet is authoritative for death; openspades does, but does not support this packet). |
 | Blocks        | UByte      | `50`    | Block count currently carried by the player. Typically `0`..`50` for vanilla servers.                     |
 | Grenades      | UByte      | `3`     | Grenade count currently carried by the player. Typically `0`..`3` for vanilla servers.                    |
 | Magazine Ammo | UByte      | `10`    | Ammunition currently loaded in the player's equipped weapon clip.                                         |
 | Reserve Ammo  | UByte      | `50`    | Spare ammunition the player has for the equipped weapon (outside the clip).                               |
-| Score         | LE Uint    | `7`     | The player's score, as defined by the server (e.g. kills, or kills plus objective points). 32-bit, little-endian. |
+| Score         | LE Uint    | `7`     | The player's score, as defined by the server (e.g. kills, or kills plus objective points). 32-bit little-endian integer. Reference clients treat it as unsigned (BetterSpades, KyroSpades); zerospades reads it into a signed `int`. Signedness is only observable for values >= 2^31. |
 
 Byte layout (offsets are within the packet, including the Packet ID byte):
 
