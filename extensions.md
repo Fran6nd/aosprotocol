@@ -240,7 +240,6 @@ encoding as the base protocol position packets.
 | X             | LE float32 | `256.0`     | World X coordinate.                                |
 | Y             | LE float32 | `256.0`     | World Y coordinate.                                |
 | Z             | LE float32 | `40.0`      | World Z coordinate.                                |
-| Target ID     | UByte      | `9`         | The player the ping is about, `255` for nobody in particular. Set by the client when it pings while aiming at a player. |
 | Duration      | LE float32 | `5.0`       | Display time, see [Durations](#durations). Server -> client only: a client sends `0` here and the server, which is authoritative, fills it in. |
 | Message ID    | UByte      | `33`        | [Predefined message](#predefined-messages) the ping carries, `0` for none. |
 | Reason        | UTF-8 text | `""`        | Free-form label, used only when Message ID is `0`. |
@@ -250,11 +249,6 @@ replaces the previous one and restarts its lifetime, and a Duration of `0`
 removes it without placing another. The server's own pings (Player ID `255`)
 behave the same way, so a server that wants several permanent markers at once
 needs ESP marks or a ping per originating id, not several pings from `255`.
-
-**Target ID** names the player a ping is about, when it is about somebody: a
-teammate the sender is aiming at, an enemy the marker is placed on. It is what
-lets a ping labelled `Behind You` or `Cover The Carrier` say who is meant, and
-`255` means the ping is about the place alone.
 
 A ping always points somewhere. A player who wants to say something without
 pointing at anything sends a [Message](#sub-id-3-message) instead — that is what
@@ -302,6 +296,10 @@ dead, and the server drops any it receives from a dead player, exactly as it
 drops one sent while the feature is switched off. Waiting to respawn is not a
 vantage point, and a corpse pointing at things the living cannot see is a way of
 spectating the enemy. Whether spectators may ping is the server's call.
+
+To identify the target of a ping, the server performs a raycasting check from the
+client's position through their crosshair direction, rather than relying on client
+data.
 
 Server handling of a client -> server Ping:
 
