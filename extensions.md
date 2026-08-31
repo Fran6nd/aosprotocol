@@ -464,7 +464,7 @@ and everything it can say is something every other client can already read.
 | Player ID     | UByte      | `4`     | On relay, the player speaking; `255` means the server itself. Ignored on the client -> server direction; the server fills it in authoritatively. |
 | Target ID     | UByte      | `9`     | The player the message is addressed to, `255` for nobody in particular. Set by the client. |
 | Chat Type     | UByte      | `1`     | Where the message lands, see below. Server -> client only: a client sends `0` and the server assigns it. |
-| Message ID    | UByte      | `52`    | Catalogue id, `1`-`255`. `0` is invalid for Message packets and must not be sent. (Note: `0` is valid for Ping and ESP Mark packets, where it means no label.) |
+| Message ID    | UByte      | `52`    | Catalogue id, `1`-`255`. `0` must not be sent; Message packets require a predefined message. |
 
 **Target ID** is what makes the *"behind you"* family readable: every client
 knows who "you" is, the addressed player sees the message aimed at them and the
