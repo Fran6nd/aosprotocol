@@ -230,7 +230,10 @@ it wants; the server validates all of that and relays it to the players of its
 choice, filling in the originating Player ID. The server may also originate a
 Ping on its own — objective markers, scripted events, admin callouts — with no
 client involved. The position uses the same coordinate frame and `LE float32`
-encoding as the base protocol position packets.
+encoding as the base protocol position packets. The client's X/Y/Z coordinates
+are required: the server uses them to validate that the client and server agree
+on the target's position, preventing desync before performing its own raycasting
+validation to confirm line-of-sight.
 
 | Field Name    | Field Type | Example     | Notes                                              |
 |---------------|------------|-------------|----------------------------------------------------|
@@ -298,8 +301,9 @@ vantage point, and a corpse pointing at things the living cannot see is a way of
 spectating the enemy. Whether spectators may ping is the server's call.
 
 To identify the target of a ping, the server performs a raycasting check from the
-client's position through their crosshair direction, rather than relying on client
-data.
+client's position through their crosshair direction using the X/Y/Z coordinates
+sent by the client to validate sync and confirm line-of-sight, rather than
+relying on client data to identify the target.
 
 Server handling of a client -> server Ping:
 
@@ -307,8 +311,10 @@ Server handling of a client -> server Ping:
   per second).
 * The label a client asks for (Message ID, or Reason) is a request like the rest:
   the server may replace it, empty it, or drop the ping over it.
-* The server should sanity-check the coordinates (at least the map bounds of
-  512 x 512 x 64, optionally a line-of-sight or solid check). The server is
+* The server must validate the coordinates by comparing them against its own state
+  for the pinged player (at least the map bounds of 512 x 512 x 64, and the
+  player's actual position for sync checking). The server should reject pings to
+  positions that diverge significantly from its own tracked state. The server is
   authoritative on placement.
 * Who receives the relayed Ping is left to the server's discretion (team only,
   everyone, spectators, etc.); the protocol does not mandate a distribution
