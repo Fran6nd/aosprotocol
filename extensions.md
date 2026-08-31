@@ -487,7 +487,7 @@ decides who sees its pings. The values are those of the base
 | 7     | `CHAT_DIRECT`  | A message to the Target ID alone, rendered as a private one. |
 
 Values `3`-`6` need the [Message Types](#message-types) extension; a server sends
-them only to clients that negotiated it and downgrades to `0` or `2` for the
+them only to clients that negotiated it and downgrades to `2` (CHAT_SYSTEM) for the
 rest. `7` is defined here, so it needs only this extension.
 
 A client renders each type where its existing chat already puts it — a chat line
