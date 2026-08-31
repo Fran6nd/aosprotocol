@@ -756,7 +756,7 @@ A map change ([Map Start](protocol075.html#map-start-075)) clears everything for
 every id, on both ends. Nothing this extension holds is meant to survive a world.
 
 
-# Packetless Packets
+# Extensions Without New Packet Types
 * [Player Limit](#player-limit)
 * [Message Types](#message-types)
 * [Kick Reason](#kick-reason)
