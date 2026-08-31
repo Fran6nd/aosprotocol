@@ -449,8 +449,9 @@ its target is killed.
 
 Says one of the [predefined messages](#predefined-messages) by its catalogue id.
 This is how a player speaks: the client sends the id it wants, the server decides
-what to do with it and relays it to the players it chooses, and each of them
-renders it in their own language.
+what to do with it and relays it to the players it chooses. Clients that support
+the extension translate the id themselves in their own language; clients without
+the extension receive the canonical English text as fallback.
 
 A single packet used in both directions, as for the Ping. Nothing but ids travels
 here — there is no text field at all, so a client cannot smuggle words through it,
@@ -535,10 +536,11 @@ invent a placeholder line, and it must not disconnect.
 ### Predefined messages
 
 The catalogue is a fixed table of short phrases, each with a one byte id. A
-client sends the id — in a Message, or as the label of a Ping — and every client
-renders the phrase in its own player's language; the canonical English text below
-is what goes on the wire when a peer does not support the extension, and what a
-client displays if it has no translation.
+client sends the id — in a Message, or as the label of a Ping — and the server
+relays it to other clients. Clients that support the extension translate the id
+in their own language; the canonical English text below is what clients without
+the extension receive as fallback, and what goes on the wire when a peer does not
+support the extension.
 
 The table is the same for everybody, which is the only reason this works: a
 French player sends `52`, a Japanese player reads *"援護してくれ"*, and neither
