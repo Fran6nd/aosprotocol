@@ -466,10 +466,7 @@ and everything it can say is something every other client can already read.
 | Chat Type     | UByte      | `1`     | Where the message lands, see below. Server -> client only: a client sends `0` and the server assigns it. |
 | Message ID    | UByte      | `52`    | Catalogue id, `1`-`255`. `0` must not be sent; Message packets require a predefined message. |
 
-**Target ID** is what makes the *"behind you"* family readable: every client
-knows who "you" is, the addressed player sees the message aimed at them and the
-others read it as aimed at that name. It says nothing about who receives the
-packet, which is a separate decision the server makes by choosing recipients.
+**Target ID** determines the message channel: a specific player ID sends a direct message to that player; `255` sends a team message that the server relays only to the team. The server decides whether to relay the message.
 
 **Chat Type** is how the message reaches the player, and the server is the only
 one who chooses it. A client asks to say something; it does not decide whether
