@@ -527,9 +527,6 @@ invent a placeholder line, and it must not disconnect.
 
 * Rate-limit messages as you rate-limit chat. A menu makes them cheap to spam;
   a sane default is the chat limit.
-* Recipients and chat type are the server's alone: the same incoming message can
-  go out as a team line to one side, a direct message to the player it names, and
-  nothing at all to the enemy team.
 
 ### Predefined messages
 
