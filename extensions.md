@@ -527,8 +527,6 @@ invent a placeholder line, and it must not disconnect.
 
 * Rate-limit messages as you rate-limit chat. A menu makes them cheap to spam;
   a sane default is the chat limit.
-* The server may refuse individual ids, whole blocks or the whole catalogue — a
-  server that wants no banter drops those ids and passes the rest on.
 * Recipients and chat type are the server's alone: the same incoming message can
   go out as a team line to one side, a direct message to the player it names, and
   nothing at all to the enemy team.
