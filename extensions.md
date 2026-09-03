@@ -811,6 +811,7 @@ and here the id itself says whose right it is.
 | 116 | Bring It Home        | 123 | Meet At Our Base    |
 | 117 | I Am Escorting You   | 124 | Go Restock          |
 | 118 | Cover The Carrier    | 125 | Restock First       |
+|     |                      | 126 | Our Base Is Under Assault |
 
 #### 128-143 — Building and digging
 
@@ -903,7 +904,8 @@ cheater, a griefer, an idler.
 | 216 | %1$p Is Afk              | `%p`       |
 | 217 | Cleared                  |            |
 | 218 | I Killed %1$p            | `%p`       |
-| 219-223 | reserved             |            |
+| 219 | %1$p Is Under Assault    | `%p`       |
+| 220-223 | reserved             |            |
 
 `Target`, `Cheater`, `Griefer` and `Cleared` name nobody: they are labels for a
 [Ping](#sub-id-1-ping) or an [ESP Mark](#sub-id-2-esp-mark), whose Player ID
@@ -916,10 +918,10 @@ position.
 
 #### 224-239 — Server notices
 
-The server talking to a player about their connection, and announcing world
-events. Everything here is sent with Player ID `255`, normally as `CHAT_SYSTEM`
-or as one of the [Message Types](#message-types) warning forms; a client never
-sends these, and a server drops them if one does.
+The server talking to a player about their connection, and announcing what only
+the server knows. Everything here is sent with Player ID `255`, normally as
+`CHAT_SYSTEM` or as one of the [Message Types](#message-types) warning forms; a
+client never sends these, and a server drops them if one does.
 
 | Id  | English text                                  | Parameters |
 |-----|-----------------------------------------------|------------|
@@ -931,12 +933,22 @@ sends these, and a server drops them if one does.
 | 229 | You Will Be Kicked In %1$i Seconds            | `%i`       |
 | 230 | The Bridge Has Collapsed                      |            |
 | 231 | The Tower Has Collapsed                       |            |
-| 232-239 | reserved                                  |            |
+| 232 | Welcome To The Server, %1$p                   | `%p`       |
+| 233 | Intel Captured                                |            |
+| 234 | Intel Lost                                    |            |
+| 235 | Our Intel Has Disappeared                     |            |
+| 236 | Base Captured                                 |            |
+| 237 | Base Lost                                     |            |
+| 238-239 | reserved                                  |            |
 
 `224` and `225` follow from what [`ExtInfo`](#extinfo-packet) told the server;
 `226` is for a client that connects but lacks something the server's game leans
 on. `228` and `229` are the warning before a kick, where
 [Kick Reason](#kick-reason) carries the reason itself.
+
+`233`-`237` are read from the receiving team's side: captured is the recipient's
+team taking it, lost is the recipient's team losing it, and the server sends each
+side the one that applies.
 
 #### 240-255 — Reserved
 
