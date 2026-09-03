@@ -127,9 +127,9 @@ The extension id, the number carried by `ExtInfo`, is `2`; the packet id is
 | Sub ID | Name     | Direction         | Size |
 |--------|----------|-------------------|------|
 | 0      | Config   | Server -> Client  | 3    |
-| 1      | Ping     | Client <-> Server | 21+  |
+| 1      | Ping     | Client <-> Server | 20+  |
 | 2      | ESP Mark | Server -> Client  | 9+   |
-| 3      | Message  | Client <-> Server | 6    |
+| 3      | Message  | Client <-> Server | 6+   |
 
 A client sends two of these and no others: a **Ping** to point at a place, and a
 **Message** to say one of the [predefined messages](#predefined-messages). They
@@ -222,6 +222,92 @@ Expiry itself is always client-side. A client may cap how many pings and marks i
 displays at once, dropping the oldest first, and is never obliged to render an
 absurd number of them.
 
+### Message parameters
+
+Some [predefined messages](#predefined-messages) are templates rather than fixed
+sentences: *"There are `%1$i` of them"* is one phrase that says any number. The
+values fill the template at the far end, after translation, so a parameter costs
+nothing in understanding — a French player sends `16` and a `3`, and a Japanese
+player reads *"敵は3人だ"*.
+
+| Marker | Field Type | Size | Renders as                                                      |
+|--------|------------|------|-----------------------------------------------------------------|
+| `%i`   | LE int32   | 4    | The number.                                                     |
+| `%f`   | LE float32 | 4    | The number, formatted by the client's own locale.               |
+| `%p`   | UByte      | 1    | The name of that player id, which the receiving client already has. |
+
+None of them is text. That is the whole point of the set: a number is a number in
+every language, and `%p` travels as a player id the receiver already has a name
+for, so a parametric message is still something every client reads in its own
+language, and still something a client cannot smuggle words through.
+
+Version 1 defines no entry that uses `%f`. The type is defined here so a later
+version can add one without changing the wire format; a version 1 implementation
+never encounters it.
+
+#### On the wire
+
+A message id fixes its own parameters: how many, of which types, in which order.
+Both ends know them from the catalogue, so nothing describes them on the wire —
+the values follow one another raw, in the order the template declares, with no
+count, no type tags and no padding.
+
+That signature is **as frozen as the text is**. A later version of this extension
+may never add a parameter to an existing id, remove one, or change its type; it
+allocates a new id instead. A version 1 client parsing a version 2 packet has
+only the id to go on, and it has to be right.
+
+Where the values go depends on the packet, and follows the Message ID that
+selects the template:
+
+| Packet                          | Message ID `0`                      | Message ID not `0`                |
+|---------------------------------|-------------------------------------|-----------------------------------|
+| [Ping](#sub-id-1-ping)          | Remaining bytes are `Reason`.       | Remaining bytes are the values.   |
+| [ESP Mark](#sub-id-2-esp-mark)  | Remaining bytes are `Reason`.       | Remaining bytes are the values.   |
+| [Message](#sub-id-3-message)    | Not valid, see the packet.          | Remaining bytes are the values.   |
+
+An id with no parameters is followed by nothing, which is why an ordinary Message
+is still 6 bytes. No entry may take more than four parameters, and none in
+version 1 takes more than one.
+
+#### In the catalogue text
+
+The id is the translation key. The canonical English is the reference rendering
+of the entry — what a translator works from, and what a peer without the
+extension receives — and it is where an entry's parameters are declared: how
+many, of which types, in which order they arrive on the wire.
+
+Markers are written positionally — `%1$i` is the first value, `%2$p` the second —
+because word order is not the same in every language and a translation has to be
+free to move them. No version 1 entry takes more than one parameter, so nothing
+yet needs reordering; the notation is fixed now so that a later version adding a
+two-value entry does not have to change how translations are written.
+
+A literal percent sign is written `%%`. This applies to catalogue text only: a
+`Reason` string is free text, never a template, and a `%` in it is always a
+percent sign.
+
+Grammar around a value is the translation's business, not the protocol's. A
+client applies its own language's plural rules to the value it substitutes; the
+canonical English is one rendering of the phrase, not a form every language has
+to bend into. The catalogue phrasings avoid the problem where they can.
+
+#### Validation
+
+The values are as authoritative as the id. A server validates them before it
+relays anything, and a client validates them before it renders anything:
+
+* The block must match the id's signature exactly. Too few bytes and too many
+  bytes are both invalid, and the packet is dropped rather than parsed leniently.
+* `%f` is invalid if NaN or infinite, as in [Durations](#durations).
+* `%p` must name a player currently in the game; the packet is dropped otherwise.
+* A server should clamp `%i` and `%f` to a range its game can mean. A client
+  asking to announce two billion enemies is a client to be ignored, the same way
+  a ping to an impossible coordinate is.
+
+A server that does not know a newer id cannot validate its values and does not
+try: unknown ids are not relayed, as before.
+
 ### Sub ID 1: Ping
 
 A single packet used in both directions. A client sends it to ping the world
@@ -246,6 +332,7 @@ validation to confirm line-of-sight.
 | Duration      | LE float32 | `5.0`       | Display time, see [Durations](#durations). Server -> client only: a client sends `0` here and the server, which is authoritative, fills it in. |
 | Message ID    | UByte      | `33`        | [Predefined message](#predefined-messages) the ping carries, `0` for none. |
 | Reason        | UTF-8 text | `""`        | Free-form label, used only when Message ID is `0`. |
+| Arguments     | varies     | —           | Values for the Message ID's parameters, used only when Message ID is not `0`. See [Message parameters](#message-parameters). |
 
 A player has one active ping at a time: a new ping from the same Player ID
 replaces the previous one and restarts its lifetime, and a Duration of `0`
@@ -263,19 +350,22 @@ a place and the server decides who is shown it. The same is true of the label �
 a client attaches the id it likes, and the server keeps it, replaces it or drops
 the ping entirely.
 
-The label of a ping is either a catalogue id or a free string. When Message ID is
-not `0` the client renders the [predefined message](#predefined-messages) for
-that id, translated, and ignores Reason, which should then be empty. When it is
-`0` the client renders Reason, and an empty Reason is a neutral "look here"
-marker.
+The label of a ping is either a catalogue id or a free string, and the two share
+the tail of the packet. When Message ID is not `0` the client renders the
+[predefined message](#predefined-messages) for that id, translated, and the
+remaining bytes are that id's [parameter values](#message-parameters) — nothing
+at all for the great majority of ids, which take none. When Message ID is `0` the
+client renders the remaining bytes as Reason, and an empty Reason is a neutral
+"look here" marker.
 
 Which id a client attaches to a ping is the client's own business. The catalogue
 groups its entries by what they usually mean, not by what may label a marker, and
 this extension puts no restriction on the combination. The one thing a client may
 not do is invent ids: only the ones the catalogue defines.
 
-The Reason occupies the remaining bytes of the packet (no length prefix or
-terminator); its length is implied by the packet length, and it may be empty. It
+The Reason occupies the remaining bytes of the packet when Message ID is `0` (no
+length prefix or terminator); its length is implied by the packet length, and it
+may be empty, which is the shortest form of the packet at 20 bytes. It
 is a free-form, client-defined UTF-8 string, consistent with the
 [UTF-8 Chat](#utf-8-chat) convention. Before relaying, the server must validate
 it as well-formed UTF-8 and drop (or sanitise) anything malformed rather than
@@ -309,13 +399,12 @@ Server handling of a client -> server Ping:
 
 * The server should rate-limit requests (a sane default is at most one per player
   per second).
-* The label a client asks for (Message ID, or Reason) is a request like the rest:
-  the server may replace it, empty it, or drop the ping over it.
+* The label a client asks for (Message ID and its
+  [parameter values](#message-parameters), or Reason).
 * The server must validate the coordinates by comparing them against its own state
   for the pinged player (at least the map bounds of 512 x 512 x 64, and the
   player's actual position for sync checking). The server should reject pings to
-  positions that diverge significantly from its own tracked state. The server is
-  authoritative on placement.
+  positions that diverge significantly from its own tracked state.
 * Who receives the relayed Ping is left to the server's discretion (team only,
   everyone, spectators, etc.); the protocol does not mandate a distribution
   policy. Relaying it to nobody is a valid decision too.
@@ -352,6 +441,7 @@ server did not choose.
 | Flags         | UByte      | `0b1`      | Lifetime modifiers, see below.                 |
 | Message ID    | UByte      | `0`        | [Predefined message](#predefined-messages) labelling the mark, `0` for none. |
 | Reason        | UTF-8 text | `"leader"` | Free-form label, used only when Message ID is `0`. |
+| Arguments     | varies     | —          | Values for the Message ID's parameters, used only when Message ID is not `0`. See [Message parameters](#message-parameters). |
 
 Flags:
 
@@ -389,9 +479,9 @@ likely to want falls out of the same five bytes:
 `SHOW_NAME` is orthogonal to all of these and may be set with any of them.
 
 The label works exactly as on a Ping: a non-zero Message ID renders the
-[predefined message](#predefined-messages) for that id, translated, and Reason is
-then ignored and should be empty. Otherwise the client renders Reason, which
-follows the Ping's rules — remaining bytes of the packet, no length prefix or
+[predefined message](#predefined-messages) for that id, translated, and the
+remaining bytes are that id's [parameter values](#message-parameters) rather than
+a Reason. Otherwise the client renders Reason, which follows the Ping's rules — remaining bytes of the packet, no length prefix or
 terminator, validated by the server as well-formed UTF-8, capped and truncated on
 a codepoint boundary — and falls back to a neutral highlight for anything it does
 not recognise. `"cheater"`, `"leader"` and `"carrier"` are examples, not assigned
@@ -453,9 +543,10 @@ what to do with it and relays it to the players it chooses. Clients that support
 the extension translate the id themselves in their own language; clients without
 the extension receive the canonical English text as fallback.
 
-A single packet used in both directions, as for the Ping. Nothing but ids travels
-here — there is no text field at all, so a client cannot smuggle words through it,
-and everything it can say is something every other client can already read.
+A single packet used in both directions, as for the Ping. Nothing but ids and
+numbers travels here — there is no text field at all, so a client cannot smuggle
+words through it, and everything it can say is something every other client can
+already read.
 
 | Field Name    | Field Type | Example | Notes                                                                   |
 |---------------|------------|---------|---------------------------------------------------------------------------|
@@ -465,6 +556,7 @@ and everything it can say is something every other client can already read.
 | Target ID     | UByte      | `9`     | The player the message is addressed to, `255` for nobody in particular. Set by the client. |
 | Chat Type     | UByte      | `1`     | Where the message lands, see below. Server -> client only: a client sends `0` and the server assigns it. |
 | Message ID    | UByte      | `52`    | Catalogue id, `1`-`255`. `0` must not be sent; Message packets require a predefined message. |
+| Arguments     | varies     | —       | Values for the Message ID's parameters, empty for an id that takes none. See [Message parameters](#message-parameters). |
 
 **Target ID** determines the message channel: a specific player ID sends a direct message to that player; `255` sends a team message that the server relays only to the team. The server decides whether to relay the message.
 
@@ -492,9 +584,12 @@ in the chat window, `3`-`6` in whatever alert or centre-screen view it uses for
 them — and adds nothing new. The extension changes what travels on the wire, not
 where a message appears on screen.
 
-The packet is a fixed 6 bytes and carries no text: the id *is* the message. That
-is the whole point, and it is why a message costs 6 bytes where the same sentence
-costs 20 to 60 as chat.
+The packet is 6 bytes and carries no text: the id *is* the message. That is the
+whole point, and it is why a message costs 6 bytes where the same sentence costs
+20 to 60 as chat. The few ids that take
+[parameters](#message-parameters) add their values to that — four bytes for a
+number, one for a player — so *"there are 3 of them"* is 10 bytes and
+*"Ana has the intel"* is 7, and neither is a string.
 
 #### English fallback
 
@@ -513,9 +608,17 @@ words when its peer cannot speak in ids:
   per extension, so the server knows a client's catalogue. Ids beyond it are sent
   to that client as English text rather than as a Message packet.
 
-All canonical strings are pure ASCII, so the fallback survives the base
-protocol's CP437 chat encoding without needing the
-[UTF-8 Chat](#utf-8-chat) convention.
+Whoever writes the fallback line fills the template in: a server sending an id
+with [parameters](#message-parameters) to a client that cannot receive one
+substitutes the values into the canonical English itself, rendering `%p` as the
+player's name, and sends the finished sentence. A client falling back the other
+way does the same with the values it was about to send.
+
+Canonical strings are pure ASCII, so the fallback survives the base protocol's
+CP437 chat encoding without needing the [UTF-8 Chat](#utf-8-chat) convention. A
+substituted player name is the exception and is not ASCII in general; a server
+encodes such a line as its chat encoding requires, which is the same problem the
+name already poses everywhere else it appears.
 
 A client that receives an id it does not know renders nothing for it. It must not
 invent a placeholder line, and it must not disconnect.
@@ -529,7 +632,8 @@ invent a placeholder line, and it must not disconnect.
 
 The catalogue is a fixed table of short phrases, each with a one byte id. A
 client sends the id — in a Message, or as the label of a Ping — and the server
-relays it to other clients. Clients that support the extension translate the id
+relays it to other clients. A few of the phrases are templates that take
+[parameters](#message-parameters), and the values travel with the id. Clients that support the extension translate the id
 in their own language; the canonical English text below is what clients without
 the extension receive as fallback, and what goes on the wire when a peer does not
 support the extension.
@@ -564,17 +668,39 @@ packets use, and it must never appear in a Message packet.
 | 7  | Sorry        | 15 | Not Ready    |
 | 8  | My Bad       |    |              |
 
-#### 16-31 — Numbers
+#### 16-31 — Parametric messages
 
-| Id      | English text        |
-|---------|---------------------|
-| 16-25   | `1` … `10`          |
-| 26      | Many                |
-| 27-31   | reserved            |
+The entries that take [parameters](#message-parameters). They are gathered here
+rather than spread through the categories below so that an implementation can
+find them all with one range check, and so that the frozen list of signatures is
+one table.
 
-A bare number usually answers "how many of them?", but the catalogue does not fix
-that; it is the one entry whose meaning comes from what it answers. Clients
-should render it exactly as the digits, which every language reads.
+| Id | English text           | Parameters   |
+|----|------------------------|--------------|
+| 16 | There Are %1$i Of Them | `%i`         |
+| 17 | %1$i Enemies Left      | `%i`         |
+| 18 | I Need %1$i More       | `%i`         |
+| 19 | %1$p Has The Intel     | `%p`         |
+| 20 | Follow %1$p            | `%p`         |
+| 21 | Cover %1$p             | `%p`         |
+| 22 | Help %1$p              | `%p`         |
+| 23-31 | reserved            |              |
+
+There is deliberately no entry that is only a number. A bare `7` is not a thing
+anybody says; it is an answer to a question the catalogue cannot see, and a
+listener who missed the question reads nothing at all. *"There are 7 of them"*
+says the same thing on its own, in one id, for any number — which is what a table
+of the digits `1` to `10` was reaching for and could not hold.
+
+`I Need %1$i More` names no object on purpose. What is needed is what the player
+is short of, and the ping or the situation says which; an id per resource would
+be a row of near-identical entries that translate no better.
+
+The `%p` entries are the only way this catalogue names anybody. Everything else
+in it is first or third person — `Follow Me`, `Cover Me`, `I Have The Intel`,
+`They Have Our Intel` — and a player who wants to say *who* has had no id for it
+and has had to fall back to chat, in their own language, which is the thing this
+extension exists to avoid.
 
 #### 32-47 — Enemy contact
 
@@ -735,9 +861,14 @@ send them and ignores them on receipt.
 
 #### Notes for implementers
 
-The canonical strings are the translation keys. A client translates by **id**,
-never by matching the English text it received, and never localises anything a
-peer might parse back.
+The **id** is the translation key. A client translates by id, never by matching
+the English text it received, and never localises anything a peer might parse
+back. English is one language in the table like any other, and a client whose
+user reads English looks the id up exactly as every other client does.
+
+A translation of a parametric entry must carry every marker its canonical English
+carries, exactly once each, and may put them in any order using their positional
+form.
 
 ### Per-player state
 
@@ -745,8 +876,9 @@ Everything this extension creates belongs to a player id, and all of it is freed
 the moment that player leaves. When a client receives
 [Player Left](protocol075.html#player-left) for an id it drops, for that id: the
 player's active ping, the ESP mark on them if any, and any predefined message
-still displayed that named them as sender or as target. The server drops the same
-things on its side and stops referring to the id.
+still displayed that named them as sender, as target, or as the value of a
+[`%p`](#message-parameters). The server drops the same things on its side and
+stops referring to the id.
 
 The reason is that ids are recycled. A mark or a ping outliving its owner does
 not fade away quietly — it lands on whoever takes the id next, and that player is
