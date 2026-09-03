@@ -481,12 +481,18 @@ likely to want falls out of the same five bytes:
 The label works exactly as on a Ping: a non-zero Message ID renders the
 [predefined message](#predefined-messages) for that id, translated, and the
 remaining bytes are that id's [parameter values](#message-parameters) rather than
-a Reason. Otherwise the client renders Reason, which follows the Ping's rules — remaining bytes of the packet, no length prefix or
-terminator, validated by the server as well-formed UTF-8, capped and truncated on
-a codepoint boundary — and falls back to a neutral highlight for anything it does
-not recognise. `"cheater"`, `"leader"` and `"carrier"` are examples, not assigned
-values. Both empty is valid and is the common case: the packet is then 9 bytes and
-the client shows the player highlighted with no label.
+a Reason. Otherwise the client renders Reason, which follows the Ping's rules —
+remaining bytes of the packet, no length prefix or terminator, validated by the
+server as well-formed UTF-8, capped and truncated on a codepoint boundary — and
+falls back to a neutral highlight for anything it does not recognise.
+`"cheater"`, `"leader"` and `"carrier"` are examples, not assigned values. Both
+empty is valid and is the common case: the packet is then 9 bytes and the client
+shows the player highlighted with no label.
+
+A server with a catalogue id for the label it wants should send the id rather
+than the string — [`Target` and `Cheater`](#singling-out-a-player) exist for
+this — so that the label arrives translated rather than in the server's
+language.
 
 The audience is the set of clients the server sends the packet to; there is no
 audience field. A field would have to be enforced by the client, and a client
@@ -670,21 +676,26 @@ packets use, and it must never appear in a Message packet.
 
 #### 16-31 — Parametric messages
 
-The entries that take [parameters](#message-parameters). They are gathered here
-rather than spread through the categories below so that an implementation can
-find them all with one range check, and so that the frozen list of signatures is
-one table.
+Where a [parametric](#message-parameters) entry goes when it belongs to no one
+category in particular. An entry that clearly belongs to a category stays with it
+— [208-223](#singling-out-a-player) and [224-239](#server-notices) below carry
+their own — and the Parameters column declares the signature wherever it appears.
 
-| Id | English text           | Parameters   |
-|----|------------------------|--------------|
-| 16 | There Are %1$i Of Them | `%i`         |
-| 17 | %1$i Enemies Left      | `%i`         |
-| 18 | I Need %1$i More       | `%i`         |
-| 19 | %1$p Has The Intel     | `%p`         |
-| 20 | Follow %1$p            | `%p`         |
-| 21 | Cover %1$p             | `%p`         |
-| 22 | Help %1$p              | `%p`         |
-| 23-31 | reserved            |              |
+| Id | English text            | Parameters   |
+|----|-------------------------|--------------|
+| 16 | There Are %1$i Of Them  | `%i`         |
+| 17 | %1$i Enemies Left       | `%i`         |
+| 18 | I Need %1$i More        | `%i`         |
+| 19 | %1$p Has The Intel      | `%p`         |
+| 20 | Follow %1$p             | `%p`         |
+| 21 | Cover %1$p              | `%p`         |
+| 22 | Help %1$p               | `%p`         |
+| 23 | Enemy At %1$i O'Clock   | `%i`         |
+| 24 | Target At %1$i O'Clock  | `%i`         |
+| 25 | Enemy At %1$i Degrees   | `%i`         |
+| 26 | %1$i Minutes Remain     | `%i`         |
+| 27 | %1$i Seconds Remain     | `%i`         |
+| 28-31 | reserved             |              |
 
 There is deliberately no entry that is only a number. A bare `7` is not a thing
 anybody says; it is an answer to a question the catalogue cannot see, and a
@@ -702,6 +713,14 @@ in it is first or third person — `Follow Me`, `Cover Me`, `I Have The Intel`,
 and has had to fall back to chat, in their own language, which is the thing this
 extension exists to avoid.
 
+The three bearing entries are read against the **sender**, like the
+[64-79](#directions-relative-to-the-sender) block and unlike the
+[48-63](#directions-relative-to-the-addressed-player) one: `12` o'clock is where
+the sender is looking, `3` is their right, and a bearing in degrees is a compass
+reading on the map, `0` at north and rising clockwise. A server clamps the clock
+entries to `1`-`12` and the degree one to `0`-`359`, as
+[Validation](#validation) requires of any `%i`.
+
 #### 32-47 — Enemy contact
 
 | Id | English text    | Id | English text              |
@@ -713,6 +732,7 @@ extension exists to avoid.
 | 36 | Enemy Tunneling | 43 | All Clear                 |
 | 37 | Enemy Building  | 44 | They Are Digging Under Us |
 | 38 | Enemy Tower     | 45 | Enemy In Our Base         |
+|    |                 | 46 | We Got A Digger           |
 
 #### 48-63 — Directions, relative to the addressed player
 
@@ -851,10 +871,63 @@ naturally with a Ping, which supplies the *where* while the id supplies the
 | 195 | Under The Bridge | 203 | In Our Base      |
 | 196 | In The Tunnel    | 204 | At The Wall      |
 | 197 | In The Water     | 205 | In The Open      |
-| 198 | On The Roof      |     |                  |
+| 198 | On The Roof      | 206 | In The River     |
 | 199 | Behind The Wall  |     |                  |
 
-#### 208-255 — Reserved
+#### 208-223 — Singling out a player
+
+Entries about one player in particular: the quarry of a manhunt, a suspected
+cheater, a griefer, an idler.
+
+| Id  | English text             | Parameters |
+|-----|--------------------------|------------|
+| 208 | Target                   |            |
+| 209 | Hunt %1$p                | `%p`       |
+| 210 | Kill %1$p                | `%p`       |
+| 211 | %1$p Is Enemy Number One | `%p`       |
+| 212 | The Hunt Is Over         |            |
+| 213 | Cheater                  |            |
+| 214 | %1$p Is A Cheater        | `%p`       |
+| 215 | Griefer                  |            |
+| 216 | %1$p Is Afk              | `%p`       |
+| 217 | Cleared                  |            |
+| 218 | I Killed %1$p            | `%p`       |
+| 219-223 | reserved             |            |
+
+`Target`, `Cheater`, `Griefer` and `Cleared` name nobody: they are labels for a
+[Ping](#sub-id-1-ping) or an [ESP Mark](#sub-id-2-esp-mark), whose Player ID
+already says who is meant.
+
+The accusing entries are the block a server is most likely to filter after
+[Reactions](#reactions). A server may drop `%1$p Is A Cheater` and `Griefer`
+outright, relay them to admins alone, or let them through; the protocol takes no
+position.
+
+#### 224-239 — Server notices
+
+The server talking to a player about their connection, and announcing world
+events. Everything here is sent with Player ID `255`, normally as `CHAT_SYSTEM`
+or as one of the [Message Types](#message-types) warning forms; a client never
+sends these, and a server drops them if one does.
+
+| Id  | English text                                  | Parameters |
+|-----|-----------------------------------------------|------------|
+| 224 | Your Client Is Outdated, Please Upgrade       |            |
+| 225 | Your Client Is Missing Features Required Here |            |
+| 226 | You Are At A Disadvantage                     |            |
+| 227 | You Seem Afk                                  |            |
+| 228 | Final Warning                                 |            |
+| 229 | You Will Be Kicked In %1$i Seconds            | `%i`       |
+| 230 | The Bridge Has Collapsed                      |            |
+| 231 | The Tower Has Collapsed                       |            |
+| 232-239 | reserved                                  |            |
+
+`224` and `225` follow from what [`ExtInfo`](#extinfo-packet) told the server;
+`226` is for a client that connects but lacks something the server's game leans
+on. `228` and `229` are the warning before a kick, where
+[Kick Reason](#kick-reason) carries the reason itself.
+
+#### 240-255 — Reserved
 
 Free for later versions of this extension. A version 1 client or server must not
 send them and ignores them on receipt.
