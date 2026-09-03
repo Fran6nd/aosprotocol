@@ -583,12 +583,23 @@ decides who sees its pings. The values are those of the base
 
 Values `3`-`6` need the [Message Types](#message-types) extension; a server sends
 them only to clients that negotiated it and downgrades to `2` (CHAT_SYSTEM) for the
-rest. `7` is defined here, so it needs only this extension.
+rest. `7` is this extension's own, and a client that negotiated it has already
+said it understands the value.
+
+`7` is equally valid on the base [Chat Message](protocol075.html#chat-message)
+packet, which is how a server sends a private line of free text: that packet
+carries the sender in its Player ID and the recipient is the client it was sent
+to, so nothing else is needed. Both packets follow the same rule as `3`-`6` —
+server -> client only, sent only to a client that negotiated this extension, `2`
+or the server's existing private form for the rest. A client never sends `7` in
+either packet, and asks for a private message the way its server already
+provides.
 
 A client renders each type where its existing chat already puts it — a chat line
 in the chat window, `3`-`6` in whatever alert or centre-screen view it uses for
-them — and adds nothing new. The extension changes what travels on the wire, not
-where a message appears on screen.
+them, `7` wherever it shows a private message — and adds nothing new. The
+extension changes what travels on the wire, not where a message appears on
+screen.
 
 The packet is 6 bytes and carries no text: the id *is* the message. That is the
 whole point, and it is why a message costs 6 bytes where the same sentence costs
