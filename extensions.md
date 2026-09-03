@@ -484,15 +484,14 @@ remaining bytes are that id's [parameter values](#message-parameters) rather tha
 a Reason. Otherwise the client renders Reason, which follows the Ping's rules —
 remaining bytes of the packet, no length prefix or terminator, validated by the
 server as well-formed UTF-8, capped and truncated on a codepoint boundary — and
-falls back to a neutral highlight for anything it does not recognise.
-`"cheater"`, `"leader"` and `"carrier"` are examples, not assigned values. Both
-empty is valid and is the common case: the packet is then 9 bytes and the client
-shows the player highlighted with no label.
+falls back to a neutral highlight for anything it does not recognise. Both empty
+is valid and is the common case: the packet is then 9 bytes and the client shows
+the player highlighted with no label.
 
-A server with a catalogue id for the label it wants should send the id rather
-than the string — [`Target` and `Cheater`](#singling-out-a-player) exist for
-this — so that the label arrives translated rather than in the server's
-language.
+A Reason is for a label the catalogue has no id for. Where it has one — the
+single-word entries at [208-223](#singling-out-a-player) exist for exactly this
+job — a server sends the id instead, so that the label arrives translated rather
+than in the server's language.
 
 The audience is the set of clients the server sends the packet to; there is no
 audience field. A field would have to be enforced by the client, and a client
@@ -860,7 +859,7 @@ and here the id itself says whose right it is.
 | 178 | Wow          | 185 | Camper       |
 | 179 | Oops         | 186 | Too easy     |
 | 180 | Close one    | 187 | Rip          |
-| 181 | Let's go     |     |              |
+| 181 | Let's go     | 188 | Loser        |
 | 182 | We got this  |     |              |
 
 This block is the one a server is most likely to filter, and filtering it is
@@ -888,8 +887,8 @@ naturally with a Ping, which supplies the *where* while the id supplies the
 
 #### 208-223 — Singling out a player
 
-Entries about one player in particular: the quarry of a manhunt, a suspected
-cheater, a griefer, an idler.
+Entries about one player in particular: the quarry of a manhunt, a hostage, the
+intel carrier, a suspected cheater, a griefer, an idler.
 
 | Id  | English text             | Parameters |
 |-----|--------------------------|------------|
@@ -905,11 +904,16 @@ cheater, a griefer, an idler.
 | 217 | Cleared                  |            |
 | 218 | I killed %1$p            | `%p`       |
 | 219 | %1$p is under assault    | `%p`       |
-| 220-223 | reserved             |            |
+| 220 | Enemy                    |            |
+| 221 | Hostage                  |            |
+| 222 | Leader                   |            |
+| 223 | Carrier                  |            |
 
-`Target`, `Cheater`, `Griefer` and `Cleared` name nobody: they are labels for a
+The single-word entries name nobody: they are labels for a
 [Ping](#sub-id-1-ping) or an [ESP Mark](#sub-id-2-esp-mark), whose Player ID
-already says who is meant.
+already says who is meant. `Enemy`, `Hostage`, `Leader` and `Carrier` are roles a
+server assigns; `Target`, `Cheater`, `Griefer` and `Cleared` are what it or a
+team says about the player holding one.
 
 The accusing entries are the block a server is most likely to filter after
 [Reactions](#reactions). A server may drop `%1$p is a cheater` and `Griefer`
