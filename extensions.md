@@ -677,13 +677,13 @@ packets use, and it must never appear in a Message packet.
 | Id | English text | Id | English text |
 |----|--------------|----|--------------|
 | 1  | Yes          | 9  | Hello        |
-| 2  | No           | 10 | Good Game    |
-| 3  | Affirmative  | 11 | Nice Shot    |
-| 4  | Negative     | 12 | Well Played  |
+| 2  | No           | 10 | Good game    |
+| 3  | Affirmative  | 11 | Nice shot    |
+| 4  | Negative     | 12 | Well played  |
 | 5  | Understood   | 13 | Wait         |
-| 6  | Thank You    | 14 | Ready        |
-| 7  | Sorry        | 15 | Not Ready    |
-| 8  | My Bad       |    |              |
+| 6  | Thank you    | 14 | Ready        |
+| 7  | Sorry        | 15 | Not ready    |
+| 8  | My bad       |    |              |
 
 #### 16-31 — Parametric messages
 
@@ -694,18 +694,18 @@ their own — and the Parameters column declares the signature wherever it appea
 
 | Id | English text            | Parameters   |
 |----|-------------------------|--------------|
-| 16 | There Are %1$i Of Them  | `%i`         |
-| 17 | %1$i Enemies Left       | `%i`         |
-| 18 | I Need %1$i More        | `%i`         |
-| 19 | %1$p Has The Intel      | `%p`         |
+| 16 | There are %1$i of them  | `%i`         |
+| 17 | %1$i enemies left       | `%i`         |
+| 18 | I need %1$i more        | `%i`         |
+| 19 | %1$p has the intel      | `%p`         |
 | 20 | Follow %1$p             | `%p`         |
 | 21 | Cover %1$p              | `%p`         |
 | 22 | Help %1$p               | `%p`         |
-| 23 | Enemy At %1$i O'Clock   | `%i`         |
-| 24 | Target At %1$i O'Clock  | `%i`         |
-| 25 | Enemy At %1$i Degrees   | `%i`         |
-| 26 | %1$i Minutes Remain     | `%i`         |
-| 27 | %1$i Seconds Remain     | `%i`         |
+| 23 | Enemy at %1$i o'clock   | `%i`         |
+| 24 | Target at %1$i o'clock  | `%i`         |
+| 25 | Enemy at %1$i degrees   | `%i`         |
+| 26 | %1$i minutes remain     | `%i`         |
+| 27 | %1$i seconds remain     | `%i`         |
 | 28-31 | reserved             |              |
 
 There is deliberately no entry that is only a number. A bare `7` is not a thing
@@ -714,13 +714,13 @@ listener who missed the question reads nothing at all. *"There are 7 of them"*
 says the same thing on its own, in one id, for any number — which is what a table
 of the digits `1` to `10` was reaching for and could not hold.
 
-`I Need %1$i More` names no object on purpose. What is needed is what the player
+`I need %1$i more` names no object on purpose. What is needed is what the player
 is short of, and the ping or the situation says which; an id per resource would
 be a row of near-identical entries that translate no better.
 
 The `%p` entries are the only way this catalogue names anybody. Everything else
-in it is first or third person — `Follow Me`, `Cover Me`, `I Have The Intel`,
-`They Have Our Intel` — and a player who wants to say *who* has had no id for it
+in it is first or third person — `Follow me`, `Cover me`, `I have the intel`,
+`They have our intel` — and a player who wants to say *who* has had no id for it
 and has had to fall back to chat, in their own language, which is the thing this
 extension exists to avoid.
 
@@ -736,14 +736,14 @@ entries to `1`-`12` and the degree one to `0`-`359`, as
 
 | Id | English text    | Id | English text              |
 |----|-----------------|----|---------------------------|
-| 32 | Enemy Spotted   | 39 | They Are Pushing          |
-| 33 | Enemies Here    | 40 | They Are Flanking         |
-| 34 | Enemy Sniper    | 41 | Spawnkiller!              |
-| 35 | Enemy Camping   | 42 | Clear                     |
-| 36 | Enemy Tunneling | 43 | All Clear                 |
-| 37 | Enemy Building  | 44 | They Are Digging Under Us |
-| 38 | Enemy Tower     | 45 | Enemy In Our Base         |
-|    |                 | 46 | We Got A Digger           |
+| 32 | Enemy spotted   | 39 | They are pushing          |
+| 33 | Enemies here    | 40 | They are flanking         |
+| 34 | Enemy sniper    | 41 | Spawnkiller!              |
+| 35 | Enemy camping   | 42 | Clear                     |
+| 36 | Enemy tunneling | 43 | All clear                 |
+| 37 | Enemy building  | 44 | They are digging under us |
+| 38 | Enemy tower     | 45 | Enemy in our base         |
+|    |                 | 46 | We got a digger           |
 
 #### 48-63 — Directions, relative to the addressed player
 
@@ -752,11 +752,11 @@ the direction is the one they are facing.
 
 | Id | English text  | Id | English text     |
 |----|---------------|----|------------------|
-| 48 | Behind You    | 53 | In Front Of You  |
-| 49 | On Your Left  | 54 | They See You     |
-| 50 | On Your Right | 55 | Watch Your Back  |
-| 51 | Above You     | 56 | Look Behind You  |
-| 52 | Below You     |    |                  |
+| 48 | Behind you    | 53 | In front of you  |
+| 49 | On your left  | 54 | They see you     |
+| 50 | On your right | 55 | Watch your back  |
+| 51 | Above you     | 56 | Look behind you  |
+| 52 | Below you     |    |                  |
 
 #### 64-79 — Directions, relative to the sender
 
@@ -766,105 +766,105 @@ and here the id itself says whose right it is.
 
 | Id | English text   | Id | English text    |
 |----|----------------|----|-----------------|
-| 64 | Behind Us!     | 71 | They Are Below  |
-| 65 | On Our Left    | 72 | Over There      |
-| 66 | On Our Right   | 73 | Up There        |
-| 67 | Above Us       | 74 | Down There      |
-| 68 | Below Us       | 75 | Everywhere!     |
-| 69 | In Front Of Us | 76 | Right Here      |
-| 70 | They Are Above |    |                 |
+| 64 | Behind us!     | 71 | They are below  |
+| 65 | On our left    | 72 | Over there      |
+| 66 | On our right   | 73 | Up there        |
+| 67 | Above us       | 74 | Down there      |
+| 68 | Below us       | 75 | Everywhere!     |
+| 69 | In front of us | 76 | Right here      |
+| 70 | They are above |    |                 |
 
 #### 80-95 — Requests
 
 | Id | English text   | Id | English text     |
 |----|----------------|----|------------------|
-| 80 | Help Me        | 88 | Help Me Build    |
-| 81 | Cover Me       | 89 | Give Me A Boost  |
-| 82 | Follow Me      | 90 | Open The Wall    |
-| 83 | Wait For Me    | 91 | Close The Wall   |
-| 84 | Come Here      | 92 | Let Me Through   |
-| 85 | I Need Blocks  | 93 | Guard This Spot  |
-| 86 | I Need Ammo    | 94 | Heal Me          |
-| 87 | I Need Health  | 95 | Dig Me Out       |
+| 80 | Help me        | 88 | Help me build    |
+| 81 | Cover me       | 89 | Give me a boost  |
+| 82 | Follow me      | 90 | Open the wall    |
+| 83 | Wait for me    | 91 | Close the wall   |
+| 84 | Come here      | 92 | Let me through   |
+| 85 | I need blocks  | 93 | Guard this spot  |
+| 86 | I need ammo    | 94 | Heal me          |
+| 87 | I need health  | 95 | Dig me out       |
 
 #### 96-111 — Orders and tactics
 
 | Id  | English text          | Id  | English text     |
 |-----|-----------------------|-----|------------------|
-| 96  | Attack                | 104 | On My Command    |
-| 97  | Defend                | 105 | Prepare For Assault |
-| 98  | Fall Back             | 106 | Flank Left       |
-| 99  | Regroup               | 107 | Flank Right      |
-| 100 | Push Up               | 108 | Go Around        |
-| 101 | Hold Position         | 109 | Rush Them        |
-| 102 | Spread Out            | 110 | Take Cover       |
-| 103 | All Together          | 111 | Kick Their Butt  |
+| 96  | Attack                | 104 | On my command    |
+| 97  | Defend                | 105 | Prepare for assault |
+| 98  | Fall back             | 106 | Flank left       |
+| 99  | Regroup               | 107 | Flank right      |
+| 100 | Push up               | 108 | Go around        |
+| 101 | Hold position         | 109 | Rush them        |
+| 102 | Spread out            | 110 | Take cover       |
+| 103 | All together          | 111 | Kick their butt  |
 
 #### 112-127 — Objective
 
 | Id  | English text         | Id  | English text        |
 |-----|----------------------|-----|---------------------|
-| 112 | Get The Intel        | 119 | Capture This Point  |
-| 113 | I Have The Intel     | 120 | Defend This Point   |
-| 114 | They Have Our Intel  | 121 | Enemy Base          |
-| 115 | Defend Our Intel     | 122 | Our Base            |
-| 116 | Bring It Home        | 123 | Meet At Our Base    |
-| 117 | I Am Escorting You   | 124 | Go Restock          |
-| 118 | Cover The Carrier    | 125 | Restock First       |
-|     |                      | 126 | Our Base Is Under Assault |
+| 112 | Get the intel        | 119 | Capture this point  |
+| 113 | I have the intel     | 120 | Defend this point   |
+| 114 | They have our intel  | 121 | Enemy base          |
+| 115 | Defend our intel     | 122 | Our base            |
+| 116 | Bring it home        | 123 | Meet at our base    |
+| 117 | I am escorting you   | 124 | Go restock          |
+| 118 | Cover the carrier    | 125 | Restock first       |
+|     |                      | 126 | Our base is under assault |
 
 #### 128-143 — Building and digging
 
 | Id  | English text        | Id  | English text     |
 |-----|---------------------|-----|------------------|
-| 128 | Build Here          | 136 | Do Not Dig Here  |
-| 129 | Dig Here            | 137 | Tear It Down!    |
-| 130 | Build A Bridge Here | 138 | Nice Build       |
-| 131 | Dig A Tunnel Here   | 139 | Watch The Fall   |
-| 132 | Build A Wall Here   | 140 | I Am Building    |
-| 133 | Build A Tower Here  | 141 | Block The Way    |
-| 134 | Make Stairs Here    |     |                  |
-| 135 | Fill This Hole      |     |                  |
+| 128 | Build here          | 136 | Do not dig here  |
+| 129 | Dig here            | 137 | Tear it down!    |
+| 130 | Build a bridge here | 138 | Nice build       |
+| 131 | Dig a tunnel here   | 139 | Watch the fall   |
+| 132 | Build a wall here   | 140 | I am building    |
+| 133 | Build a tower here  | 141 | Block the way    |
+| 134 | Make stairs here    |     |                  |
+| 135 | Fill this hole      |     |                  |
 
 #### 144-159 — Own status
 
 | Id  | English text       | Id  | English text        |
 |-----|--------------------|-----|---------------------|
-| 144 | On My Way          | 152 | I Am Dead           |
-| 145 | In Position        | 153 | Respawning          |
-| 146 | I Follow You       | 154 | I Am Sniping Here   |
-| 147 | I Am Low           | 155 | I Am Flanking       |
-| 148 | I Am Out Of Blocks | 156 | I Am Digging In     |
-| 149 | I Am Out Of Ammo   | 157 | Going Back To Base  |
-| 150 | Reloading          | 158 | I Am Lost           |
-| 151 | I Am Hit           |     |                     |
+| 144 | On my way          | 152 | I am dead           |
+| 145 | In position        | 153 | Respawning          |
+| 146 | I follow you       | 154 | I am sniping here   |
+| 147 | I am low           | 155 | I am flanking       |
+| 148 | I am out of blocks | 156 | I am digging in     |
+| 149 | I am out of ammo   | 157 | Going back to base  |
+| 150 | Reloading          | 158 | I am lost           |
+| 151 | I am hit           |     |                     |
 
 #### 160-175 — Warnings
 
 | Id  | English text     | Id  | English text     |
 |-----|------------------|-----|------------------|
-| 160 | Grenade!         | 167 | Cave In!         |
-| 161 | Watch Out!       | 168 | Do Not Shoot     |
-| 162 | Look Up          | 169 | Hold Your Fire   |
-| 163 | Look Down        | 170 | Friendly Fire!   |
+| 160 | Grenade!         | 167 | Cave in!         |
+| 161 | Watch out!       | 168 | Do not shoot     |
+| 162 | Look up          | 169 | Hold your fire   |
+| 163 | Look down        | 170 | Friendly fire!   |
 | 164 | Careful          | 171 | Stop             |
-| 165 | Do Not Go There  | 172 | Stop Griefing    |
-| 166 | Falling Blocks!  | 173 | Do Not Fall      |
+| 165 | Do not go there  | 172 | Stop griefing    |
+| 166 | Falling blocks!  | 173 | Do not fall      |
 
 #### 176-191 — Reactions
 
 | Id  | English text | Id  | English text |
 |-----|--------------|-----|--------------|
-| 176 | Lol          | 183 | Good Try     |
+| 176 | Lol          | 183 | Good try     |
 | 177 | Nice         | 184 | Revenge!     |
 | 178 | Wow          | 185 | Camper       |
-| 179 | Oops         | 186 | Too Easy     |
-| 180 | Close One    | 187 | Rip          |
-| 181 | Let's Go     |     |              |
-| 182 | We Got This  |     |              |
+| 179 | Oops         | 186 | Too easy     |
+| 180 | Close one    | 187 | Rip          |
+| 181 | Let's go     |     |              |
+| 182 | We got this  |     |              |
 
 This block is the one a server is most likely to filter, and filtering it is
-expected: a server that considers `Too Easy` or `Camper` an invitation to
+expected: a server that considers `Too easy` or `Camper` an invitation to
 needling drops those ids and relays the rest. That decision belongs to the
 server, which is why the catalogue carries them rather than pretending players
 will not find a way to say them.
@@ -877,14 +877,14 @@ naturally with a Ping, which supplies the *where* while the id supplies the
 
 | Id  | English text     | Id  | English text     |
 |-----|------------------|-----|------------------|
-| 192 | At The Tent      | 200 | On The Hill      |
-| 193 | At The Intel     | 201 | In The Trench    |
-| 194 | On The Bridge    | 202 | In Their Base    |
-| 195 | Under The Bridge | 203 | In Our Base      |
-| 196 | In The Tunnel    | 204 | At The Wall      |
-| 197 | In The Water     | 205 | In The Open      |
-| 198 | On The Roof      | 206 | In The River     |
-| 199 | Behind The Wall  |     |                  |
+| 192 | At the tent      | 200 | On the hill      |
+| 193 | At the intel     | 201 | In the trench    |
+| 194 | On the bridge    | 202 | In their base    |
+| 195 | Under the bridge | 203 | In our base      |
+| 196 | In the tunnel    | 204 | At the wall      |
+| 197 | In the water     | 205 | In the open      |
+| 198 | On the roof      | 206 | In the river     |
+| 199 | Behind the wall  |     |                  |
 
 #### 208-223 — Singling out a player
 
@@ -896,15 +896,15 @@ cheater, a griefer, an idler.
 | 208 | Target                   |            |
 | 209 | Hunt %1$p                | `%p`       |
 | 210 | Kill %1$p                | `%p`       |
-| 211 | %1$p Is Enemy Number One | `%p`       |
-| 212 | The Hunt Is Over         |            |
+| 211 | %1$p is enemy number one | `%p`       |
+| 212 | The hunt is over         |            |
 | 213 | Cheater                  |            |
-| 214 | %1$p Is A Cheater        | `%p`       |
+| 214 | %1$p is a cheater        | `%p`       |
 | 215 | Griefer                  |            |
-| 216 | %1$p Is Afk              | `%p`       |
+| 216 | %1$p is afk              | `%p`       |
 | 217 | Cleared                  |            |
-| 218 | I Killed %1$p            | `%p`       |
-| 219 | %1$p Is Under Assault    | `%p`       |
+| 218 | I killed %1$p            | `%p`       |
+| 219 | %1$p is under assault    | `%p`       |
 | 220-223 | reserved             |            |
 
 `Target`, `Cheater`, `Griefer` and `Cleared` name nobody: they are labels for a
@@ -912,7 +912,7 @@ cheater, a griefer, an idler.
 already says who is meant.
 
 The accusing entries are the block a server is most likely to filter after
-[Reactions](#reactions). A server may drop `%1$p Is A Cheater` and `Griefer`
+[Reactions](#reactions). A server may drop `%1$p is a cheater` and `Griefer`
 outright, relay them to admins alone, or let them through; the protocol takes no
 position.
 
@@ -925,20 +925,20 @@ client never sends these, and a server drops them if one does.
 
 | Id  | English text                                  | Parameters |
 |-----|-----------------------------------------------|------------|
-| 224 | Your Client Is Outdated, Please Upgrade       |            |
-| 225 | Your Client Is Missing Features Required Here |            |
-| 226 | You Are At A Disadvantage                     |            |
-| 227 | You Seem Afk                                  |            |
-| 228 | Final Warning                                 |            |
-| 229 | You Will Be Kicked In %1$i Seconds            | `%i`       |
-| 230 | The Bridge Has Collapsed                      |            |
-| 231 | The Tower Has Collapsed                       |            |
-| 232 | Welcome To The Server, %1$p                   | `%p`       |
-| 233 | Intel Captured                                |            |
-| 234 | Intel Lost                                    |            |
-| 235 | Our Intel Has Disappeared                     |            |
-| 236 | Base Captured                                 |            |
-| 237 | Base Lost                                     |            |
+| 224 | Your client is outdated, please upgrade       |            |
+| 225 | Your client is missing features required here |            |
+| 226 | You are at a disadvantage                     |            |
+| 227 | You seem afk                                  |            |
+| 228 | Final warning                                 |            |
+| 229 | You will be kicked in %1$i seconds            | `%i`       |
+| 230 | The bridge has collapsed                      |            |
+| 231 | The tower has collapsed                       |            |
+| 232 | Welcome to the server, %1$p                   | `%p`       |
+| 233 | Intel captured                                |            |
+| 234 | Intel lost                                    |            |
+| 235 | Our intel has disappeared                     |            |
+| 236 | Base captured                                 |            |
+| 237 | Base lost                                     |            |
 | 238-239 | reserved                                  |            |
 
 `224` and `225` follow from what [`ExtInfo`](#extinfo-packet) told the server;
@@ -965,6 +965,10 @@ user reads English looks the id up exactly as every other client does.
 A translation of a parametric entry must carry every marker its canonical English
 carries, exactly once each, and may put them in any order using their positional
 form.
+
+Canonical English is written in sentence case: the first word is capitalised and
+the rest are not. A translation follows its own language's rules instead, and a
+client is free to case an entry as its interface wants.
 
 ### Per-player state
 
