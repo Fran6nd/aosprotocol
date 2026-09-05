@@ -27,7 +27,8 @@ additional values in, or certain behaviours related to, existing packets.
 
 A few extensions are in use without ever having been given an id. They cannot be
 negotiated through the `ExtInfo` packet, so support for them has to be assumed or
-detected some other way.
+detected some other way. The registry lists them as `unregistered`; they are not
+a third extension type, only extensions that were never registered.
 
 ## Extension Packets
 

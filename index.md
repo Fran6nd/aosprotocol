@@ -20,15 +20,9 @@ The 0.75 protocol supports extensions, which allow adding new packets as well as
 querying the support for client and server functionality.
 
 The ids, types and negotiation mechanism are described in
-[Extensions](extensions/extension.html), and the registry of every known
-extension is listed in the [0.75 documentation](protocol075.html#extensions).
-Each extension has its own specification under `extensions/`:
-
- * [Player Properties](extensions/player-properties.html) (0)
- * [Player Limit](extensions/player-limit.html) (192)
- * [Message Types](extensions/message-types.html) (193)
- * [Kick Reason](extensions/kick-reason.html) (194)
- * [UTF-8 Chat](extensions/utf-8-chat.html) (unregistered)
+[Extensions](extensions/extension.html). The registry of every known extension,
+with its id and a link to its specification, is listed in the
+[0.75 documentation](protocol075.html#extensions).
 
 ### Implementers
  * [OpenSpades](https://github.com/yvt/openspades)
