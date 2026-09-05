@@ -19,32 +19,15 @@ reverse engineered to document the protocol.
 The 0.75 protocol supports extensions, which allow adding new packets as well as
 querying the support for client and server functionality.
 
-### Extensions providing packets
+The negotiation mechanism and the registry of extension ids are documented in
+[Extensions](protocol075.html#extensions), and each extension has its own
+specification under `extensions/`:
 
-Packetful extensions are extensions that can be used to send packets. Each
-extension has 256 packet types reserved for itself. This is useful for adding
-functionality that requires sending additional information from or to the client.
-
-| ID | Name              | Description                                                      | Link                                                   |
-|----|-------------------|------------------------------------------------------------------|--------------------------------------------------------|
-| 0  | Player Properties | Sends additional player attributes from the server to the client | [Player Properties](extensions.html#player-properties) |
-
-
-### Packetless Extensions
-
-Packetless extensions are extensions that can not send any packets. This is useful
-for signalling support for additional values in or certain behaviours related to
-existing packets.
-
-Packetless extensions exist as an artefact of the implementation of extensions.
-As the space reserved for extension packets is limited, values above 192 do not
-have any packet types left.
-
-| ID  | Name                                           | Description                                           |
-|-----|------------------------------------------------|-------------------------------------------------------|
-| 192 | [Player Limit](extensions.html#player-limit)   | Support for up to 256 players                         |
-| 193 | [Message Types](extensions.html#message-types) | Additional message types such as warnings and statuses|
-| 194 | [Kick Reason](extensions.html#kick-reason)     | Repurposes the chat to send a disconnect reason text  |
+ * [Player Properties](extensions/player-properties.html) (0)
+ * [Player Limit](extensions/player-limit.html) (192)
+ * [Message Types](extensions/message-types.html) (193)
+ * [Kick Reason](extensions/kick-reason.html) (194)
+ * [UTF-8 Chat](extensions/utf-8-chat.html) (unregistered)
 
 ### Implementers
  * [OpenSpades](https://github.com/yvt/openspades)
