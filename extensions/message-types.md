@@ -21,5 +21,4 @@ the player's screen.
 | 5     | CHAT_WARNING | Displays a warning                    |
 | 6     | CHAT_ERROR   | Displays a error                      |
 
-See [Extensions](../protocol075.html#extensions) for how the extension is
-negotiated.
+See [Extensions](extension.html) for how the extension is negotiated.

@@ -86,12 +86,6 @@ this byte.
 * [Change Weapon](#change-weapon)
 * [Map Cached (0.76)](#map-cached-076)
 * [Extensions](#extensions)
-* [Extension Types](#extension-types)
-* [Extensions Providing Packets](#extensions-providing-packets)
-* [Packetless Extensions](#packetless-extensions)
-* [Unregistered Extensions](#unregistered-extensions)
-* [ExtInfo Packet](#extinfo-packet)
-* [Extension Negotiation Flow](#extension-negotiation-flow)
 * [Extra Packets](#extra-packets)
 * [Version Handshake Init (EP)](#version-handshake-init-ep)
 * [Version Handshake Response (EP)](#version-handshake-response-ep)
@@ -893,98 +887,22 @@ clients of the weapon change.
 # Extensions
 
 The 0.75 protocol supports extensions, which allow adding new packets as well as
-querying the support for client and server functionality.
+querying the support for client and server functionality. Each extension is given
+a unique id when it is first registered, and is negotiated with the `ExtInfo`
+packet (id 60).
 
-Each extension is given a unique id that is decided when it is first registered,
-and is specified in its own file under `extensions/`. The tables below are the
-registry of those ids, and link to each extension's specification.
+How ids are allocated, what `HAS_PACKETS` and `PACKETLESS` mean, the extension
+packet layout and the negotiation flow are all described in
+[Extensions](extensions/extension.html). Each extension is specified in its own
+file next to it, and the table below is the registry of every known extension.
 
-## Extension Types
-
-We differentiate between two types of extensions:
-
-| Type          | Purpose                               | Extension id range |
-| ------------- | ------------------------------------- | ------------------ |
-| `HAS_PACKETS` | introduce new packets to the protocol | 0-191              |
-| `PACKETLESS`  | don't use and need any packets        | 192-255            |
-
-Each extension is given one legacy packet id equal to `64+extension_id`.
-For `PACKETLESS` extensions this would mean that their packet ids are out
-of spec `>255`, thus they don't have any.
-
-Packetless extensions exist as an artefact of the implementation of extensions.
-As the space reserved for extension packets is limited, values above 191 do not
-have any packet types left. They are still useful for signalling support for
-additional values in, or certain behaviours related to, existing packets. An
-example for a packetless extension would be *OpenSpades'* UnicodeExt.
-
-Each extension packet will contain 1 additional byte in its data, which is a
-subpacket id, used to have multiple packets available for each extension. This
-is always the case, even if an extension only needs 1 packet in total.
-
-General extension packet structure:
-
-| Field name    | Type      | Notes          |
-| ------------- | --------- | -------------- |
-| Packet id     | UByte     | 64-255         |
-| Sub packet id | UByte     | 0-255          |
-| Data          | UByte[]   | extension data |
-
-## Extensions Providing Packets
-
-Packetful extensions are extensions that can be used to send packets. Each
-extension has 256 packet types reserved for itself. This is useful for adding
-functionality that requires sending additional information from or to the client.
-
-| ID | Name                                                     | Description                                                      |
-|----|----------------------------------------------------------|------------------------------------------------------------------|
-| 0  | [Player Properties](extensions/player-properties.html)   | Sends additional player attributes from the server to the client |
-
-## Packetless Extensions
-
-| ID  | Name                                          | Description                                             |
-|-----|-----------------------------------------------|---------------------------------------------------------|
-| 192 | [Player Limit](extensions/player-limit.html)   | Support for up to 256 players                           |
-| 193 | [Message Types](extensions/message-types.html) | Additional message types such as warnings and statuses  |
-| 194 | [Kick Reason](extensions/kick-reason.html)     | Repurposes the chat to send a disconnect reason text    |
-
-## Unregistered Extensions
-
-Extensions that are in use but have never been given an extension id. They are
-not announced through the [ExtInfo Packet](#extinfo-packet), so support for them
-has to be assumed or detected some other way.
-
-| ID   | Name                                       | Description                                       |
-|------|--------------------------------------------|---------------------------------------------------|
-| none | [UTF-8 Chat](extensions/utf-8-chat.html)   | Chat messages prefixed with `0xff` are UTF-8      |
-
-## ExtInfo Packet
-
-| ----------: | ----------------- |
-| Packet ID   | 60                |
-| Total Size: | `2+2*length` bytes |
-
-| Field name | Field type   | Notes                        |
-| ---------- | ------------ | ---------------------------- |
-| length     | UByte        | `length` entries will follow |
-| entries    | ExtInfoEntry | see below                    |
-
-**ExtInfoEntry**
-
-| Field name | Field type | Notes                        |
-| ---------- | ---------- | ---------------------------- |
-| ext. ID    | UByte      | see [Extension Types](#extension-types) |
-| version    | UByte      | Usually starts at 1          |
-
-## Extension Negotiation Flow
-
-The server should send an `ExtInfo` packet (optimally) after the Version Info response has been received to compatible clients
-(OpenSpades versions > 0.1.3, see https://github.com/piqueserver/piqueserver/issues/504),
-assuming it supports any. The client can store the list of extensions for later use and should
-reply with an `ExtInfo` packet that lists the extensions it supports (if it does actually support any).
-
-The client can omit any extensions that the server does not support from its
-reply, but this is not necessary as the server can simply ignore them itself.
+| ID   | Name                                                   | Type          | Description                                                      |
+|------|--------------------------------------------------------|---------------|------------------------------------------------------------------|
+| 0    | [Player Properties](extensions/player-properties.html) | `HAS_PACKETS` | Sends additional player attributes from the server to the client |
+| 192  | [Player Limit](extensions/player-limit.html)           | `PACKETLESS`  | Support for up to 256 players                                    |
+| 193  | [Message Types](extensions/message-types.html)         | `PACKETLESS`  | Additional message types such as warnings and statuses           |
+| 194  | [Kick Reason](extensions/kick-reason.html)             | `PACKETLESS`  | Repurposes the chat to send a disconnect reason text             |
+| none | [UTF-8 Chat](extensions/utf-8-chat.html)               | unregistered  | Chat messages prefixed with `0xff` are UTF-8                     |
 
 # Extra Packets
 

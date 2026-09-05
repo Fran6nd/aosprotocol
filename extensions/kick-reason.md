@@ -14,5 +14,4 @@ The vanilla [disconnect reasons](../protocol075.html#disconnect-reasons) only
 carry a single number, so this extension is the way to hand the player a
 human-readable explanation.
 
-See [Extensions](../protocol075.html#extensions) for how the extension is
-negotiated.
+See [Extensions](extension.html) for how the extension is negotiated.

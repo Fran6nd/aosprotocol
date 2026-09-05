@@ -17,7 +17,7 @@ Sends additional player attributes from the server to the client.
 The server sends this packet to inform the client of authoritative stats for
 a single player. There is no client-to-server form. The 12-byte total
 includes the Packet ID and Sub Packet ID as described in the
-[general extension packet structure](../protocol075.html#extensions).
+[general extension packet structure](extension.html#extension-packets).
 
 | Field Name    | Field Type | Example | Notes                                                                                                     |
 |---------------|------------|---------|-----------------------------------------------------------------------------------------------------------|
@@ -45,5 +45,4 @@ Byte layout (offsets are within the packet, including the Packet ID byte):
 | 7      | 1    | Reserve Ammo  |
 | 8      | 4    | Score         |
 
-See [Extensions](../protocol075.html#extensions) for how the extension is
-negotiated.
+See [Extensions](extension.html) for how the extension is negotiated.

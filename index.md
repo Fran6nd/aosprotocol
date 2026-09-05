@@ -19,9 +19,10 @@ reverse engineered to document the protocol.
 The 0.75 protocol supports extensions, which allow adding new packets as well as
 querying the support for client and server functionality.
 
-The negotiation mechanism and the registry of extension ids are documented in
-[Extensions](protocol075.html#extensions), and each extension has its own
-specification under `extensions/`:
+The ids, types and negotiation mechanism are described in
+[Extensions](extensions/extension.html), and the registry of every known
+extension is listed in the [0.75 documentation](protocol075.html#extensions).
+Each extension has its own specification under `extensions/`:
 
  * [Player Properties](extensions/player-properties.html) (0)
  * [Player Limit](extensions/player-limit.html) (192)
