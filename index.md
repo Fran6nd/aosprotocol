@@ -20,8 +20,8 @@ The 0.75 protocol supports extensions, which allow adding new packets as well as
 querying the support for client and server functionality.
 
 The ids, types and negotiation mechanism are described in
-[Extensions](extensions/extension.html). The registry of every known extension,
-with its id and a link to its specification, is listed in the
+[Extensions](extensions/extension.html). The registry of extension ids, each
+with a link to its specification, is listed in the
 [0.75 documentation](protocol075.html#extensions).
 
 ### Implementers

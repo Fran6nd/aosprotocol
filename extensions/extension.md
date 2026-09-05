@@ -8,8 +8,10 @@ in this folder, and the registry of ids lives in the
 
 ## Extension IDs
 
-Each extension is given a unique id that is decided when it is first registered.
-We differentiate between two types of extensions:
+Each extension is given an unique id that is decided when it is first
+registered. We differentiate between two types of packets:
+
+*Those that:*
 
 | Type          | Purpose                               | Extension id range |
 | ------------- | ------------------------------------- | ------------------ |
@@ -20,15 +22,22 @@ Each extension is given one legacy packet id equal to `64+extension_id`.
 For `PACKETLESS` extensions this would mean that their packet ids are out
 of spec `>255`, thus they don't have any.
 
+An example for a packetless extension would be *OpenSpades'* UnicodeExt.
+
+Packetful extensions are extensions that can be used to send packets. Each
+extension has 256 packet types reserved for itself. This is useful for adding
+functionality that requires sending additional information from or to the client.
+
+Packetless extensions are extensions that can not send any packets. This is useful
+for signalling support for additional values in or certain behaviours related to
+existing packets.
+
 Packetless extensions exist as an artefact of the implementation of extensions.
 As the space reserved for extension packets is limited, values above 191 do not
-have any packet types left. They are still useful for signalling support for
-additional values in, or certain behaviours related to, existing packets.
+have any packet types left.
 
-A few extensions are in use without ever having been given an id. They cannot be
-negotiated through the `ExtInfo` packet, so support for them has to be assumed or
-detected some other way. The registry lists them as `unregistered`; they are not
-a third extension type, only extensions that were never registered.
+Some extensions have no registered extension id. They are not announced through
+the `ExtInfo` packet.
 
 ## Extension Packets
 
@@ -48,7 +57,7 @@ General extension packet structure:
 
 | ----------: | ------------------ |
 | Packet ID   | 60                 |
-| Total Size: | `2+2*length` bytes |
+| Total size: | `2+2*length`       |
 
 | Field name | Field type   | Notes                        |
 | ---------- | ------------ | ---------------------------- |

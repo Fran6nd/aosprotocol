@@ -1,18 +1,16 @@
 # Message Types
 
-Adds new chat types to the [Chat Message](../protocol075.html#chat-message)
-packet.
+This packet is an extension to the [Chat Message](../protocol075.html#chat-message), it adds new chat types.
 
 | ------------: | ------------ |
 | Extension ID: | 193          |
 | Version:      | 1            |
 | Type:         | `PACKETLESS` |
 
-Clients can handle the new types however they want. In most clients the message
-will be displayed in a different area, size, colour or with a different sound in
-the player's screen.
+So clients can handle it how they want, in most clients it will display the message in different area/size/color/sound in
+player's screen.
 
-## New Types
+## New Types:
 
 | Value | Type         | Notes                                 |
 |-------|--------------|---------------------------------------|

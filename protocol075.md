@@ -894,7 +894,8 @@ packet (id 60).
 How ids are allocated, what `HAS_PACKETS` and `PACKETLESS` mean, the extension
 packet layout and the negotiation flow are all described in
 [Extensions](extensions/extension.html). Each extension is specified in its own
-file next to it, and the table below is the registry of every known extension.
+file next to it, and the table below is the registry of the extension ids
+registered so far.
 
 | ID   | Name                                                   | Type          | Description                                                      |
 |------|--------------------------------------------------------|---------------|------------------------------------------------------------------|
