@@ -893,17 +893,17 @@ packet (id 60).
 
 How ids are allocated, what `HAS_PACKETS` and `PACKETLESS` mean, the extension
 packet layout and the negotiation flow are all described in
-[Extensions](extensions/extension.html). Each extension is specified in its own
+[Extensions](extensions/extension.md). Each extension is specified in its own
 file next to it, and the table below is the registry of the extension ids
 registered so far.
 
-| ID   | Name                                                   | Type          | Description                                                      |
-|------|--------------------------------------------------------|---------------|------------------------------------------------------------------|
-| 0    | [Player Properties](extensions/player-properties.html) | `HAS_PACKETS` | Sends additional player attributes from the server to the client |
-| 192  | [Player Limit](extensions/player-limit.html)           | `PACKETLESS`  | Support for up to 256 players                                    |
-| 193  | [Message Types](extensions/message-types.html)         | `PACKETLESS`  | Additional message types such as warnings and statuses           |
-| 194  | [Kick Reason](extensions/kick-reason.html)             | `PACKETLESS`  | Repurposes the chat to send a disconnect reason text             |
-| none | [UTF-8 Chat](extensions/utf-8-chat.html)               | unregistered  | Chat messages prefixed with `0xff` are UTF-8                     |
+| ID   | Name                                                 | Type          | Description                                                      |
+|------|------------------------------------------------------|---------------|------------------------------------------------------------------|
+| 0    | [Player Properties](extensions/player-properties.md) | `HAS_PACKETS` | Sends additional player attributes from the server to the client |
+| 192  | [Player Limit](extensions/player-limit.md)           | `PACKETLESS`  | Support for up to 256 players                                    |
+| 193  | [Message Types](extensions/message-types.md)         | `PACKETLESS`  | Additional message types such as warnings and statuses           |
+| 194  | [Kick Reason](extensions/kick-reason.md)             | `PACKETLESS`  | Repurposes the chat to send a disconnect reason text             |
+| none | [UTF-8 Chat](extensions/utf-8-chat.md)               | unregistered  | Chat messages prefixed with `0xff` are UTF-8                     |
 
 # Extra Packets
 

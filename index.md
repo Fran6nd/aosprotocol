@@ -11,8 +11,8 @@ reverse engineered to document the protocol.
 
 ## Versions
 
- * [0.75 (and 0.76) documentation](protocol075.html)
- * [1.0 alpha documentation](protocol100a1.html)
+ * [0.75 (and 0.76) documentation](protocol075.md)
+ * [1.0 alpha documentation](protocol100a1.md)
 
 ## Extensions
 
@@ -20,9 +20,9 @@ The 0.75 protocol supports extensions, which allow adding new packets as well as
 querying the support for client and server functionality.
 
 The ids, types and negotiation mechanism are described in
-[Extensions](extensions/extension.html). The registry of extension ids, each
+[Extensions](extensions/extension.md). The registry of extension ids, each
 with a link to its specification, is listed in the
-[0.75 documentation](protocol075.html#extensions).
+[0.75 documentation](protocol075.md#extensions).
 
 ### Implementers
  * [OpenSpades](https://github.com/yvt/openspades)
@@ -34,9 +34,9 @@ each version should be linked here.
 
 ## Other Protocols
 
- * [Master Server Protocol](protocolmaster.html)
- * [Ping Protocol](protocolping.html)
+ * [Master Server Protocol](protocolmaster.md)
+ * [Ping Protocol](protocolping.md)
 
 # Other Resources
 * [KVX File Format Specification](https://web.archive.org/web/20100102023608/http://mystaddict.tlayeh.com/Computer%20Camp/Slab6/slab6.txt) - An archive of the mirror of the readme for Slab6 which contains the .kvx file format, the format that the AoS model format is based on
-* [VXL File Format Specification](mapformat.html) - A description of the .vxl file format, the format used for AoS maps<br />([original](http://silverspaceship.com/aosmap/aos_file_format.html), [mirror](aos_file_format.html))
+* [VXL File Format Specification](mapformat.md) - A description of the .vxl file format, the format used for AoS maps<br />([original](http://silverspaceship.com/aosmap/aos_file_format.html), [mirror](aos_file_format.html))

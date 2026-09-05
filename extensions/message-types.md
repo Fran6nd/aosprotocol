@@ -1,6 +1,6 @@
 # Message Types
 
-This packet is an extension to the [Chat Message](../protocol075.html#chat-message), it adds new chat types.
+This packet is an extension to the [Chat Message](../protocol075.md#chat-message), it adds new chat types.
 
 | ------------: | ------------ |
 | Extension ID: | 193          |
@@ -19,4 +19,4 @@ player's screen.
 | 5     | CHAT_WARNING | Displays a warning                    |
 | 6     | CHAT_ERROR   | Displays a error                      |
 
-See [Extensions](extension.html) for how the extension is negotiated.
+See [Extensions](extension.md) for how the extension is negotiated.

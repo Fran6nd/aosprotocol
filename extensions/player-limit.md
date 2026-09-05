@@ -7,4 +7,4 @@ Tells client server supports up to 256 players.
 | Version:      | 1            |
 | Type:         | `PACKETLESS` |
 
-See [Extensions](extension.html) for how the extension is negotiated.
+See [Extensions](extension.md) for how the extension is negotiated.
