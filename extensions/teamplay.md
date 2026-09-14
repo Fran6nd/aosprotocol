@@ -1,13 +1,14 @@
 # Teamplay
 
-The features a team needs to play together and a client cannot provide on its
-own: seeing teammates through walls, marking a place in the world, and being
-pointed at a player by the server. Each client-side feature is permitted
-independently by the server, so a server can enable any combination or none.
+Encourages players to play as a team, with the features a client cannot
+provide on its own: seeing teammates through walls, marking a place in the
+world, and being pointed at a player by the server. Each client-side feature is
+permitted independently by the server, so a server can enable any combination
+or none.
 
 | ------------: | ------------- |
-| Extension ID: | 2             |
-| Packet ID:    | 66            |
+| Extension ID: | 48            |
+| Packet ID:    | 112           |
 | Version:      | 1             |
 | Type:         | `HAS_PACKETS` |
 
@@ -32,7 +33,7 @@ Which features are permitted, and which way north is.
 
 | Field Name    | Field Type | Example | Notes                              |
 |---------------|------------|---------|------------------------------------|
-| Packet ID     | UByte      | `66`    | Always `66`.                       |
+| Packet ID     | UByte      | `112`   | Always `112`.                      |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.    |
 | Features      | UByte      | `0b110` | Bitmask, see below.                |
 | North X       | LE float32 | `0.0`   | See [North](#north).               |
@@ -166,7 +167,7 @@ encoding as the base protocol's position packets.
 
 | Field Name    | Field Type | Example | Notes                                     |
 |---------------|------------|---------|-------------------------------------------|
-| Packet ID     | UByte      | `66`    | Always `66`.                              |
+| Packet ID     | UByte      | `112`   | Always `112`.                             |
 | Sub Packet ID | UByte      | `1`     | Always `1` for this sub-packet.           |
 | Player ID     | UByte      | `0`     | On relay, the player that pinged; `255` means the server itself. Ignored client -> server; the server fills it in. |
 | X             | LE float32 | `256.0` | World coordinate.                         |
@@ -254,7 +255,7 @@ is an attempt to reveal a player to somebody the server did not choose.
 
 | Field Name    | Field Type | Example    | Notes                                 |
 |---------------|------------|------------|---------------------------------------|
-| Packet ID     | UByte      | `66`       | Always `66`.                          |
+| Packet ID     | UByte      | `112`      | Always `112`.                         |
 | Sub Packet ID | UByte      | `2`        | Always `2` for this sub-packet.       |
 | Player ID     | UByte      | `7`        | The player to reveal.                 |
 | Duration      | LE float32 | `10.0`     | See [Durations](#durations).          |
