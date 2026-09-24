@@ -88,6 +88,9 @@ A server wanting fewer than six things on a ring fills the spare wedges with
 [`NONE`](#actions), which leaves everything else where the player learnt it. A
 server wanting more uses another pie, up to the ten a menu holds.
 
+There is no field to grow here and no value to spend: a version that wants rings
+of another size says so in the version byte, and the whole server moves together.
+
 ### Contexts
 
 What the crosshair is on when the menu opens decides which pies are offered. A
@@ -360,14 +363,6 @@ The menu belongs to the connection, not to the world and not to a player.
 
 Version 1 defines sub id `0`. A receiver drops a sub id it does not know, so a
 later version may add sub-packets — but not change the layout of `0`, which is
-what makes that safe. Inside the Menu the room is in the reserved bytes and bits:
-the two [Message ID](#room-for-predefined-messages) bytes, Flags `1`-`7`,
-Contexts `3`-`7`, and Actions `4`-`255`. A version 1 client refuses a menu using
-any of them, so a server sends each client the menu its version can read — and
-every version can describe the same rings, because the words are in the packet.
-
-The [six slices](#six-slices) are not among that room. There is no field to grow
-and no value to spend: a version that wants rings of another size says so in the
-version byte and the whole server moves together.
+what makes that safe.
 
 See [Extensions](extension.md) for how the extension is negotiated.
