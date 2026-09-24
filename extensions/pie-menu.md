@@ -42,9 +42,8 @@ another.
 ## Sub ID 0: Menu
 
 The whole menu, every time. A Menu replaces the one the client was showing,
-entire. There is no way to change a single pie or slice — a menu assembled from
-fragments is one nobody has seen whole, and the packet describing all of it costs
-under a kilobyte, once per connection.
+entire. There is no way to change a single pie or slice: a menu assembled from
+fragments is one nobody has seen whole.
 
 | Field Name    | Field Type | Example | Notes                                 |
 |---------------|------------|---------|---------------------------------------|
@@ -88,10 +87,6 @@ server, or after the next Menu packet.
 A server wanting fewer than six things on a ring fills the spare wedges with
 [`NONE`](#actions), which leaves everything else where the player learnt it. A
 server wanting more uses another pie, up to the ten a menu holds.
-
-Six rather than four or eight because it is what the ring already holds in
-practice: enough for a pair of opposites on the vertical axis and two more each
-side, while each wedge stays wide enough to hit at speed without looking.
 
 ### Contexts
 
@@ -167,10 +162,6 @@ packet — the server's command language is its own, and the client interprets n
 of it, see [Command slices](#command-slices).
 
 ### Empty slices
-
-A `NONE` slice is a hole in the ring: a server with four things to say puts them
-in the four wedges it wants and leaves the other two empty, rather than letting a
-count of four decide where any of them land.
 
 **The client does nothing with an empty slice.** It sends no packet, shows no
 message, plays no sound and reports no error — choosing one is the same as
@@ -251,20 +242,10 @@ whole menu, so there is no state to reconcile and no order to get right — the
 last Menu to arrive is the menu, and a server changing one ring resends the ten.
 
 The client applies a new Menu **the next time the menu is opened**, not the
-instant it arrives. A ring that changed under a held thumb would send a phrase
-the player never read, on a slice they had already aimed at; the menu on screen
-is a promise about what releasing the key will do, and a packet does not get to
-break it. A menu open when a Menu arrives therefore finishes on the rings it was
-drawn with, and the change is waiting the next time the key goes down.
-
-Nothing needs to be sent for a menu to stop applying, since a Menu is only ever
-replaced by another. A server ending a mode's rings sends the ones that follow
-it, or a Pie Count of `0` for none at all.
+instant it arrives: a ring that changed under a held thumb would send a phrase
+the player never read, on a slice they had already aimed at.
 
 ## Geometry
-
-The gesture is the feature: a player reaches for a direction, not for a word, and
-a direction meaning one thing here and another elsewhere is worse than no menu.
 
 * Slice `0` is at the top, the rest **clockwise**.
 * The six slices divide the ring evenly, `60` degrees each, so slice `0` is
@@ -317,8 +298,8 @@ Where and how is the client's business; that it happens is not.
 Version 1 carries its words in the packet, so every player reads them in the
 language the server wrote them in. Fixing that belongs to
 [Teamplay](teamplay.md) — a catalogue of short phrases with a fixed id each,
-translated by every client — and a pie menu is the obvious thing to build from
-it. None of that is here yet. **The two bytes it needs are.**
+translated by every client. None of that is here yet. **The two bytes it needs
+are.**
 
 The `Message ID` on each [Pie](#pie) and each [Slice](#slice) is where a
 catalogue id will go: on a slice, the phrase it says and draws; on a pie, the
@@ -356,9 +337,7 @@ The string caps are in bytes, not characters, so a parser can enforce them befor
 decoding anything.
 
 Ten pies because rings are reached by cycling through them, one flip at a time,
-so the tenth is already further away than anything on it is worth. A server with
-more to offer than ten rings hold is building a menu to be read rather than one
-to be reached for.
+so the tenth is already further away than anything on it is worth.
 
 These caps bound the packet without a cap of its own: a slice is at most `181`
 bytes, a pie at most `1121`, and a Menu at most `11213`. A client may refuse a
@@ -389,7 +368,6 @@ every version can describe the same rings, because the words are in the packet.
 
 The [six slices](#six-slices) are not among that room. There is no field to grow
 and no value to spend: a version that wants rings of another size says so in the
-version byte and the whole server moves together, since a menu is only worth
-learning if every player on it learnt the same one.
+version byte and the whole server moves together.
 
 See [Extensions](extension.md) for how the extension is negotiated.
