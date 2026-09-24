@@ -8,12 +8,12 @@ nothing until they die. This extension fills that gap with one small packet per
 hit.
 
 | ------------: | ------------- |
-| Extension ID: | 32            |
-| Packet ID:    | 96            |
+| Extension ID: | `0x20`        |
+| Packet ID:    | `0x60`        |
 | Version:      | 1             |
 | Type:         | `HAS_PACKETS` |
 
-The packet id is `64 + extension id`, see
+The packet id is `0x40 + extension id`, see
 [Extension IDs](extension.md#extension-ids).
 
 ### Sub Packets:
@@ -24,12 +24,16 @@ The packet id is `64 + extension id`, see
 
 This extension carries **no sub packet id**, which departs from the
 [general extension packet structure](extension.md#extension-packets): the damage
-amount sits at offset 2, where a sub packet id would otherwise be. The only
-implementation, [TigerSpades](https://github.com/rzrn/tigerspades), predates the
-rule being written down, and the one packet leaves nothing to disambiguate, so
-the wire format is documented as it is rather than as the rule would have it. A
-future version that needs a second packet has to introduce the byte and bump the
-version.
+amount sits at offset 2, where a sub packet id would otherwise be. Both
+implementations predate the rule being written down, and the one packet leaves
+nothing to disambiguate, so the wire format is documented as it is rather than as
+the rule would have it. A future version that needs a second packet has to
+introduce the byte and bump the version.
+
+The implementations are [TigerSpades](https://github.com/rzrn/tigerspades)
+(`src/network.c`, `src/main.c`) on the client side and
+[aos-arena](https://github.com/rzrn/aos-arena)
+(`arenalib/packets.py`, `game_modes/arena.py`) on the server side.
 
 ## Damage Marker
 
@@ -38,7 +42,7 @@ a server that receives this packet drops it.
 
 | Field Name    | Field Type | Example | Notes                                                    |
 |---------------|------------|---------|----------------------------------------------------------|
-| Packet ID     | UByte      | `96`    | Always `96`.                                             |
+| Packet ID     | UByte      | `0x60`  | Always `0x60`.                                           |
 | Player ID     | UByte      | `7`     | The player who **took** the damage.                      |
 | Hit Amount    | UByte      | `45`    | Health points the hit removed, see [Amount](#amount).    |
 
@@ -52,19 +56,22 @@ Always 3 bytes.
 
 ## Amount
 
-Hit Amount is the health the hit actually removed, after the server has applied
-whatever it applies — falloff, armour, friendly-fire scaling — not the weapon's
-nominal damage. It is what the victim's HP went down by, so a client can add
-consecutive markers up and arrive at the damage it has done.
+Hit Amount is the damage the server is about to apply, once it has resolved the
+hit its own way — hit area, distance falloff, melee — and after any script has
+had the chance to adjust it. In aos-arena it is the value handed to the victim's
+`hit()`, sent just before that call.
 
-The field is a `UByte`. A server whose damage can exceed `255` clamps to `255`
-rather than wrapping; a single hit that large has killed the target anyway.
-Overkill is clamped the same way: a hit of `80` against `30` remaining HP is sent
-as `30`, so the numbers a client shows never exceed the health the player had.
+It is the damage, **not** the health the victim actually lost. The two differ on
+the hit that kills: a hit of `80` against `30` remaining HP is sent as `80`, so
+the last marker of a kill overstates what it took. Clients must not sum markers
+and expect the victim's health to fall out of it.
 
-`0` means a hit that landed and did no damage, and is worth sending: it tells the
-attacker they connected with something that absorbed the shot. A client may
-render it differently, or not at all.
+The field is a `UByte`, which caps a single hit at `255`. Vanilla weapon damage
+and melee stay far below that, but a script that scales damage up has to clamp
+before sending rather than let the value wrap.
+
+`0` means a hit that landed and did no damage — in practice, a script that zeroed
+it. A client may render it differently, or not at all.
 
 One packet per hit. Nothing merges or deduplicates them, so a burst that lands
 several hits in the same frame produces several packets and several markers,
@@ -75,12 +82,12 @@ which is what a client wants to show.
 The packet has no audience field. The server sends it to whichever clients should
 see the marker and to nobody else, and a client draws every marker it receives.
 
-Normally that is the attacker alone, which is what "damage markers" means and all
-the extension was built for. A server is free to do otherwise — sending a
-player's own damage to them, or every hit to spectators — but it should know what
-it discloses before it does: a marker names a player id and an amount, so
-broadcasting them hands out an enemy's remaining health and reveals that an
-unseen player is being shot.
+**The audience is the attacker alone.** aos-arena sends the packet only back down
+the connection the hit arrived on, and only when that player negotiated the
+extension. A server is free to do otherwise, but it should know what it discloses
+before it does: a marker names a player id and an amount, so sending them more
+widely hands out an enemy's remaining health and reveals that an unseen player is
+being shot.
 
 The victim is not told they were hit unless the server includes them in the
 recipients. [Set HP](../protocol075.md#set-hp) remains the packet that informs
