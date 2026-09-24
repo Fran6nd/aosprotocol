@@ -169,20 +169,21 @@ of it, see [Command slices](#command-slices).
 
 ### Encoding
 
-Every string in a Menu is UTF-8, as [Validation](#validation) has it. A
+Every string in a Menu is UTF-8, and so is everything a slice sends. A
 [Chat Message](../protocol075.md#chat-message) is Code Page 437, so a `CHAT` or
-`COMMAND` slice crosses between the two on its way out:
+`COMMAND` slice always goes out behind the `0xff` prefix of
+[UTF-8 Chat](utf-8-chat.md), never as Code Page 437.
 
-* Where [UTF-8 Chat](utf-8-chat.md) is in use, the client sends the Text as the
-  UTF-8 it already is, behind the `0xff` prefix that convention defines.
-* Where it is not, the client sends Code Page 437, as it does for a line a player
-  typed. How it stands in for a character CP437 has not is the question a typed
-  line already raises, and this extension gives it no new answer.
+**This extension requires that convention.** It has no extension id of its own
+and nothing to negotiate, so negotiating Pie Menu is where a server says it
+reads one: a server that sends a Menu undertakes to read `0xff`-prefixed chat
+from the client it sent it to. One unwilling to sends no Menu, which is the
+refusal it already has for everything else here.
 
-So **a server writes its menu in what it can deliver**: one that has not
-negotiated UTF-8 Chat, and wants its words to arrive as written, keeps the
-`CHAT` and `COMMAND` text inside Code Page 437. Theme and Label never leave the
-client, so they are UTF-8 either way and a server may write them in any script.
+Requiring it is what lets every string here be the same kind of string, from the
+Theme a client draws to the command a server parses, and it costs nothing a
+server defining a menu in its players' language was not doing already. What
+happens to a line once the server has it is the server's business as ever.
 
 ### Empty slices
 
@@ -299,7 +300,7 @@ the client logs it rather than disconnecting. A Menu is refused when:
 * A Message ID is not `0`, see
   [Room for predefined messages](#room-for-predefined-messages).
 
-Strings are UTF-8, consistent with [UTF-8 Chat](utf-8-chat.md), and drawn as they
+Strings are UTF-8 throughout, see [Encoding](#encoding), and drawn as they
 arrive. A client strips control characters and line breaks — a Theme is one
 caption, a Label one line — and treats an all-whitespace string as empty, which
 every field allows. A client applies its ordinary chat rate limit to what a menu
