@@ -152,7 +152,10 @@ offered, never where their words go.
 **`PING`** marks the world position the crosshair was on **when the menu opened**,
 not where it points when the slice is chosen — the marker belongs to the place
 the player called out as they reached for the menu. The Text is the ping's
-Reason, and may be empty for a neutral marker.
+Reason, and may be empty for a neutral marker. A Reason is capped by the server
+that relays it, not by this extension, so a server should not write a ping label
+longer than its own cap will keep — a menu promising a label the ping arrives
+without is worse than a shorter label.
 
 It needs [Teamplay](teamplay.md) negotiated with its `PING` bit set. Without
 either, the client sends the Text as chat instead, so the words still arrive and
@@ -163,6 +166,23 @@ governs the fallback alone.
 is not speech and does not belong in the room. On the wire it is an ordinary chat
 packet — the server's command language is its own, and the client interprets none
 of it, see [Command slices](#command-slices).
+
+### Encoding
+
+Every string in a Menu is UTF-8, as [Validation](#validation) has it. A
+[Chat Message](../protocol075.md#chat-message) is Code Page 437, so a `CHAT` or
+`COMMAND` slice crosses between the two on its way out:
+
+* Where [UTF-8 Chat](utf-8-chat.md) is in use, the client sends the Text as the
+  UTF-8 it already is, behind the `0xff` prefix that convention defines.
+* Where it is not, the client sends Code Page 437, as it does for a line a player
+  typed. How it stands in for a character CP437 has not is the question a typed
+  line already raises, and this extension gives it no new answer.
+
+So **a server writes its menu in what it can deliver**: one that has not
+negotiated UTF-8 Chat, and wants its words to arrive as written, keeps the
+`CHAT` and `COMMAND` text inside Code Page 437. Theme and Label never leave the
+client, so they are UTF-8 either way and a server may write them in any script.
 
 ### Empty slices
 
@@ -192,7 +212,9 @@ which is the work a menu exists to remove.
 So `/votekick #%p` reaches the server as `/votekick #7`, the command being the
 server's own and its spelling with it. The client expands once, immediately
 before sending, and never re-scans the result, so a name that looks like a token
-is not one.
+is not one. The Text cap counts the bytes in the packet, before expansion, which
+may add one byte per token; a server writing a command near the cap should count
+the id it will carry rather than the two characters standing for it.
 
 **A player is the only thing worth substituting.** Everything else a command
 might want from where the player is standing, the server can work out for itself
@@ -338,6 +360,13 @@ Two things that version must settle:
 
 The string caps are in bytes, not characters, so a parser can enforce them before
 decoding anything.
+
+These are numbers where the rest of the protocol gives none — a
+[Chat Message](../protocol075.md#chat-message) asks only for "reasonable limits"
+and a [Teamplay](teamplay.md#sub-id-1-ping) Reason is capped by whichever server
+relays it. The difference is who enforces them: those are truncated by a server
+that may choose its own length, while these are the thresholds a client refuses a
+Menu on, and a threshold has to be a number both ends already agree.
 
 Ten pies because rings are reached by cycling through them, one flip at a time,
 so the tenth is already further away than anything on it is worth.
