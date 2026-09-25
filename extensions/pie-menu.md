@@ -105,6 +105,9 @@ offered, never where their words go.
 | `3`       | `COMMAND` | Text, as a chat message the server reads as a command.     |
 | `4`-`255` | reserved  | Refuses the menu, see [Validation](#validation).           |
 
+The Action is also what a client styles a slice by, so that a wedge which pings,
+one which speaks and one which runs a command need not look alike.
+
 **`PING`** marks the world position the crosshair was on when the menu opened,
 not where it points when the slice is chosen. The Text is the ping's Reason and
 may be empty for a neutral marker. It needs [Teamplay](teamplay.md) negotiated
