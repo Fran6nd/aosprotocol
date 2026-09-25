@@ -60,12 +60,17 @@ client's business. An empty Theme means no caption.
 What the crosshair is on when the menu opens decides which pies are offered. A
 bitmask, so a ring that suits more than one context is sent once.
 
-| Bit | Name       | Offered with the crosshair on                      |
-|-----|------------|----------------------------------------------------|
-| 0   | `WORLD`    | Terrain, the sky, or nothing in particular.        |
-| 1   | `TEAMMATE` | A player on the opening player's own team.         |
-| 2   | `ENEMY`    | A player on the other team.                        |
-| 3-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits. |
+| Bit | Name        | Offered when the menu opens on                     |
+|-----|-------------|----------------------------------------------------|
+| 0   | `WORLD`     | Terrain, the sky, or nothing in particular.        |
+| 1   | `TEAMMATE`  | A player on the opening player's own team.         |
+| 2   | `ENEMY`     | A player on the other team.                        |
+| 3   | `SPECTATOR` | Anything, while the opening player is a spectator. |
+| 4-7 | reserved    | Must be `0`. Clients **must** ignore unknown bits. |
+
+A spectator is team `255`, see [Team IDs](../protocol075.md#team-ids). They have
+no team, so bits `0`-`2` never apply to one and a spectator is offered
+`SPECTATOR` pies alone.
 
 The context is fixed when the menu opens and does not change while it is held. A
 context with no pies has no menu, and no other context's rings stand in.
