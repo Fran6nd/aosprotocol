@@ -127,6 +127,9 @@ A `NONE` slice does nothing at all — no packet, no message, no sound, no error
 How an empty wedge looks is the client's business, but it must not stand in for a
 slice that is missing by inventing one.
 
+A menu sends ordinary chat, so rate-limiting it is the server's business. Nothing
+here asks for a limit, and a server is free to apply one.
+
 ### Substitutions
 
 The Text of a slice may name the player the menu was opened on, so that a command
