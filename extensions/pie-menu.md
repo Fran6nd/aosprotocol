@@ -114,8 +114,6 @@ instead, so the words still arrive and only the marker is lost.
 **`COMMAND`** always goes on the team channel, whatever `GLOBAL` says. On the
 wire it is an ordinary chat packet: the client interprets none of it, does not
 look for a leading `/`, and has no local command language reachable from here.
-Because the Label is drawn and the Text is sent, the client echoes what it sent
-in its own chat view.
 
 A `NONE` slice does nothing at all — no packet, no message, no sound, no error.
 How an empty wedge looks is the client's business, but it must not stand in for a
