@@ -12,13 +12,21 @@ float the number over that player.
 Sent by the server to the player who dealt the damage, one packet per hit. There
 is no client-to-server form.
 
-| Field Name | Field Type | Example | Notes                                     |
-|------------|------------|---------|-------------------------------------------|
-| Packet ID  | UByte      | `0x60`  | Always `0x60`.                            |
-| Player ID  | UByte      | `7`     | The player who took the damage.           |
-| Hit Amount | UByte      | `45`    | Damage the server applied, capped at 255. |
+| Field Name | Field Type | Example | Notes                               |
+|------------|------------|---------|-------------------------------------|
+| Packet ID  | UByte      | `0x60`  | Always `0x60`.                      |
+| Player ID  | UByte      | `7`     | The player who took the damage.     |
+| Hit Amount | see below  | `45`    | Damage the server applied.          |
 
-Always 3 bytes.
+The packet length selects the type of Hit Amount:
+
+| Packet length | Hit Amount type    |
+|--------------:|--------------------|
+| 3 bytes       | UByte              |
+| 4 bytes       | LE Short (signed)  |
+| 6 bytes       | LE Int (signed)    |
+
+The client drops a packet of any other length. A negative Hit Amount is a heal.
 
 How the number is drawn is the client's call; TigerSpades floats it above the
 player for about three seconds.
