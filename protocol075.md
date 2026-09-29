@@ -91,6 +91,7 @@ this byte.
 * [Version Handshake Response (EP)](#version-handshake-response-ep)
 * [Version Get (EP)](#version-get-ep)
 * [Version Response (EP)](#version-response-ep)
+* [Version Response (Extended) (EP)](#version-response-extended-ep)
 * [Powerthirst Edition](#powerthirst-edition)
 * [Map Start (PT)](#map-start-pt)
 * [Map Chunk (PT)](#map-chunk-pt)
@@ -949,10 +950,17 @@ required to get version info).
 
 Ask the client to send the client and operational system infos.
 
+With no payload, the client answers with a [Version Response](#version-response-ep).
+With a payload, the client answers with a [Version Response (Extended)](#version-response-extended-ep).
 
-| ----------: | -------- |
-| Packet ID   | 33       |
-| Total Size: | 1 byte   |
+
+| ----------: | -------------- |
+| Packet ID   | 33             |
+| Total Size: | 1 + n bytes    |
+
+| Field Name   | Field Type    | Example | Notes                                        |
+|--------------|---------------|---------|----------------------------------------------|
+| property IDs | UByte[n]      | `0 1 2` | Optional. Properties requested, see below.   |
 
 ## Version Response (EP)
 #### Client->Server
@@ -972,6 +980,41 @@ Send the client and operational system infos.
 | version_revision   | Byte         | `-1`         | Current client revision version        |
 | version_revision   | Byte         | `-1`         | Current client revision version        |
 | os_info            | CP437 String | `Windows 10` | Operational System informations        |
+
+## Version Response (Extended) (EP)
+#### Client->Server
+
+Reply to a [Version Get](#version-get-ep) that lists property IDs. It reuses the
+[Existing Player](#existing-player) packet ID, marked by `x` in the first byte.
+
+| ----------: | -------------- |
+| Packet ID   | 9              |
+| Total Size: | (varies) bytes |
+
+| Field Name | Field Type | Example | Notes                           |
+|------------|------------|---------|---------------------------------|
+| marker     | UByte      | `x`     | `0x78`                          |
+| properties | Property[] |         | Requested IDs in ascending order, once each |
+
+Each property:
+
+| Field Name | Field Type | Example | Notes                                    |
+|------------|------------|---------|------------------------------------------|
+| id         | UByte      | `1`     | Requested property ID                    |
+| length     | UByte      | `5`     | Payload length in bytes                  |
+| payload    | UByte[]    |         | Empty if the client does not know the ID |
+
+| ID | Property      | Payload                                                                  |
+|----|---------------|--------------------------------------------------------------------------|
+| 0  | Application   | UByte major, UByte minor, UByte revision, CP437 String client name       |
+| 1  | User locale   | CP437 String, lowercase language with optional `_` region, e.g. `en_us`, `fr` |
+| 2  | Feature flags | LE UInt32. Bit 0: client supports [UTF-8 chat](extensions/utf-8-chat.md)    |
+
+The locale is the client's interface language, not the language its player writes
+in. It comes from the `core_locale` setting, else the operating system, else `en_us`.
+
+The client sends one packet per property, and each packet repeats the entries
+before it, so the last packet holds all of them.
 
 # Powerthirst Edition
 
