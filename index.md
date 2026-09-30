@@ -28,6 +28,7 @@ with a link to its specification, is listed in the
  * [OpenSpades](https://github.com/yvt/openspades)
  * [piqueserver](https://github.com/piqueserver/piqueserver)
  * [BetterSpades](https://github.com/xtreme8000/BetterSpades)
+ * [TigerSpades](https://github.com/rzrn/tigerspades)
 
 Links to the respective projects pages that detail the extensions evailable in
 each version should be linked here.
