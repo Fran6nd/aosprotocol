@@ -65,7 +65,8 @@ outfit, or one it has no art for, as `0`.
 | 9      | Butcher   | Bloodied apron, rubber boots.       |
 | 10     | Convict   | Striped prison uniform.             |
 | 11     | Builder   | High-visibility vest, tool belt.    |
-| 12-255 | reserved  | Drawn as `0`.                       |
+| 12     | Robot     | Metal plating, glowing eyes.        |
+| 13-255 | reserved  | Drawn as `0`.                       |
 
 ## Sub ID 0: Extended Create Player
 
