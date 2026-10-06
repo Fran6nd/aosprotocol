@@ -51,17 +51,20 @@ player's outline and draws the held tool or weapon as it is. With
 `CUSTOM_COLOR` set, the colour tints the outfit. A client draws an unknown
 outfit, or one it has no art for, as `0`.
 
-| Value | Name     | Look                                |
-|-------|----------|-------------------------------------|
-| 0     | Soldier  | The normal player model.            |
-| 1     | Undead   | Rotting skin, torn uniform, groans. |
-| 2     | Scout    | Light kit, no helmet.               |
-| 3     | Royal    | Crown and cape.                     |
-| 4     | Vampire  | Pale, high-collared cloak.          |
-| 5     | Miner    | Hard hat with a lamp, dusty.        |
-| 6     | Ghillie  | Camouflage suit.                    |
-| 7     | Brawler  | Bare arms, headband.                |
-| 8-255 | reserved | Drawn as `0`.                       |
+| Value  | Name      | Look                                |
+|--------|-----------|-------------------------------------|
+| 0      | Soldier   | The normal player model.            |
+| 1      | Undead    | Rotting skin, torn uniform, groans. |
+| 2      | Scout     | Light kit, no helmet.               |
+| 3      | Royal     | Crown and cape.                     |
+| 4      | Vampire   | Pale, high-collared cloak.          |
+| 5      | Miner     | Hard hat with a lamp, dusty.        |
+| 6      | Ghillie   | Camouflage suit.                    |
+| 7      | Brawler   | Bare arms, headband.                |
+| 8      | Scientist | Lab coat, goggles.                  |
+| 9      | Butcher   | Bloodied apron, rubber boots.       |
+| 10     | Convict   | Striped prison uniform.             |
+| 11-255 | reserved  | Drawn as `0`.                       |
 
 ## Sub ID 0: Extended Create Player
 
