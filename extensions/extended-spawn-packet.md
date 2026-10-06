@@ -46,8 +46,9 @@ the tool or weapon they hold, and their corpse. It does not change their team.
 
 ## Outfit
 
-An outfit changes how a player looks, and nothing else. It keeps the player's
-outline and draws the held tool or weapon as it is. With `CUSTOM_COLOR` set, the
+An outfit changes how a player looks, and nothing else. It is drawn like the
+normal player: solid voxels on the same body parts, keeping the player's outline,
+with the held tool or weapon drawn as it is. With `CUSTOM_COLOR` set, the
 colour tints the outfit. A client draws an unknown outfit, or one it has no art
 for, as `0`.
 
@@ -59,8 +60,8 @@ gives every outfit theirs.
 | 0      | Soldier   | The normal player model.            |
 | 1      | Undead    | Rotting skin, torn uniform.         |
 | 2      | Scout     | Light kit, no helmet.               |
-| 3      | Royal     | Crown and cape.                     |
-| 4      | Vampire   | Pale, high-collared cloak.          |
+| 3      | Royal     | Crown, fur-trimmed tunic.           |
+| 4      | Vampire   | Pale skin, high-collared coat.      |
 | 5      | Miner     | Hard hat with a lamp, dusty.        |
 | 6      | Ghillie   | Camouflage suit.                    |
 | 7      | Brawler   | Bare arms, headband.                |
@@ -69,7 +70,7 @@ gives every outfit theirs.
 | 10     | Convict   | Striped prison uniform.             |
 | 11     | Builder   | High-visibility vest, tool belt.    |
 | 12     | Robot     | Metal plating, visor.               |
-| 13     | God       | White robe, halo.                   |
+| 13     | God       | White toga, laurel wreath.          |
 | 14     | Demon     | Red skin, small horns.              |
 | 15-255 | reserved  | Drawn as `0`.                       |
 
