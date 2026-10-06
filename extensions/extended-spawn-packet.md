@@ -72,7 +72,9 @@ gives every outfit theirs.
 | 12     | Robot     | Metal plating, visor.               |
 | 13     | God       | White toga, laurel wreath.          |
 | 14     | Demon     | Red skin, small horns.              |
-| 15-255 | reserved  | Drawn as `0`.                       |
+| 15     | Bodyguard | Dark suit, sunglasses, earpiece.    |
+| 16     | Terrorist | Balaclava, chest rig.               |
+| 17-255 | reserved  | Drawn as `0`.                       |
 
 ## Sub ID 0: Extended Create Player
 
