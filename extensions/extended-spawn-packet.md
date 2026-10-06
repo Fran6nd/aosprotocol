@@ -64,7 +64,8 @@ outfit, or one it has no art for, as `0`.
 | 8      | Scientist | Lab coat, goggles.                  |
 | 9      | Butcher   | Bloodied apron, rubber boots.       |
 | 10     | Convict   | Striped prison uniform.             |
-| 11-255 | reserved  | Drawn as `0`.                       |
+| 11     | Builder   | High-visibility vest, tool belt.    |
+| 12-255 | reserved  | Drawn as `0`.                       |
 
 ## Sub ID 0: Extended Create Player
 
