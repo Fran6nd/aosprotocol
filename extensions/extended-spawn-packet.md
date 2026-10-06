@@ -46,15 +46,18 @@ the tool or weapon they hold, and their corpse. It does not change their team.
 
 ## Outfit
 
-An outfit changes how a player looks and sounds, and nothing else. It keeps the
-player's outline and draws the held tool or weapon as it is. With
-`CUSTOM_COLOR` set, the colour tints the outfit. A client draws an unknown
-outfit, or one it has no art for, as `0`.
+An outfit changes how a player looks, and nothing else. It keeps the player's
+outline and draws the held tool or weapon as it is. With `CUSTOM_COLOR` set, the
+colour tints the outfit. A client draws an unknown outfit, or one it has no art
+for, as `0`.
+
+An outfit may have its own sounds. A client that gives one outfit its own sounds
+gives every outfit theirs.
 
 | Value  | Name      | Look                                |
 |--------|-----------|-------------------------------------|
 | 0      | Soldier   | The normal player model.            |
-| 1      | Undead    | Rotting skin, torn uniform, groans. |
+| 1      | Undead    | Rotting skin, torn uniform.         |
 | 2      | Scout     | Light kit, no helmet.               |
 | 3      | Royal     | Crown and cape.                     |
 | 4      | Vampire   | Pale, high-collared cloak.          |
@@ -65,7 +68,7 @@ outfit, or one it has no art for, as `0`.
 | 9      | Butcher   | Bloodied apron, rubber boots.       |
 | 10     | Convict   | Striped prison uniform.             |
 | 11     | Builder   | High-visibility vest, tool belt.    |
-| 12     | Robot     | Metal plating, glowing eyes.        |
+| 12     | Robot     | Metal plating, visor.               |
 | 13-255 | reserved  | Drawn as `0`.                       |
 
 ## Sub ID 0: Extended Create Player
