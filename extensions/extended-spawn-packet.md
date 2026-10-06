@@ -69,7 +69,9 @@ gives every outfit theirs.
 | 10     | Convict   | Striped prison uniform.             |
 | 11     | Builder   | High-visibility vest, tool belt.    |
 | 12     | Robot     | Metal plating, visor.               |
-| 13-255 | reserved  | Drawn as `0`.                       |
+| 13     | God       | White robe, halo.                   |
+| 14     | Demon     | Red skin, small horns.              |
+| 15-255 | reserved  | Drawn as `0`.                       |
 
 ## Sub ID 0: Extended Create Player
 
