@@ -43,6 +43,13 @@ Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). Used only
 while `CUSTOM_COLOR` is set. It replaces the team colour on the player model,
 the tool or weapon they hold, and their corpse. It does not change their team.
 
+## Team
+
+`0` and `1` as in the base protocol, `255` spectator. `2` to `254` are further
+teams: their players are drawn and hit like any other player, are teammates only
+of their own team, and are left out of the scoreboard. They are drawn in their
+colour when `CUSTOM_COLOR` is set, and otherwise in a colour the client chooses.
+
 ## Sub ID 0: Extended Create Player
 
 | Field Name    | Field Type   | Example  | Notes                                          |
@@ -52,7 +59,7 @@ the tool or weapon they hold, and their corpse. It does not change their team.
 | Player ID     | UByte        | `254`    |                                                |
 | Flags         | UByte        | `0b1011` | See [Flags](#flags).                           |
 | Weapon        | UByte        | `0`      | As in Create Player.                           |
-| Team          | UByte        | `0`      | As in Create Player.                           |
+| Team          | UByte        | `0`      | See [Team](#team).                             |
 | X position    | LE Float     | `256.0`  | As in Create Player.                           |
 | Y position    | LE Float     | `256.0`  | As in Create Player.                           |
 | Z position    | LE Float     | `40.0`   | As in Create Player.                           |
@@ -67,7 +74,7 @@ the tool or weapon they hold, and their corpse. It does not change their team.
 | Sub Packet ID | UByte        | `1`      | Always `1` for this sub-packet.                  |
 | Player ID     | UByte        | `254`    |                                                  |
 | Flags         | UByte        | `0b1011` | See [Flags](#flags).                             |
-| Team          | UByte        | `0`      | As in Existing Player.                           |
+| Team          | UByte        | `0`      | See [Team](#team).                               |
 | Weapon        | UByte        | `0`      | As in Existing Player.                           |
 | Held item     | UByte        | `0`      | As in Existing Player.                           |
 | Kills         | LE UInt      | `0`      | As in Existing Player.                           |
