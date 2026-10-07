@@ -1,8 +1,8 @@
 # Extended Spawn Packet
 
 Per-player properties the base protocol has no room for: flags that leave a
-player out of what other clients report about players, a colour that replaces
-their team colour, and a cosmetic outfit.
+player out of what other clients report about players, and a colour that
+replaces their team colour.
 
 | ------------: | ------------- |
 | Extension ID: | `0x34`        |
@@ -14,9 +14,9 @@ their team colour, and a cosmetic outfit.
 
 | Sub ID | Name                     | Direction        | Size  |
 |--------|--------------------------|------------------|-------|
-| 0      | Extended Create Player   | Server -> Client | `22+` |
-| 1      | Extended Existing Player | Server -> Client | `18+` |
-| 2      | Set Player               | Server -> Client | `8`   |
+| 0      | Extended Create Player   | Server -> Client | `21+` |
+| 1      | Extended Existing Player | Server -> Client | `17+` |
+| 2      | Set Flags                | Server -> Client | `4`   |
 
 To a client that negotiated this extension, the server sends sub 0 instead of
 [Create Player](../protocol075.md#create-player) and sub 1 instead of
@@ -44,38 +44,6 @@ Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). Used only
 while `CUSTOM_COLOR` is set. It replaces the team colour on the player model,
 the tool or weapon they hold, and their corpse. It does not change their team.
 
-## Outfit
-
-An outfit changes how a player looks, and nothing else. It is drawn like the
-normal player: solid voxels on the same body parts, keeping the player's outline,
-with the held tool or weapon drawn as it is. With `CUSTOM_COLOR` set, the
-colour tints the outfit. A client draws an unknown outfit, or one it has no art
-for, as `0`.
-
-An outfit may have its own sounds. A client that gives one outfit its own sounds
-gives every outfit theirs.
-
-| Value  | Name      | Look                                |
-|--------|-----------|-------------------------------------|
-| 0      | Soldier   | The normal player model.            |
-| 1      | Undead    | Rotting skin, torn uniform.         |
-| 2      | Scout     | Light kit, no helmet.               |
-| 3      | Royal     | Crown, fur-trimmed tunic.           |
-| 4      | Vampire   | Pale skin, high-collared coat.      |
-| 5      | Miner     | Hard hat with a lamp, dusty.        |
-| 6      | Ghillie   | Camouflage suit.                    |
-| 7      | Brawler   | Bare arms, headband.                |
-| 8      | Scientist | Lab coat, goggles.                  |
-| 9      | Butcher   | Bloodied apron, rubber boots.       |
-| 10     | Convict   | Striped prison uniform.             |
-| 11     | Builder   | High-visibility vest, tool belt.    |
-| 12     | Robot     | Metal plating, visor.               |
-| 13     | God       | White toga, laurel wreath.          |
-| 14     | Demon     | Red skin, small horns.              |
-| 15     | Bodyguard | Dark suit, sunglasses, earpiece.    |
-| 16     | Terrorist | Balaclava, chest rig.               |
-| 17-255 | reserved  | Drawn as `0`.                       |
-
 ## Sub ID 0: Extended Create Player
 
 | Field Name    | Field Type   | Example  | Notes                                          |
@@ -90,7 +58,6 @@ gives every outfit theirs.
 | Y position    | LE Float     | `256.0`  | As in Create Player.                           |
 | Z position    | LE Float     | `40.0`   | As in Create Player.                           |
 | Colour        | UByte[3]     |          | See [Colour](#colour).                         |
-| Outfit        | UByte        | `1`      | See [Outfit](#outfit).                         |
 | Name          | CP437 String | `Wolf`   | As in Create Player, to the end of the packet. |
 
 ## Sub ID 1: Extended Existing Player
@@ -107,12 +74,11 @@ gives every outfit theirs.
 | Kills         | LE UInt      | `0`      | As in Existing Player.                           |
 | Block Colour  | UByte[3]     |          | Blue, green, red, as in Existing Player.         |
 | Colour        | UByte[3]     |          | See [Colour](#colour).                           |
-| Outfit        | UByte        | `1`      | See [Outfit](#outfit).                           |
 | Name          | CP437 String | `Wolf`   | As in Existing Player, to the end of the packet. |
 
-## Sub ID 2: Set Player
+## Sub ID 2: Set Flags
 
-Changes the properties of a player the client already knows.
+Changes the flags of a player the client already knows.
 
 | Field Name    | Field Type | Example | Notes                           |
 |---------------|------------|---------|---------------------------------|
@@ -120,14 +86,12 @@ Changes the properties of a player the client already knows.
 | Sub Packet ID | UByte      | `2`     | Always `2` for this sub-packet. |
 | Player ID     | UByte      | `254`   |                                 |
 | Flags         | UByte      | `0`     | See [Flags](#flags).            |
-| Colour        | UByte[3]   |         | See [Colour](#colour).          |
-| Outfit        | UByte      | `0`     | See [Outfit](#outfit).          |
 
 ## Lifetime
 
-The properties belong to the player id, and each sub-packet replaces all of
-them. [Player Left](../protocol075.md#player-left) resets them to `0` once it is
-applied, so a silent player leaves silently.
+The flags and colour belong to the player id, and each sub-packet replaces
+those it carries. [Player Left](../protocol075.md#player-left) resets them to
+`0` once it is applied, so a silent player leaves silently.
 [Map Start](../protocol075.md#map-start-075) resets every id.
 
 ## Notes
