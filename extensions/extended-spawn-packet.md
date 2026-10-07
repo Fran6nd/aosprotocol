@@ -16,24 +16,27 @@ replaces their team colour.
 |--------|--------------------------|------------------|-------|
 | 0      | Extended Create Player   | Server -> Client | `21+` |
 | 1      | Extended Existing Player | Server -> Client | `17+` |
+| 2      | Extended State Data      | Server -> Client | `36+` |
 
 To a client that negotiated this extension, the server sends sub 0 instead of
-[Create Player](../protocol075.md#create-player) and sub 1 instead of
-[Existing Player](../protocol075.md#existing-player). Other extensions treat
+[Create Player](../protocol075.md#create-player), sub 1 instead of
+[Existing Player](../protocol075.md#existing-player) and sub 2 instead of
+[State Data](../protocol075.md#state-data). Other extensions treat
 them as the packets they replace.
 
 ## Flags
 
-| Bit | Name            | Meaning                                                                  |
-|-----|-----------------|--------------------------------------------------------------------------|
-| 0   | `HIDE_ROSTER`   | Left out of the scoreboard, player counts and spectator camera cycling. |
-| 1   | `HIDE_PRESENCE` | No join, team change or leave notification.                              |
-| 2   | `HIDE_KILLFEED` | No kill feed line for a kill this player made or suffered.               |
-| 3   | `NO_STATS`      | Ignored by client-side statistics such as kill counters and streaks.     |
-| 4   | `CUSTOM_COLOR`  | Drawn in the player's [colour](#colour) instead of the team colour.      |
-| 5-7 | reserved        | Must be `0`. Clients ignore unknown bits.                                |
+| Bit | Name              | Meaning                                                                     |
+|-----|-------------------|-----------------------------------------------------------------------------|
+| 0   | `HIDE_SCOREBOARD` | Left out of the scoreboard and its counts, and of spectator camera cycling. |
+| 1   | `HIDE_PRESENCE`   | No join, team change or leave notification.                                 |
+| 2   | `HIDE_KILLFEED`   | No kill feed line for a kill this player made or suffered.                  |
+| 3   | `NO_STATS`        | Ignored by client-side statistics such as kill counters and streaks.        |
+| 4   | `CUSTOM_COLOR`    | Drawn in the player's [colour](#colour) instead of the team colour.         |
+| 5   | `HIDE_MAP`        | Left off the minimap and the map view.                                      |
+| 6-7 | reserved          | Must be `0`. Clients ignore unknown bits.                                   |
 
-Bits 0 to 3 change what is reported, not what is drawn: the player is still
+Bits 0 to 3 and 5 change what is reported, not what is drawn: the player is still
 rendered, heard and hit as usual. A client ignores them for its own player, and
 still tells its player about their own kills and deaths.
 
@@ -46,9 +49,11 @@ the tool or weapon they hold, and their corpse. It does not change their team.
 ## Team
 
 `0` and `1` as in the base protocol, `255` spectator. `2` to `254` are further
-teams: their players are drawn and hit like any other player, are teammates only
-of their own team, and are left out of the scoreboard. They are drawn in their
-colour when `CUSTOM_COLOR` is set, and otherwise in a colour the client chooses.
+teams, listed by [Extended State Data](#sub-id-2-extended-state-data). Their
+players are drawn and hit like any other player, and are teammates only of their
+own team: for the minimap, name tags, the spectator camera and friendly fire.
+Further teams do not appear in the scoreboard. A team the client has no entry
+for has an empty name and the colour `128, 128, 128`.
 
 ## Sub ID 0: Extended Create Player
 
@@ -82,6 +87,30 @@ colour when `CUSTOM_COLOR` is set, and otherwise in a colour the client chooses.
 | Colour        | UByte[3]     |          | See [Colour](#colour).                           |
 | Name          | CP437 String | `Wolf`   | As in Existing Player, to the end of the packet. |
 
+## Sub ID 2: Extended State Data
+
+| Field Name    | Field Type  | Example | Notes                                    |
+|---------------|-------------|---------|------------------------------------------|
+| Packet ID     | UByte       | `0x74`  | Always `0x74`.                           |
+| Sub Packet ID | UByte       | `2`     | Always `2` for this sub-packet.          |
+| Player ID     | UByte       | `0`     | As in State Data.                        |
+| Fog Colour    | UByte[3]    |         | Blue, green, red, as in State Data.      |
+| Team Count    | UByte       | `3`     |                                          |
+| Teams         | TeamEntry[] |         | Team Count entries.                      |
+| Game Mode     | UByte       | `0`     | As in State Data.                        |
+| Mode State    |             |         | CTF State or TC State, as in State Data. |
+
+**TeamEntry** (14 bytes)
+
+| Field Name | Field Type   | Example  | Notes                      |
+|------------|--------------|----------|----------------------------|
+| Team ID    | UByte        | `2`      | See [Team](#team).         |
+| Colour     | UByte[3]     |          | Blue, green, red.          |
+| Name       | CP437 String | `Zombie` | Always 10 characters long. |
+
+Teams `0` and `1` are always listed, and `255` never. Ids need not follow each
+other.
+
 ## Lifetime
 
 The flags and colour belong to the player id, and each sub-packet replaces
@@ -91,9 +120,7 @@ them. [Player Left](../protocol075.md#player-left) resets them to
 
 ## Notes
 
-Silent players are left out of the master server
-[Count Update](../protocolmaster.md#count-update). Ids above `31` need
-[Player Limit](player-limit.md), so servers allocate silent ids downwards from
-`254`.
+Ids above `31` need [Player Limit](player-limit.md), so servers allocate silent
+ids downwards from `254`.
 
 See [Extensions](extension.md) for how the extension is negotiated.
