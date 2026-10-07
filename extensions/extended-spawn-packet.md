@@ -16,7 +16,6 @@ replaces their team colour.
 |--------|--------------------------|------------------|-------|
 | 0      | Extended Create Player   | Server -> Client | `21+` |
 | 1      | Extended Existing Player | Server -> Client | `17+` |
-| 2      | Set Flags                | Server -> Client | `4`   |
 
 To a client that negotiated this extension, the server sends sub 0 instead of
 [Create Player](../protocol075.md#create-player) and sub 1 instead of
@@ -76,21 +75,10 @@ the tool or weapon they hold, and their corpse. It does not change their team.
 | Colour        | UByte[3]     |          | See [Colour](#colour).                           |
 | Name          | CP437 String | `Wolf`   | As in Existing Player, to the end of the packet. |
 
-## Sub ID 2: Set Flags
-
-Changes the flags of a player the client already knows.
-
-| Field Name    | Field Type | Example | Notes                           |
-|---------------|------------|---------|---------------------------------|
-| Packet ID     | UByte      | `0x74`  | Always `0x74`.                  |
-| Sub Packet ID | UByte      | `2`     | Always `2` for this sub-packet. |
-| Player ID     | UByte      | `254`   |                                 |
-| Flags         | UByte      | `0`     | See [Flags](#flags).            |
-
 ## Lifetime
 
 The flags and colour belong to the player id, and each sub-packet replaces
-those it carries. [Player Left](../protocol075.md#player-left) resets them to
+them. [Player Left](../protocol075.md#player-left) resets them to
 `0` once it is applied, so a silent player leaves silently.
 [Map Start](../protocol075.md#map-start-075) resets every id.
 
