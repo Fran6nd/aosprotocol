@@ -107,12 +107,16 @@ lamp to the camera, and d the distance in blocks between them:
 `smoothstep(x) = x²(3 - 2x)`. The glare follows Beam, leaving at most a faint
 glint from Lens where Beam is `0`. Clients should scale it by Distance and Fog.
 
-**Visibility.** A lamp inside a solid block shows nothing. Solid blocks on the
-segment from the lamp to the camera hide the glare; players and models do not. A
+**Visibility.** A lamp inside a solid block shows nothing. Whatever stands on the
+segment from the lamp to the camera hides the glare, players and models as much as
+solid blocks, so that the glare never shows a lamp the camera can't see. A lamp
+partly hidden may show the part of its glare that is in sight. The view's own
+first-person hands and weapon don't hide it; the glare is drawn under them. A
 client may ease it in and out over about 0.1 s.
 
 Beam, Lens and Visibility are required, so that every client gives a
-lit player away alike. The look of the glare is free.
+lit player away alike, and only when the lamp is in sight. The look of the glare
+is free.
 
 #### Reference rendering
 
