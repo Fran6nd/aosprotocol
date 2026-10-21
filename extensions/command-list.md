@@ -119,6 +119,23 @@ start of a Name, and no `0xff` prefix. Names are compared as the server sends
 them; a client may match them case-insensitively while completing, but sends
 the server's spelling.
 
+### Language
+
+A server **should** write Help and param Names in the player's language. It
+learns it from the User locale of a
+[Version Response (Extended)](../protocol075.md#version-response-extended-ep),
+asked for with a [Version Get](../protocol075.md#version-get-ep) listing
+property `1`: the client's interface language, such as `en_us` or `fr`. A
+server matches the language and region it has, falls back to the language
+alone, and then to its own default. With no locale, it uses its default.
+
+Command Names and Choices are never translated. The player types them back, and
+the server parses them the same for everyone.
+
+Each connection is sent its own list, so players in different languages read
+the same commands in their own. A server that sends the list before the locale
+arrives sends it again once it does.
+
 ## The line a client sends
 
 `/`, the Name, then each argument, separated by single spaces:
