@@ -903,7 +903,7 @@ registered so far.
 | 0    | [Player Properties](extensions/player-properties.md) | `HAS_PACKETS` | Sends additional player attributes from the server to the client |
 | 0x20 | [Damage Markers](extensions/damage-markers.md)       | `HAS_PACKETS` | Tells the client how much damage a hit did and who took it       |
 | 48   | [Teamplay](extensions/teamplay.md)                   | `HAS_PACKETS` | The features a team needs to play together                       |
-| 49   | [Pie Menu](extensions/pie-menu.md)                   | `HAS_PACKETS` | The server defines the client's radial quick menu                |
+| 0x31 | [Pie Menu](extensions/pie-menu.md)                   | `HAS_PACKETS` | The server defines the client's radial quick menu                |
 | 0x32 | [Flashlight](extensions/flashlight.md)               | `HAS_PACKETS` | A light a player carries, switched by the server, seen by all    |
 | 192  | [Player Limit](extensions/player-limit.md)           | `PACKETLESS`  | Support for up to 255 players                                    |
 | 193  | [Message Types](extensions/message-types.md)         | `PACKETLESS`  | Additional message types such as warnings and statuses           |
@@ -1015,8 +1015,6 @@ Each property:
 
 The locale is the client's interface language, not the language its player writes
 in. It comes from the `core_locale` setting, else the operating system, else `en_us`.
-A server translating for it matches the language and region, then the language
-alone, then falls back to its own default, which it also uses with no locale.
 
 The client sends one packet per property, and each packet repeats the entries
 before it, so the last packet holds all of them.

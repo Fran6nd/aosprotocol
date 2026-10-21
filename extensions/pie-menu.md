@@ -10,30 +10,34 @@ that the server chooses what is on offer, since it knows its mode, its commands
 and its vocabulary.
 
 | ------------: | ------------- |
-| Extension ID: | 49            |
-| Packet ID:    | 113           |
+| Extension ID: | `0x31`        |
+| Packet ID:    | `0x71`        |
 | Version:      | 1             |
 | Type:         | `HAS_PACKETS` |
 
-## Menu
+### Sub Packets:
 
-Server to client only; a server that receives one drops it. The whole menu, every
-time: a Menu replaces the one the client was showing, entire.
+| Sub ID | Name | Direction        | Size |
+|--------|------|------------------|------|
+| 0      | Menu | Server -> Client | 3+   |
+
+Server to client only; a server that receives one drops it.
+
+## Sub ID 0: Menu
+
+The whole menu, every time: a Menu replaces the one the client was showing,
+entire.
 
 | Field Name    | Field Type | Example | Notes                                 |
 |---------------|------------|---------|---------------------------------------|
-| Packet ID     | UByte      | `113`   | Always `113`.                         |
-| Sub Packet ID | UByte      | `0`     | Always `0`.                           |
+| Packet ID     | UByte      | `0x71`  | Always `0x71`.                        |
+| Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.       |
 | Pie Count     | UByte      | `4`     | Pies that follow, `0`-`10`.           |
 | Pies          | Pie[]      |         | The remaining bytes, see [Pie](#pie). |
 
-The count is stated rather than implied by the packet length, so that one wrong
-length byte cannot eat the pie behind it and still parse.
-
-Theme, Label and Text carry text the way a
-[Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
-behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). What a slice sends goes
-out however the client normally sends chat.
+Theme, Label and Text are **UTF-8 Text**: UTF-8 with no `0xff` prefix and no
+terminator, its length in bytes given by the UByte before it. Every range below
+is in bytes, so a parser can check it before decoding.
 
 ### Pie
 
@@ -42,9 +46,9 @@ One ring, captioned in the middle by its theme.
 | Field Name       | Field Type | Example    | Notes                                   |
 |------------------|------------|------------|-----------------------------------------|
 | Contexts         | UByte      | `0b011`    | Where it is offered, see [Contexts](#contexts). |
-| Theme Message ID | UByte      | `0`        | Reserved. Must be `0`.                  |
-| Theme Length     | UByte      | `6`        | Bytes of Theme, `0`-`32`.               |
-| Theme            | Text       | `"Social"` | The centre caption. May be empty.       |
+| Theme Message ID | UByte      | `0`        | Reserved. Must be `0`; a client ignores it. |
+| Theme Length     | UByte      | `6`        | `0`-`32`.                               |
+| Theme            | UTF-8 Text | `"Social"` | The centre caption. Empty means none.   |
 | Slices           | Slice[6]   |            | Exactly six, see [Slice](#slice).       |
 
 Every pie has exactly six slices, so there is no slice count on the wire: a
@@ -53,7 +57,7 @@ wanting fewer fills the spare wedges with [`NONE`](#actions); one wanting more
 uses another pie.
 
 Pies are offered in the order sent, within each context. Which opens first is the
-client's business. An empty Theme means no caption.
+client's business.
 
 ### Contexts
 
@@ -82,12 +86,12 @@ One wedge. It draws a Label and sends exactly one thing.
 | Field Name   | Field Type | Example   | Notes                                      |
 |--------------|------------|-----------|--------------------------------------------|
 | Action       | UByte      | `1`       | See [Actions](#actions).                   |
-| Message ID   | UByte      | `0`       | Reserved. Must be `0`.                     |
+| Message ID   | UByte      | `0`       | Reserved. Must be `0`; a client ignores it. |
 | Flags        | UByte      | `0b0`     | See below.                                 |
-| Text Length  | UByte      | `5`       | Bytes of Text, `0`-`255`. Not `0` for `CHAT` or `COMMAND`. |
-| Text         | Text       | `"/apoc"` | What it sends.                             |
-| Label Length | UByte      | `4`       | Bytes of Label, `0`-`48`.                  |
-| Label        | Text       | `"Nuke"`  | What it draws. **Empty means draw the Text.** |
+| Text Length  | UByte      | `5`       | `0`-`255`. Not `0` for `CHAT` or `COMMAND`. |
+| Text         | UTF-8 Text | `"/apoc"` | What it sends.                             |
+| Label Length | UByte      | `4`       | `0`-`48`.                                  |
+| Label        | UTF-8 Text | `"Nuke"`  | What it draws. **Empty means draw the Text.** |
 
 | Bit | Name     | Meaning                                                      |
 |-----|----------|--------------------------------------------------------------|
@@ -108,16 +112,21 @@ offered, never where their words go.
 | `1`       | `CHAT`    | Text, as a [Chat Message](../protocol075.md#chat-message). |
 | `2`       | `PING`    | A [Teamplay Ping](teamplay.md#sub-id-1-ping), Text as its Reason. |
 | `3`       | `COMMAND` | Text, as a chat message the server reads as a command.     |
-| `4`-`255` | reserved  | Refuses the menu, see [Validation](#validation).           |
+| `4`-`255` | reserved  | A client treats an unknown Action as `NONE`.               |
 
 The Action is also what a client styles a slice by, so that a wedge which pings,
 one which speaks and one which runs a command need not look alike.
 
+**Sending Text as chat.** A Chat Message is Code Page 437, so a client sends the
+Text unchanged when it is all ASCII, and otherwise behind the `0xff` prefix of
+[UTF-8 Chat](utf-8-chat.md).
+
 **`PING`** marks the world position the crosshair was on when the menu opened,
-not where it points when the slice is chosen. The Text is the ping's Reason and
-may be empty for a neutral marker. It needs [Teamplay](teamplay.md) negotiated
-with its `PING` bit set; without either, the client sends the Text as chat
-instead, so the words still arrive and only the marker is lost.
+not where it points when the slice is chosen. The Text is the ping's Reason as
+it is, both being UTF-8, and may be empty for a neutral marker. It needs
+[Teamplay](teamplay.md) negotiated with its `PING` bit set; without either, the
+client sends the Text as chat instead, so the words still arrive and only the
+marker is lost.
 
 **`COMMAND`** always goes on the team channel, whatever `GLOBAL` says. On the
 wire it is an ordinary chat packet: the client interprets none of it, does not
@@ -148,15 +157,17 @@ anything else is reserved, and version 1 leaves both characters as they are.
 
 The client expands once, immediately before sending, and never re-scans the
 result, so a name that looks like a token is not one. `%p` expands to nothing in
-the [`WORLD`](#contexts) context, where there is no player. The Text cap counts
+the [`WORLD`](#contexts) context, where there is no player. The Text range counts
 the bytes in the packet, before expansion.
 
 ### Language
 
-Themes and Labels **should** be in the player's
-[User locale](../protocol075.md#version-response-extended-ep). The Text of a
-`CHAT` or `PING` slice may be too, since it is what the player says; the Text of
-a `COMMAND` slice never is, so such a slice gives a Label. A Menu sent before
+Themes and Labels **should** be in the player's User locale, from a
+[Version Response (Extended)](../protocol075.md#version-response-extended-ep): the
+server matches the language and region, then the language alone, then falls back
+to its own default, which it also uses with no locale. The Text of a `CHAT` or
+`PING` slice may be translated too, since it is what the player says; the Text
+of a `COMMAND` slice never is, so such a slice gives a Label. A Menu sent before
 the locale arrives is sent again after it.
 
 ## Replacing the client's menu
@@ -194,24 +205,9 @@ applied whole or not at all**. Where one is refused the previous menu stands and
 the client logs it rather than disconnecting. A Menu is refused when:
 
 * A record runs past the end of the packet, or bytes remain after the last pie.
-* Pie Count is above `10`, or does not match the pies that follow, each of which
-  carries exactly six slices.
-* A Theme, Text or Label exceeds its cap, see [Limits](#limits).
-* An Action is `4` or above.
+* A count or a length is outside the range in its Notes.
+* A Theme, Text or Label is not well-formed UTF-8.
 * A `CHAT` or `COMMAND` slice has an empty Text.
-* A Message ID is not `0`.
-
-## Limits
-
-| Thing         | Cap   |
-|---------------|-------|
-| Pies per menu | `10`  |
-| Theme         | `32`  |
-| Label         | `48`  |
-| Text          | `255` |
-
-The string caps are in bytes, not characters, so a parser can enforce them before
-decoding anything.
 
 ## Connection state
 
