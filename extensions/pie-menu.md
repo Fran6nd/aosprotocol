@@ -84,7 +84,7 @@ One wedge. It draws a Label and sends exactly one thing.
 | Action       | UByte      | `1`       | See [Actions](#actions).                   |
 | Message ID   | UByte      | `0`       | Reserved. Must be `0`.                     |
 | Flags        | UByte      | `0b0`     | See below.                                 |
-| Text Length  | UByte      | `5`       | Bytes of Text, `0`-`255`.                  |
+| Text Length  | UByte      | `5`       | Bytes of Text, `0`-`255`. Not `0` for `CHAT` or `COMMAND`. |
 | Text         | Text       | `"/apoc"` | What it sends.                             |
 | Label Length | UByte      | `4`       | Bytes of Label, `0`-`48`.                  |
 | Label        | Text       | `"Nuke"`  | What it draws. **Empty means draw the Text.** |
@@ -122,6 +122,9 @@ instead, so the words still arrive and only the marker is lost.
 **`COMMAND`** always goes on the team channel, whatever `GLOBAL` says. On the
 wire it is an ordinary chat packet: the client interprets none of it, does not
 look for a leading `/`, and has no local command language reachable from here.
+
+A `CHAT` or `COMMAND` slice always has Text: an empty one would draw nothing and
+still send a line. A wedge that sends nothing is a `NONE` slice.
 
 A `NONE` slice does nothing at all — no packet, no message, no sound, no error.
 How an empty wedge looks is the client's business, but it must not stand in for a
@@ -206,6 +209,7 @@ the client logs it rather than disconnecting. A Menu is refused when:
   carries exactly six slices.
 * A Theme, Text or Label exceeds its cap, see [Limits](#limits).
 * An Action is `4` or above, or a reserved bit is set in Flags or Contexts.
+* A `CHAT` or `COMMAND` slice has an empty Text.
 * A Message ID is not `0`.
 
 ## Limits
