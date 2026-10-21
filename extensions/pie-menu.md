@@ -148,6 +148,25 @@ result, so a name that looks like a token is not one. `%p` expands to nothing in
 the [`WORLD`](#contexts) context, where there is no player. The Text cap counts
 the bytes in the packet, before expansion.
 
+### Language
+
+A server **should** write Themes and Labels in the player's language. It learns
+it from the User locale of a
+[Version Response (Extended)](../protocol075.md#version-response-extended-ep),
+asked for with a [Version Get](../protocol075.md#version-get-ep) listing
+property `1`: the client's interface language, such as `en_us` or `fr`. A
+server matches the language and region it has, falls back to the language
+alone, and then to its own default. With no locale, it uses its default.
+
+The Text of a `CHAT` or `PING` slice is what the player says, so it may be in
+their language too; teammates read it as written. The Text of a `COMMAND` slice
+is never translated: the server parses it the same for everyone. A `COMMAND`
+slice that should read well in every language gives a Label.
+
+Each connection is sent its own Menu, so players in different languages get the
+same rings in their own. A server that sends a Menu before the locale arrives
+sends it again once it does.
+
 ## Replacing the client's menu
 
 * **No Menu has arrived.** The client keeps its own.
