@@ -470,7 +470,8 @@ Create a line of blocks between 2 points. The block color is defined by the `Set
 | End Z position   | LE Int          | `0`     |       |
 
 ## CTF State
-Brief description.
+The [State Data](#state-data) tail for game mode `0`: scores, both intels and
+both bases.
 
 | ----------: | -------- |
 | Packet ID   | none     |
@@ -483,15 +484,26 @@ Brief description.
 | Team 1 score           | UByte         | `0`     |                                                                      |
 | Team 2 score           | UByte         | `0`     |                                                                      |
 | Capture limit          | UByte         | `0`     |                                                                      |
-| Intel flags            | UByte         | `0`     | bits signal if teams have intel - bit 1 for team 1, bit 2 for team 2 |
-| Team 1 intel location  | Location Data | `0`     | see below                                                            |
-| Team 2 intel location  | Location Data | `0`     | see below                                                            |
+| Intel flags            | UByte         | `0`     | See below                                                            |
+| Team 1 intel location  | Location Data | `0`     | Team 1's own intel. Held if bit 1 is set, see below                  |
+| Team 2 intel location  | Location Data | `0`     | Team 2's own intel. Held if bit 0 is set, see below                  |
 | Team 1 base X position | LE Float      | `0`     |                                                                      |
 | Team 1 base Y position | LE Float      | `0`     |                                                                      |
 | Team 1 base Z position | LE Float      | `0`     |                                                                      |
 | Team 2 base X position | LE Float      | `0`     |                                                                      |
 | Team 2 base Y position | LE Float      | `0`     |                                                                      |
 | Team 2 base Z position | LE Float      | `0`     |                                                                      |
+
+The intel flags say which team **carries the enemy intel**, so they read
+crosswise to the location fields:
+
+| Bit | Set when                          | Then held                |
+|-----|-----------------------------------|--------------------------|
+| 0   | Team 1 carries team 2's intel.    | Team 2 intel location    |
+| 1   | Team 2 carries team 1's intel.    | Team 1 intel location    |
+| 2-7 | Never set.                        |                          |
+
+piqueserver, LSD and ZeroSpades all read and write them this way.
 
 The intel location data is 12 bytes long. If the intel is being held, the first
 byte is a UByte with the ID of the holding player, then the rest are padding.
@@ -514,11 +526,29 @@ initial data packet, but as what's sent varies greatly depending on the
 gamemode, it is documented separately.
 
 ## TC State
+The [State Data](#state-data) tail for game mode `1`: the territories, or
+command posts.
+
+| ----------: | ------------------------ |
+| Packet ID   | none                     |
+| Total Size: | `1 + 13 * count` bytes   |
 
 | Field Name                | Field Type                          | Example | Notes                                                                      |
 | ------------------------- | ----------------------------------- | ------- | -------------------------------------------------------------------------- |
 | territory count           | UByte                               | 16      | Maximum is 16 otherwise the client will crash with 'Invalid memory access' |
-| Array[] of territory data | LE Float, LE Float, LE Float, UByte |         | See table below                                                            |
+| Array[] of territory data | Territory[count]                    |         | See table below                                                            |
+
+#### Territory
+
+| Field Name | Field Type | Example | Notes                                |
+|------------|------------|---------|--------------------------------------|
+| X position | LE Float   | `256.0` |                                      |
+| Y position | LE Float   | `256.0` |                                      |
+| Z position | LE Float   | `40.0`  |                                      |
+| Team       | UByte      | `2`     | Owner: `0` team 1, `1` team 2, `2` neutral |
+
+Clients read exactly `count` territories. piqueserver pads the array with zero
+bytes up to 16 entries, which clients ignore.
 
 This packet is not a complete packet, as it is only sent after the initial
 data, where the gamemode is sent. It could be considered as part of that
@@ -532,9 +562,9 @@ Indicates that the map transfer is complete. Also informs the client of
 numerous game parameters. Be aware that CTFState or TCState may be appended to
 the packet after the gamemode ID portion.
 
-| ----------: | -------- |
-| Packet ID   | 15       |
-| Total Size: | 52 bytes |
+| ----------: | ---------------------------------------------------- |
+| Packet ID   | 15                                                   |
+| Total Size: | 32 bytes, plus the [CTF](#ctf-state) or [TC](#tc-state) State |
 
 #### Fields
 
@@ -552,7 +582,24 @@ the packet after the gamemode ID portion.
 | Team 2 red color value   | UByte          | 0         |                           |
 | Team 1 name              | CP437 String   | Blue      | Always 10 characters long |
 | Team 2 name              | CP437 String   | Green     | Always 10 characters long |
-| Gamemode ID              | UByte          | 0         | 0 for CTF, 1 for TC       |
+| Gamemode ID              | UByte          | 0         | See below                 |
+
+#### Gamemode ID
+
+| Value     | Mode                     | Followed by             |
+|-----------|--------------------------|-------------------------|
+| 0         | Capture the Flag (CTF)   | [CTF State](#ctf-state) |
+| 1         | Territory Control (TC)   | [TC State](#tc-state)   |
+| 2-255     | undefined                | A server never sends it |
+
+These are the only two modes on the wire. Every other mode a server runs, such
+as team deathmatch, arena or babel, is a server script that presents itself as
+CTF or TC and sends that mode's state. The mode name a server reports to the master server list is
+separate and never reaches the client.
+
+A client that receives another value cannot tell how long the tail is: ZeroSpades
+and OpenSpades read it as TC, and BetterSpades logs an unknown mode and reads no
+state.
 
 
 ## Kill Action
