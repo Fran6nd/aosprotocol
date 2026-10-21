@@ -38,9 +38,6 @@ Names are encoded as a [Chat Message](../protocol075.md#chat-message) is: Code
 Page 437, or UTF-8 behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md).
 Command Names and Choices are ASCII, see [Names](#names).
 
-A server **should** keep the packet under 16 KiB; a client may refuse one over
-64 KiB.
-
 ### Command
 
 | Field Name  | Field Type | Example              | Notes                                 |
@@ -70,7 +67,7 @@ changes, say after a login.
 | Name Length  | UByte      | `6`        | `1`-`24`.                                     |
 | Name         | Text       | `"player"` | What a prompt or a hint calls it.             |
 | Choice Count | UByte      | `0`        | `0` unless Type is `CHOICE`, then `1`-`32`.   |
-| Choices      | Choice[]   |            | Each a Choice Length, `1`-`24`, and a Choice. |
+| Choices      | Choice[]   |            | See [Choices](#choices).                      |
 
 | Bit | Name       | Meaning                                                         |
 |-----|------------|-----------------------------------------------------------------|
@@ -89,10 +86,26 @@ Arguments are positional.
 | `1`       | `INTEGER` | A decimal integer, `-` allowed.                        |
 | `2`       | `NUMBER`  | A decimal number, `-` and one `.` allowed.             |
 | `3`       | `PLAYER`  | `#` and the player id in decimal, as in `#7`.          |
-| `4`       | `CHOICE`  | One of the Choices, as listed.                         |
+| `4`       | `CHOICE`  | One of its [Choices](#choices), spelled as listed.     |
 | `5`-`255` | reserved  | A client treats an unknown Type as `WORD`.             |
 
 `PLAYER` is sent as `#id`, since names repeat and hold spaces.
+
+### Choices
+
+A `CHOICE` param takes one value from a fixed set the server lists with it: a
+team, a mode, `on` or `off`. The client offers exactly those, as completions or
+a picker, and sends the one picked as it is spelled here.
+
+| Field Name    | Field Type | Example  | Notes      |
+|---------------|------------|----------|------------|
+| Choice Length | UByte      | `4`      | `1`-`24`.  |
+| Choice        | Text       | `"blue"` | See [Names](#names). |
+
+So `/switch` with params `PLAYER player` and `CHOICE team` listing `blue`,
+`green` and `spectator` lets a client offer those three, and sends
+`/switch #7 green`. Like every type, the set guides the player; it does not
+stop them typing something else.
 
 ### Names
 
