@@ -43,6 +43,8 @@ Active means a commit in the last twelve months, as of September 2026.
 ## Workflow
 You want to add a packet to AoS? Great!
 
+First check whether a chat [command](commands.md) would do: it needs no packet, and every client can already send one.
+
 ### Packet Proposal
 File an issue and name it `PP: PacketName`. Describe what packet you wish to add,
 and how it would improve the game.
