@@ -28,7 +28,7 @@ them as the packets they replace.
 
 | Bit | Name              | Meaning                                                                     |
 |-----|-------------------|-----------------------------------------------------------------------------|
-| 0   | `HIDE_SCOREBOARD` | Left out of the scoreboard and its counts, and of spectator camera cycling. |
+| 0   | `HIDE_SCOREBOARD` | Left out of the scoreboard, the player counts the client shows, and spectator camera cycling. |
 | 1   | `HIDE_PRESENCE`   | No join, team change or leave notification.                                 |
 | 2   | `HIDE_KILLFEED`   | No kill feed line for a kill this player made or suffered.                  |
 | 3   | `NO_STATS`        | Ignored by client-side statistics such as kill counters and streaks.        |
@@ -54,6 +54,19 @@ players are drawn and hit like any other player, and are teammates only of their
 own team: for the minimap, name tags, the spectator camera and friendly fire.
 Further teams do not appear in the scoreboard. A team the client has no entry
 for has an empty name and the colour `128, 128, 128`.
+
+The server alone puts a player on a further team; a client's
+[Change Team](../protocol075.md#change-team) still asks only for `0`, `1` or
+`255`. A team change reaches other clients as in the base protocol, a
+[Kill Action](../protocol075.md#kill-action) then a create, here sub 0.
+
+## Clients without the extension
+
+Base packets carry only teams `0`, `1` and `255`. For a player on a further
+team, the server either sends a client without the extension nothing about
+them, or creates them there on `0` or `1`, its choice, knowing that team will
+see them as an ally. The flags and colour have no base equivalent and are
+simply not sent.
 
 ## Sub ID 0: Extended Create Player
 
@@ -108,15 +121,19 @@ for has an empty name and the colour `128, 128, 128`.
 | Colour     | UByte[3]     |          | Blue, green, red.          |
 | Name       | CP437 String | `Zombie` | Always 10 characters long. |
 
-Teams `0` and `1` are always listed, and `255` never. Ids need not follow each
-other.
+The server lists teams `0` and `1`, never `255`, and no id twice. Ids need not
+follow each other. Since the client cannot play without this packet, it does not
+refuse one that breaks these rules: it ignores an entry for `255`, keeps the
+first entry for a repeated id, and treats a missing team as one it has no entry
+for, see [Team](#team).
 
 ## Lifetime
 
 The flags and colour belong to the player id, and each sub-packet replaces
 them. [Player Left](../protocol075.md#player-left) resets them to
 `0` once it is applied, so a silent player leaves silently.
-[Map Start](../protocol075.md#map-start-075) resets every id.
+[Map Start](../protocol075.md#map-start-075) resets every id, and clears the
+further teams until the next Extended State Data lists them again.
 
 ## Notes
 
