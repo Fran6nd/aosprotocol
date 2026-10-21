@@ -153,22 +153,11 @@ the bytes in the packet, before expansion.
 
 ### Language
 
-A server **should** write Themes and Labels in the player's language. It learns
-it from the User locale of a
-[Version Response (Extended)](../protocol075.md#version-response-extended-ep),
-asked for with a [Version Get](../protocol075.md#version-get-ep) listing
-property `1`: the client's interface language, such as `en_us` or `fr`. A
-server matches the language and region it has, falls back to the language
-alone, and then to its own default. With no locale, it uses its default.
-
-The Text of a `CHAT` or `PING` slice is what the player says, so it may be in
-their language too; teammates read it as written. The Text of a `COMMAND` slice
-is never translated: the server parses it the same for everyone. A `COMMAND`
-slice that should read well in every language gives a Label.
-
-Each connection is sent its own Menu, so players in different languages get the
-same rings in their own. A server that sends a Menu before the locale arrives
-sends it again once it does.
+Themes and Labels **should** be in the player's
+[User locale](../protocol075.md#version-response-extended-ep). The Text of a
+`CHAT` or `PING` slice may be too, since it is what the player says; the Text of
+a `COMMAND` slice never is, so such a slice gives a Label. A Menu sent before
+the locale arrives is sent again after it.
 
 ## Replacing the client's menu
 
@@ -208,7 +197,7 @@ the client logs it rather than disconnecting. A Menu is refused when:
 * Pie Count is above `10`, or does not match the pies that follow, each of which
   carries exactly six slices.
 * A Theme, Text or Label exceeds its cap, see [Limits](#limits).
-* An Action is `4` or above, or a reserved bit is set in Flags or Contexts.
+* An Action is `4` or above.
 * A `CHAT` or `COMMAND` slice has an empty Text.
 * A Message ID is not `0`.
 

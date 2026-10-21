@@ -1015,6 +1015,8 @@ Each property:
 
 The locale is the client's interface language, not the language its player writes
 in. It comes from the `core_locale` setting, else the operating system, else `en_us`.
+A server translating for it matches the language and region, then the language
+alone, then falls back to its own default, which it also uses with no locale.
 
 The client sends one packet per property, and each packet repeats the entries
 before it, so the last packet holds all of them.
