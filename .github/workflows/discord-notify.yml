@@ -1,0 +1,38 @@
+name: Discord PR notifications
+
+# pull_request_target (not pull_request) so the DISCORD_WEBHOOK secret is
+# available for PRs opened from forks. Safe here: no PR code is checked out.
+on:
+  pull_request_target:
+    types: [opened, closed]
+
+permissions: {}
+
+jobs:
+  notify:
+    if: github.event.action == 'opened' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          ACTION: ${{ github.event.action }}
+          REPO: ${{ github.event.repository.name }}
+          TITLE: ${{ github.event.pull_request.title }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          MERGER: ${{ github.event.pull_request.merged_by.login }}
+          URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "::error::DISCORD_WEBHOOK secret is not set"
+            exit 1
+          fi
+          if [ "$ACTION" = "opened" ]; then
+            content=$(printf '📢 **New Pull Request Opened!**\n**Title:** %s\n**Author:** %s\n\n💬 Please join the discussion and review here: %s' \
+              "$TITLE" "$AUTHOR" "$URL")
+          else
+            content=$(printf '🚀 **Protocol Updated!**\nA pull request was merged into **%s**.\n\n**Update:** %s\n**Merged by:** %s\n**Link:** %s' \
+              "$REPO" "$TITLE" "$MERGER" "$URL")
+          fi
+          jq -n --arg content "$content" '{content: $content, allowed_mentions: {parse: []}}' \
+            | curl -fsS -H "Content-Type: application/json" -d @- "$WEBHOOK"
