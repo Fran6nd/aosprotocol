@@ -180,6 +180,12 @@ map, which is the one that counts, to find the block hit, the face to build
 against, or a point in the open; it trusts only what it cannot know otherwise,
 where the camera was and where it looked.
 
+Typical uses are an edit mode for spectators, who build and dig from the free
+camera with slices such as `/place %r` and `/dig %b`, since a server otherwise
+never learns where a spectator is or looks; and better accuracy when the
+client's map and the server's have drifted apart, since with `%r` the server
+finds the block on its own map rather than taking the client's.
+
 The client expands once, immediately before sending, and never re-scans the
 result, so a name that looks like a token is not one. The Text limit counts the
 bytes in the packet, before expansion.
