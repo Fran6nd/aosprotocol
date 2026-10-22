@@ -146,26 +146,43 @@ here asks for a limit, and a server is free to apply one.
 
 ### Substitutions
 
-The Text of a slice may name the player the menu was opened on, so that a command
-acting on a player can be told which one.
+The Text of a slice may name what the menu was opened on, so that a command can
+be told which player, which block or where the player was looking.
 
 | Token | Expands to                                                            |
 |-------|-----------------------------------------------------------------------|
-| `%p`  | The player aimed at when the menu opened, as `#` and its id in decimal. |
+| `%p`  | The player aimed at, as `#` and its id in decimal.                    |
+| `%b`  | The block aimed at, as `x y z` in decimal.                            |
+| `%r`  | The camera ray, as `x y z dx dy dz`.                                  |
 | `%%`  | A literal percent sign.                                               |
 
 So `/votekick %p` reaches the server as `/votekick #7`, the form a command's
-player argument takes. A `%` followed by
+player argument takes, and `/dig %b` as `/dig 256 301 40`. A `%` followed by
 anything else is reserved, and version 1 leaves both characters as they are.
 
+Every token describes the moment the menu opened, whether the opening player is
+playing or spectating, so a [`SPECTATOR`](#contexts) pie can use them too. The
+aim is a ray from the camera along its view direction, out to the
+[fog](../protocol075.md#about-coordinates), `128` blocks:
+
+* **`%p`** is the player under the crosshair. It expands to nothing when no
+  player was aimed at, as always in the [`WORLD`](#contexts) context, leaving the
+  argument missing rather than a bare `#`.
+* **`%b`** is the first solid block the ray meets, as three integers. It expands
+  to nothing when the ray meets none.
+* **`%r`** is the ray itself, and is never empty. `x y z` is the camera position
+  with two decimals, the free camera's for a spectator, and `dx dy dz` is the
+  view direction, of length `1`, with four. The decimal point is always `.`, with
+  no exponent, as in `255.50 300.12 40.25 0.7071 -0.7071 0.0000`.
+
+`%b` suits a simple command. `%r` lets the server cast the ray against its own
+map, which is the one that counts, to find the block hit, the face to build
+against, or a point in the open; it trusts only what it cannot know otherwise,
+where the camera was and where it looked.
+
 The client expands once, immediately before sending, and never re-scans the
-result, so a name that looks like a token is not one. The player aimed at is the
-one under the crosshair when the menu opened, whether the opening player is
-playing or spectating, so a [`SPECTATOR`](#contexts) pie can name one too. `%p`
-expands to nothing when no player was aimed at, as always in the
-[`WORLD`](#contexts) context, leaving the argument missing rather than a bare
-`#`. The Text limit counts the bytes in the packet,
-before expansion.
+result, so a name that looks like a token is not one. The Text limit counts the
+bytes in the packet, before expansion.
 
 ### Language
 
