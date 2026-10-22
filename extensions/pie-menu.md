@@ -74,7 +74,8 @@ bitmask, so a ring that suits more than one context is sent once.
 
 A spectator is team `255`, see [Team IDs](../protocol075.md#team-ids). They have
 no team, so bits `0`-`2` never apply to one and a spectator is offered
-`SPECTATOR` pies alone.
+`SPECTATOR` pies alone. A staff member spectating from a team is a spectator
+here too; the server knows its staff and offers them `SPECTATOR` pies to suit.
 
 The context is fixed when the menu opens and does not change while it is held. A
 context with no pies has no menu, and no other context's rings stand in.
@@ -149,16 +150,19 @@ acting on a player can be told which one.
 
 | Token | Expands to                                                            |
 |-------|-----------------------------------------------------------------------|
-| `%p`  | The id of the player the menu was opened on, in decimal, without `#`.  |
+| `%p`  | The id of the player aimed at when the menu opened, in decimal, without `#`. |
 | `%%`  | A literal percent sign.                                               |
 
 So `/votekick #%p` reaches the server as `/votekick #7`. A `%` followed by
 anything else is reserved, and version 1 leaves both characters as they are.
 
 The client expands once, immediately before sending, and never re-scans the
-result, so a name that looks like a token is not one. `%p` expands to nothing in
-the [`WORLD`](#contexts) context, where there is no player. The Text range counts
-the bytes in the packet, before expansion.
+result, so a name that looks like a token is not one. The player aimed at is the
+one under the crosshair when the menu opened, whether the opening player is
+playing or spectating, so a [`SPECTATOR`](#contexts) pie can name one too. `%p`
+expands to nothing when no player was aimed at, as always in the
+[`WORLD`](#contexts) context. The Text range counts the bytes in the packet,
+before expansion.
 
 ### Language
 
