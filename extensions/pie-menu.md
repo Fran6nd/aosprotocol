@@ -166,12 +166,6 @@ expands to nothing when no player was aimed at, as always in the
 `#`. The Text range counts the bytes in the packet,
 before expansion.
 
-**The client's own menu is not bound by this.** It is never on the wire, so it may
-use tokens of its own, such as `%n` for the name of the player aimed at, which
-suits a chat line where `#7` would mean nothing to its readers. A Menu from the
-server never gets them: there, every token but `%p` and `%%` is reserved and left
-as it is.
-
 ### Language
 
 Themes and Labels **should** be in the player's User locale, from a
