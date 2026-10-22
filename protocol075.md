@@ -22,6 +22,35 @@ player.
 Send this magic number as part of the `enet_host_connect(ENetHost, ENetAddress,
 channels, int)` function
 
+## Transport
+
+The protocol runs over [ENet](http://enet.bespin.org/) 1.3, on UDP over IPv4.
+It uses a single ENet channel. Packets are sent reliably, except that
+piqueserver sends [World Update](#world-update-075) unsequenced. Both sides
+enable ENet's range coder (`enet_host_compress_with_range_coder`): a client must
+be able to decompress, and every known client also compresses. A client
+connects with:
+
+```c
+host = enet_host_create(NULL, 1, 1, 0, 0);
+enet_host_compress_with_range_coder(host);
+peer = enet_host_connect(host, &address, 1, 3); /* 3 for 0.75 */
+```
+
+## Server Addresses
+
+A server is usually written as an `aos://` address:
+
+```
+aos://ADDRESS[:PORT][:VERSION]
+```
+
+* **ADDRESS** is the IPv4 address as one decimal integer, in **little-endian**
+  order: the first octet is the lowest byte. `aos://16777343` is `127.0.0.1`.
+  Clients also accept a dotted address, as in `aos://127.0.0.1`.
+* **PORT** defaults to `32887`.
+* **VERSION** may follow as `0.75` or `0.76`; without it, 0.75 is assumed.
+
 ## Disconnect Reasons
 
 Whenever the connection is closed by the server, there is a reason supplied to
@@ -29,16 +58,46 @@ the client in the event's data (event.data).
 
 | Number | Reason                       |
 |--------|------------------------------|
+| 0      | Undefined, or timed out      |
 | 1      | Banned                       |
-| 2      | IP connection limit exceded? |
+| 2      | Too many connections from one IP |
 | 3      | Wrong protocol version       |
 | 4      | Server full                  |
+| 5      | Server shutdown              |
 | 10     | Kicked                       |
+| 20     | Invalid name                 |
+
+These are the values piqueserver sends and OpenSpades, ZeroSpades and
+BetterSpades display. libenet reports a timeout as `0` too, so a client cannot
+tell the two apart.
+
+The Voxlap client reads these codes differently. According to the
+[Canon Client Doc](https://notaburner.mooo.com/assets/clidoc_draft.html), it
+reads `2` as *kicked*, and uses `8` to `11` (banned, server full, kicked, wrong
+version) once the map has loaded, `0` to `4` only during the map transfer, and
+`61` for a server shutdown. A client must not crash on a value it does not know.
 
 ## About Coordinates
 
 In Ace of Spades the up-down axis is Z and it is inverted. This means 63 is
 water level and 0 is the highest point on a map.
+
+* **Axes.** X runs left to right and Y front to back, both `0` to `511` on a
+  standard map. Z runs top to bottom, `0` to `63`.
+* **Voxels and positions.** Blocks have integer positions; players, grenades,
+  tents and intels have float positions. Flooring each axis of a float position
+  gives the voxel it is in, so `{0.5, 0.5, 0.5}` is the centre of voxel
+  `{0, 0, 0}`.
+* **Players.** A player's position is their eye, where the camera sits.
+* **Orientation** is a direction vector, usually of length `1`.
+* **The bottom layers.** Grenades and the spade's dig never destroy blocks at
+  `z = 62` or `63`. Clients refuse to change `z = 63` at all.
+* **Fog.** Fog is a cylinder of radius `128` blocks around the camera,
+  measured on X and Y only. Nothing is drawn past it, and shots and block colour
+  picking do not reach past it.
+* **Sectors.** The map is labelled in a grid of 64 by 64 blocks: a letter `A`
+  to `H` for `floor(x / 64)`, then a digit `1` to `8` for `floor(y / 64) + 1`.
+  `A1` is the corner at `x = 0, y = 0`.
 
 # Packets
 
@@ -103,7 +162,9 @@ this byte.
 
 ## Data types
 
-Generally, all fields in the Protocol are Low Endian if not specified.
+Generally, all fields in the Protocol are little-endian if not specified.
+Signed integers are two's complement, floats are IEEE 754 single precision, and
+fields follow each other with no padding.
 
 The following shorthands are used in this document:
 
