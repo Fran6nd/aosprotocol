@@ -13,6 +13,7 @@ reverse engineered to document the protocol.
 
  * [0.75 (and 0.76) documentation](protocol075.md)
  * [1.0 alpha documentation](protocol100a1.md)
+ * [Client conventions](client.md)
 
 ## Extensions
 
