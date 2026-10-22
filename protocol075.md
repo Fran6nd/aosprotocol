@@ -99,6 +99,26 @@ water level and 0 is the highest point on a map.
   to `H` for `floor(x / 64)`, then a digit `1` to `8` for `floor(y / 64) + 1`.
   `A1` is the corner at `x = 0, y = 0`.
 
+## Block Gravity
+
+A block stays up while a chain of solid blocks, touching face to face, links it
+to the bottom of the map: `z >= 62` for piqueserver, `z = 63` for OpenSpades and
+ZeroSpades. When blocks are destroyed, each side checks their solid neighbours,
+and every block left with no such chain falls and is removed. Each client and
+the server work this out for themselves; no packet carries the falling blocks.
+
+According to the
+[Canon Client Doc](https://notaburner.mooo.com/assets/clidoc_draft.html), Voxlap
+also:
+
+* **Batches block changes.** It collects the [Block Actions](#block-action) and
+  [Block Lines](#block-line) received together, then applies every creation
+  before every destruction. Some servers rely on this to repaint a block by
+  sending a destroy then a build in one go. OpenSpades, ZeroSpades and
+  BetterSpades apply each packet at once, so this does not work with them.
+* **Wraps the map** on X and Y for drawing and grenades, so that terrain repeats
+  past the edges. Players, block gravity and building do not wrap.
+
 # Packets
 
 All packets start with an unsigned byte to specify their type, followed by the
