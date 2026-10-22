@@ -35,11 +35,11 @@ entire.
 | Pie Count     | UByte      | `4`     | Pies that follow, `0`-`10`.           |
 | Pies          | Pie[]      |         | The remaining bytes, see [Pie](#pie). |
 
-Theme, Label and Text carry text the way a
+Theme, Text, Label and Tooltip are NUL-terminated strings, as elsewhere in the
+protocol, and carry text the way a
 [Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
-behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each follows a UByte
-giving its length in bytes, prefix included, and every range below is in bytes,
-so a parser can check it before decoding.
+behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each limit below is in
+bytes, counting a `0xff` prefix but not the NUL.
 
 ### Pie
 
@@ -49,8 +49,7 @@ One ring, captioned in the middle by its theme.
 |------------------|------------|------------|-----------------------------------------|
 | Contexts         | UByte      | `0b011`    | Where it is offered, see [Contexts](#contexts). |
 | Theme Message ID | UByte      | `0`        | Reserved. Must be `0`; a client ignores it. |
-| Theme Length     | UByte      | `6`        | `0`-`32`.                               |
-| Theme            | Text       | `"Social"` | The centre caption. Empty means none.   |
+| Theme            | String     | `"Social"` | The centre caption, up to `32` bytes. Empty means none. |
 | Slices           | Slice[6]   |            | Exactly six, see [Slice](#slice).       |
 
 Every pie has exactly six slices, so there is no slice count on the wire: a
@@ -91,10 +90,14 @@ One wedge. It draws a Label and sends exactly one thing.
 | Action       | UByte      | `1`       | See [Actions](#actions).                   |
 | Message ID   | UByte      | `0`       | Reserved. Must be `0`; a client ignores it. |
 | Flags        | UByte      | `0b0`     | See below.                                 |
-| Text Length  | UByte      | `5`       | `0`-`255`.                                 |
-| Text         | Text       | `"/apoc"` | What it sends.                             |
-| Label Length | UByte      | `4`       | `0`-`48`.                                  |
-| Label        | Text       | `"Nuke"`  | What it draws. **Empty means draw the Text.** |
+| Text         | String     | `"/apoc"` | What it sends, up to `255` bytes.          |
+| Label        | String     | `"Nuke"`  | What it draws, up to `48` bytes. **Empty means draw the Text.** |
+| Tooltip      | String     | `"Calls in an airstrike"` | Up to `128` bytes. Empty means none. |
+
+The Tooltip says more about the slice than its Label can. A client shows it
+while the slice is highlighted, before the key is released, and never sends it.
+Where and how it is drawn is the client's business, and a client may leave
+tooltips out.
 
 | Bit | Name     | Meaning                                                      |
 |-----|----------|--------------------------------------------------------------|
@@ -161,12 +164,12 @@ one under the crosshair when the menu opened, whether the opening player is
 playing or spectating, so a [`SPECTATOR`](#contexts) pie can name one too. `%p`
 expands to nothing when no player was aimed at, as always in the
 [`WORLD`](#contexts) context, leaving the argument missing rather than a bare
-`#`. The Text range counts the bytes in the packet,
+`#`. The Text limit counts the bytes in the packet,
 before expansion.
 
 ### Language
 
-Themes and Labels **should** be in the player's User locale, from a
+Themes, Labels and Tooltips **should** be in the player's User locale, from a
 [Version Response (Extended)](../protocol075.md#version-response-extended-ep): the
 server matches the language and region, then the language alone, then falls back
 to its own default, which it also uses with no locale. The Text of a `CHAT` or
@@ -208,10 +211,11 @@ A client parses the whole packet before applying any of it, and **a menu is
 applied whole or not at all**. Where one is refused the previous menu stands and
 the client logs it rather than disconnecting. A Menu is refused when:
 
-* A record runs past the end of the packet, or bytes remain after the last pie.
-* A count or a length is outside the range in its Notes.
-* A Theme, Text or Label behind the `0xff` prefix is not well-formed UTF-8.
-* A Theme, Text or Label holds a control character, `0x00`-`0x1f` or `0x7f`.
+* A record or a string runs past the end of the packet, or bytes remain after
+  the last pie.
+* Pie Count is outside its range, or a string is longer than its limit.
+* A string behind the `0xff` prefix is not well-formed UTF-8.
+* A string holds a control character, `0x01`-`0x1f` or `0x7f`.
 
 ## Connection state
 
