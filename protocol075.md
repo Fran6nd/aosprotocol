@@ -217,6 +217,9 @@ ID, or even based on which players have moved since last update (although this m
 | Packet ID   | 2                  |
 | Total Size: | 1+24*players bytes |
 
+Entry `i` is player id `i`, so the entry count is `(size - 1) / 24`. A client
+skips its own entry, since it moves its own player itself.
+
 #### Fields
 
 | Field Name                         | Field Type                        | Example | Notes                    |
@@ -297,6 +300,9 @@ Contains the key-states of a player, packed into a byte.
 | 7         | Sneak  |
 | 8         | Sprint |
 
+Placement `1` is the lowest bit. For its own player id, a client uses only the
+Jump bit, so that a server can make the player jump; it ignores the rest.
+
 ## Weapon Input
 Contains the weapon input state.
 
@@ -308,6 +314,8 @@ Contains the weapon input state.
 |--------------|------------|---------|----------------------------------------------------------------------------------------------|
 | Player ID    | UByte      | `0`     |                                                                                              |
 | Weapon input | UByte      | `0`     | The lowest bit represents the primary fire, the second lowest represents the secondary fire. |
+
+A client ignores one sent for its own player id.
 
 ## Hit Packet
 #### Client-to-Server
@@ -355,6 +363,9 @@ Sent to the client when hurt.
 | Source X position | LE Float   | `0`     |                      |
 | Source Y position | LE Float   | `0`     |                      |
 | Source Z position | LE Float   | `0`     |                      |
+
+The source is where the damage came from, for the client's hit direction
+indicator.
 
 ## Grenade Packet
 Spawns a grenade with the given information.
@@ -435,6 +446,10 @@ Set player's team, weapon, etc.
 | Red        | UByte                                                       | `0`     |       |
 | Name       | [CP437](http://en.wikipedia.org/wiki/Code_page_437) String? | `Deuce` |       |
 
+Sent to a joining client for each player already in the game. It carries no
+position: the player appears where the next [World Update](#world-update-075)
+puts them.
+
 ## Short Player Data
 Like Existing Player, but with less information.
 
@@ -467,6 +482,18 @@ This packet is used to move various game objects like tents, intels and even gre
 | Y position | LE Float   | `0`     |             |
 | Z position | LE Float   | `0`     |             |
 
+In CTF, the Object ID is one of the following, and Team is ignored:
+
+| Object ID | Object            |
+|-----------|-------------------|
+| 0         | First team intel  |
+| 1         | Second team intel |
+| 2         | First team base   |
+| 3         | Second team base  |
+
+In TC, the Object ID is a territory's index in the [TC State](#tc-state), and
+Team is its new owner: `0`, `1` or `2` for neutral.
+
 ## Create Player
 Send on respawn of a player.
 
@@ -485,6 +512,16 @@ Send on respawn of a player.
 | Y position | LE Float                                                    | `0`     |       |
 | Z position | LE Float                                                    | `0`     |       |
 | Name       | [CP437](http://en.wikipedia.org/wiki/Code_page_437) String? | `Deuce` |       |
+
+Also sent when a player changes team or weapon, see
+[Change Team](#change-team). On a spawn the client restocks the player and
+resets their held block colour to `111, 111, 111`. A player on team `0` faces
+`+X` and one on team `1` faces `-X`.
+
+Clients do not agree on where the position is. OpenSpades and ZeroSpades place
+the eye 2.4 blocks above it, BetterSpades uses it as it is, and the
+[Canon Client Doc](https://notaburner.mooo.com/assets/clidoc_draft.html) gives
+2 blocks above for Voxlap.
 
 ## Block Action
 Sent when a block is placed/destroyed.
@@ -513,8 +550,16 @@ Sent when a block is placed/destroyed.
 | 2     | Spade (right button) destroy           | destroys 3 blocks, one above and below additionally |
 | 3     | Grenade destroy                        | destroys all blocks within an 3x3x3 area            |
 
+The bottom layers are protected, see [About Coordinates](#about-coordinates).
+Clients track the block count of their own player: Build takes one block, and
+type `1` gives one back when the player is holding the spade.
+
 ## Block Line
 Create a line of blocks between 2 points. The block color is defined by the `Set Color` packet. 
+
+Voxels on the line that are already solid keep their colour. The line uses one
+block per voxel, `|dx| + |dy| + |dz| + 1` in all. OpenSpades and ZeroSpades
+draw at most 50 of them.
 
 | ----------: | -------- |
 | Packet ID   | 14       |
@@ -888,6 +933,9 @@ Id of the player who has been restocked.
 |------------|------------|---------|--------------------------------|
 | Player ID  | UByte      | `0`     | ID of the player who restocked |
 
+The client restocks its own player: `100` HP, `50` blocks, `3` grenades and a
+full reserve of ammunition for its weapon.
+
 ## Fog Colour
 #### Server->Client
 
@@ -926,6 +974,9 @@ other clients.
 | Player ID    | UByte      | `0`     | Player who reloaded |
 | Clip ammo    | UByte      | `0`     |                     |
 | Reserve ammo | UByte      | `0`     |                     |
+
+For its own player, the client takes the ammunition counts from the packet. For
+another player it only plays the reload sound, and ignores the counts.
 
 ## Change Team
 #### Client-->Server-->Protocol-->Kill Action & Create Player
