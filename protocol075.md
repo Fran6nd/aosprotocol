@@ -176,6 +176,33 @@ The following shorthands are used in this document:
 | LE Uint      | 32bit unsigned integer                                  |
 | CP437 String | String encoded with CP437. Usually fixed-length.        |
 
+### Text
+
+Strings are [Code Page 437](https://en.wikipedia.org/wiki/Code_page_437), unless
+they start with a `0xff` byte: then the rest is UTF-8, see
+[UTF-8 Chat](extensions/utf-8-chat.md). A client writing a string uses CP437
+when every character has a CP437 byte, and `0xff` and UTF-8 otherwise.
+
+* A NUL byte ends a string.
+* In CP437, bytes `0x01` to `0x1f` are the symbols of the code page (`☺`, `♥`,
+  `♫`…), except `0x0a` and `0x0d`, which are line breaks.
+* In UTF-8 text, OpenSpades and ZeroSpades read bytes `0x01` to `0x08` as colour
+  changes for the rest of the line:
+
+| Byte   | Colour              |
+|--------|---------------------|
+| `0x01` | First team colour   |
+| `0x02` | Second team colour  |
+| `0x03` | Neutral team colour |
+| `0x04` | Red                 |
+| `0x05` | Green               |
+| `0x06` | Back to the default |
+| `0x07` | Grey                |
+| `0x08` | Yellow, ZeroSpades only |
+
+Team names in [State Data](#state-data) are 10 bytes and need not end in a
+NUL, so a client reads at most 10.
+
 ## Position Data
 `Client <-> Server`
 
@@ -410,6 +437,9 @@ Sets a player's currently equipped tool/weapon.
 | 1     | Block   |
 | 2     | Gun     |
 | 3     | Grenade |
+
+A server sends no other tool or weapon value: ZeroSpades and OpenSpades treat
+an unknown one as an error and disconnect.
 
 ## Set Colour
 Set the colour of a player's held block.
@@ -1004,6 +1034,10 @@ clients of the team change.
 | 255      | Spectator           |
 | 0        | First team (Blue)   |
 | 1        | Second team (Green) |
+
+Some implementations read the team as a signed byte, so spectator is `-1`
+there: the same byte. Territories and [Move Object](#move-object) also use `2`
+for neutral, which is never a player's team.
 
 ## Change Weapon
 #### Client-->Server-->Protocol-->Kill Action & Create Player
