@@ -36,6 +36,7 @@ each version should be linked here.
 ## Other Protocols
 
  * [Master Server Protocol](protocolmaster.md)
+ * [Server List](serverlist.md)
  * [Ping Protocol](protocolping.md)
 
 # Other Resources
