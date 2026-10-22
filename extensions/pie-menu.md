@@ -213,6 +213,7 @@ the client logs it rather than disconnecting. A Menu is refused when:
 * A record runs past the end of the packet, or bytes remain after the last pie.
 * A count or a length is outside the range in its Notes.
 * A Theme, Text or Label is not well-formed UTF-8.
+* A Theme, Text or Label holds a control character, `0x00`-`0x1f` or `0x7f`.
 * A `CHAT` or `COMMAND` slice has an empty Text.
 
 ## Connection state
