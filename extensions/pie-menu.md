@@ -35,9 +35,11 @@ entire.
 | Pie Count     | UByte      | `4`     | Pies that follow, `0`-`10`.           |
 | Pies          | Pie[]      |         | The remaining bytes, see [Pie](#pie). |
 
-Theme, Label and Text are **UTF-8 Text**: UTF-8 with no `0xff` prefix and no
-terminator, its length in bytes given by the UByte before it. Every range below
-is in bytes, so a parser can check it before decoding.
+Theme, Label and Text carry text the way a
+[Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
+behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each follows a UByte
+giving its length in bytes, prefix included, and every range below is in bytes,
+so a parser can check it before decoding.
 
 ### Pie
 
@@ -48,7 +50,7 @@ One ring, captioned in the middle by its theme.
 | Contexts         | UByte      | `0b011`    | Where it is offered, see [Contexts](#contexts). |
 | Theme Message ID | UByte      | `0`        | Reserved. Must be `0`; a client ignores it. |
 | Theme Length     | UByte      | `6`        | `0`-`32`.                               |
-| Theme            | UTF-8 Text | `"Social"` | The centre caption. Empty means none.   |
+| Theme            | Text       | `"Social"` | The centre caption. Empty means none.   |
 | Slices           | Slice[6]   |            | Exactly six, see [Slice](#slice).       |
 
 Every pie has exactly six slices, so there is no slice count on the wire: a
@@ -89,10 +91,10 @@ One wedge. It draws a Label and sends exactly one thing.
 | Action       | UByte      | `1`       | See [Actions](#actions).                   |
 | Message ID   | UByte      | `0`       | Reserved. Must be `0`; a client ignores it. |
 | Flags        | UByte      | `0b0`     | See below.                                 |
-| Text Length  | UByte      | `5`       | `0`-`255`. Not `0` for `CHAT` or `COMMAND`. |
-| Text         | UTF-8 Text | `"/apoc"` | What it sends.                             |
+| Text Length  | UByte      | `5`       | `0`-`255`.                                 |
+| Text         | Text       | `"/apoc"` | What it sends.                             |
 | Label Length | UByte      | `4`       | `0`-`48`.                                  |
-| Label        | UTF-8 Text | `"Nuke"`  | What it draws. **Empty means draw the Text.** |
+| Label        | Text       | `"Nuke"`  | What it draws. **Empty means draw the Text.** |
 
 | Bit | Name     | Meaning                                                      |
 |-----|----------|--------------------------------------------------------------|
@@ -118,13 +120,12 @@ offered, never where their words go.
 The Action is also what a client styles a slice by, so that a wedge which pings,
 one which speaks and one which runs a command need not look alike.
 
-**Sending Text as chat.** A Chat Message is Code Page 437, so a client sends the
-Text unchanged when it is all ASCII, and otherwise behind the `0xff` prefix of
-[UTF-8 Chat](utf-8-chat.md).
+What a slice sends goes out however the client normally sends chat.
 
 **`PING`** marks the world position the crosshair was on when the menu opened,
-not where it points when the slice is chosen. The Text is the ping's Reason as
-it is, both being UTF-8, and may be empty for a neutral marker. It needs
+not where it points when the slice is chosen. The Text becomes the ping's Reason,
+which is plain UTF-8: the client drops a `0xff` prefix, or decodes Code Page 437.
+It may be empty for a neutral marker. It needs
 [Teamplay](teamplay.md) negotiated with its `PING` bit set; without either, the
 client sends the Text as chat instead, so the words still arrive and only the
 marker is lost.
@@ -132,9 +133,6 @@ marker is lost.
 **`COMMAND`** always goes on the team channel, whatever `GLOBAL` says. On the
 wire it is an ordinary chat packet: the client interprets none of it, does not
 look for a leading `/`, and has no local command language reachable from here.
-
-A `CHAT` or `COMMAND` slice always has Text: an empty one would draw nothing and
-still send a line. A wedge that sends nothing is a `NONE` slice.
 
 A `NONE` slice does nothing at all — no packet, no message, no sound, no error.
 How an empty wedge looks is the client's business, but it must not stand in for a
@@ -212,9 +210,8 @@ the client logs it rather than disconnecting. A Menu is refused when:
 
 * A record runs past the end of the packet, or bytes remain after the last pie.
 * A count or a length is outside the range in its Notes.
-* A Theme, Text or Label is not well-formed UTF-8.
+* A Theme, Text or Label behind the `0xff` prefix is not well-formed UTF-8.
 * A Theme, Text or Label holds a control character, `0x00`-`0x1f` or `0x7f`.
-* A `CHAT` or `COMMAND` slice has an empty Text.
 
 ## Connection state
 
