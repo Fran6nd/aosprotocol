@@ -32,21 +32,23 @@ Replaces the client's whole list.
 | Command Count | UByte      | `12`    | Commands that follow, `0`-`255`.              |
 | Commands      | Command[]  |         | The remaining bytes, see [Command](#command). |
 
-Every text field is **UTF-8 Text**: UTF-8 with no `0xff` prefix and no
-terminator, its length in bytes given by the UByte before it. Every range below
-is in bytes, so a parser can check it before decoding. Command Names, Aliases
-and Choices are further limited to ASCII, see [Names](#names).
+Text fields carry text the way a
+[Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
+behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each follows a UByte
+giving its length in bytes, prefix included, and every range below is in bytes,
+so a parser can check it before decoding. Command Names, Aliases and Choices are
+ASCII, see [Names](#names).
 
 ### Command
 
 | Field Name  | Field Type | Example              | Notes                                 |
 |-------------|------------|----------------------|---------------------------------------|
 | Name Length | UByte      | `8`                  | `1`-`32`.                             |
-| Name        | UTF-8 Text | `"teleport"`         | Without the `/`, see [Names](#names). |
+| Name        | Text       | `"teleport"`         | Without the `/`, see [Names](#names). |
 | Alias Count | UByte      | `1`                  | `0`-`8`.                              |
 | Aliases     | Alias[]    |                      | Other names for the same command.     |
 | Help Length | UByte      | `16`                 | `0`-`255`.                            |
-| Help        | UTF-8 Text | `"Moves a player"`   | No line breaks; a client may cut it.  |
+| Help        | Text       | `"Moves a player"`   | No line breaks; a client may cut it.  |
 | Param Count | UByte      | `2`                  | `0`-`8`.                              |
 | Params      | Param[]    |                      | See [Param](#param).                  |
 
@@ -64,7 +66,7 @@ changes, say after a login.
 | Type         | UByte      | `3`        | See [Types](#types).                          |
 | Flags        | UByte      | `0b000`    | See below.                                    |
 | Name Length  | UByte      | `6`        | `1`-`24`.                                     |
-| Name         | UTF-8 Text | `"player"` | What a prompt or a hint calls it.             |
+| Name         | Text       | `"player"` | What a prompt or a hint calls it.             |
 | Choice Count | UByte      | `0`        | `0` unless Type is `CHOICE`, then `1`-`32`.   |
 | Choices      | Choice[]   |            | See [Choices](#choices).                      |
 
@@ -99,7 +101,7 @@ a picker, and sends the one picked as it is spelled here.
 | Field Name    | Field Type | Example  | Notes      |
 |---------------|------------|----------|------------|
 | Choice Length | UByte      | `4`      | `1`-`24`.  |
-| Choice        | UTF-8 Text | `"blue"` | See [Names](#names). |
+| Choice        | Text       | `"blue"` | See [Names](#names). |
 
 So `/switch` with params `PLAYER player` and `CHOICE team` listing `blue`,
 `green` and `spectator` lets a client offer those three, and sends
@@ -130,9 +132,7 @@ is sent again after it.
 ```
 
 for a command `kick` with params `PLAYER player` and `WORD reason` flagged
-`REST`. A Chat Message is Code Page 437, so a client sends the line unchanged
-when it is all ASCII, and otherwise behind the `0xff` prefix of
-[UTF-8 Chat](utf-8-chat.md).
+`REST`. It goes out however the client normally sends chat.
 
 A client adds no quotes or escapes. Each server splits the line itself, so a
 `REST` argument reaches the command as that server splits it. Servers cap a chat
@@ -153,7 +153,7 @@ the client logs it rather than disconnecting. A list is refused when:
 * A record runs past the end of the packet, or bytes remain after the last
   command.
 * A count or a length is outside the range in its Notes.
-* A Help or param Name is not well-formed UTF-8.
+* A Help or param Name behind the `0xff` prefix is not well-formed UTF-8.
 * A Name, Alias or Choice holds a character outside those in [Names](#names).
 * A Name or Alias appears twice in the list, as either.
 * A required param follows an `OPTIONAL` one, or a param other than the last,
