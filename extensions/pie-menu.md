@@ -150,10 +150,11 @@ acting on a player can be told which one.
 
 | Token | Expands to                                                            |
 |-------|-----------------------------------------------------------------------|
-| `%p`  | The id of the player aimed at when the menu opened, in decimal, without `#`. |
+| `%p`  | The player aimed at when the menu opened, as `#` and its id in decimal. |
 | `%%`  | A literal percent sign.                                               |
 
-So `/votekick #%p` reaches the server as `/votekick #7`. A `%` followed by
+So `/votekick %p` reaches the server as `/votekick #7`, the form a command's
+player argument takes. A `%` followed by
 anything else is reserved, and version 1 leaves both characters as they are.
 
 The client expands once, immediately before sending, and never re-scans the
@@ -161,7 +162,8 @@ result, so a name that looks like a token is not one. The player aimed at is the
 one under the crosshair when the menu opened, whether the opening player is
 playing or spectating, so a [`SPECTATOR`](#contexts) pie can name one too. `%p`
 expands to nothing when no player was aimed at, as always in the
-[`WORLD`](#contexts) context. The Text range counts the bytes in the packet,
+[`WORLD`](#contexts) context, leaving the argument missing rather than a bare
+`#`. The Text range counts the bytes in the packet,
 before expansion.
 
 ### Language
