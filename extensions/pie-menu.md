@@ -137,7 +137,7 @@ The Text of a slice may name what the menu was opened on.
 |-------|---------------------|---------------------------------------------|------------------------------------------------------------------------------------------|------------------------|
 | `%p`  | The player aimed at | `#7`                                        | `#` then an integer, the player id                                                      | No player is aimed at. |
 | `%b`  | The block aimed at  | `257 298 40`                                | 3 integers: `x y z`                                                                      | No block is aimed at.  |
-| `%r`  | The camera ray      | `255.50 300.12 40.25 0.7071 -0.7071 0.0000` | 6 fixed-point numbers: the position `x y z` with 2 decimal places, then the direction `dx dy dz` with 4 | Never.      |
+| `%r`  | The camera ray      | `255.50 300.12 40.25 0.7071 -0.7071 0.0000` | 6 decimal numbers: the position `x y z` with at least 2 decimal places, then the direction `dx dy dz` with at least 4 | Never.      |
 | `%%`  | A percent sign      | `%`                                         |                                                                                          | Never.                 |
 
 A `%` followed by anything else, or by nothing, is reserved, and version 1 leaves
@@ -156,15 +156,13 @@ to what it receives.
 * **The camera ray**, `%r`, is the aim itself: the camera position, then the view
   direction, a vector of length `1` in the same
   [coordinates](../protocol075.md#about-coordinates), so `dz` above `0` looks
-  down. Rounded, it is only close to length `1`, so a server normalises it again.
+  down. A server normalises it again before use.
 
 **Types.** The values of a token are separated by single spaces.
 
 * An **integer** is written in base 10, with no sign, leading zeros or padding.
-* A **fixed-point** number has exactly the decimal places its row gives, rounded
-  to nearest, with `-` when negative and no `+`, at least one digit before the
-  decimal point, `.` as the decimal point whatever the locale, and no exponent.
-  A value that rounds to zero has no sign.
+* A **decimal** number has at least the decimal places its row gives, `.` as
+  the decimal point whatever the locale, and no exponent.
 
 `%b` suits a simple command. `%r` lets the server cast the ray against its own
 map: a spectator edit mode, building and digging from the free camera with
