@@ -186,9 +186,10 @@ too when primary fire is released, and after each round of a one-round-at-a-time
 reload. Each claim carries the next Sequence, wrapping after `255`.
 
 **The server corrects.** It keeps its own count and never takes the client's.
-It answers a claim only when they differ: in State, or by more rounds than the
-firearm fires in `0.2` seconds, at least one. A State that differs only because
-one side finished a reload within the last `0.5` seconds is not a difference.
+It answers a claim when they differ by more than it tolerates. How much that
+is, in rounds and in how long after a reload a State may still differ, is the
+server's choice: network jitter decides it, and piqueserver already tolerates
+some drift in its count.
 It also sends its own Weapon State when it changes a slot itself: when a reload
 it was asked for starts or ends, a Restock, a pickup, a new Loadout, and to a
 joining client.
@@ -199,10 +200,11 @@ server's own changes since applied: a reload, a Restock, a pickup. Rounds fired
 after the claim are left out. The client adopts it and takes off the rounds it
 has fired since that claim, so none is counted twice.
 
-**A press during the server's reload.** The client's reload can end a moment
-before the server's. A fire press that reaches the server in the last `0.5`
-seconds of its reload starts counting rounds from the reload's end, rather than
-being refused.
+**A press during the server's reload.** Jitter can make a whole-magazine
+reload end on the client a moment before the server's. A fire press that reaches
+the server in the last moment of such a reload, as long as the server allows,
+counts rounds from the reload's end rather than being refused. During a
+one-round-at-a-time reload a press stops the reload, as in every client.
 
 **Replies and relays.** To clients with the extension the server answers a
 Weapon Reload with Weapon State, not Weapon Reload, and relays only Weapon
