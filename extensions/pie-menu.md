@@ -142,7 +142,8 @@ no player aimed at sends `/votekick `, not `/votekick #`.
 
 **The aim** is a ray from the camera the player was viewing through, their eyes
 while playing, or the free camera or the followed view while spectating, along
-its view direction, out to `128` blocks measured horizontally, the fog distance.
+its view direction. It has no length limit; a server that wants one applies it
+to what it receives.
 
 * **The player aimed at**, `%p`, is the first player the aim meets before any
   block.
