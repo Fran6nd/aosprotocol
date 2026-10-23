@@ -236,6 +236,10 @@ without the extension get Weapon Reload as today, its byte counts capped at
   extension, the vanilla weapon the player's first firearm is
   [drawn as](#models), or the rifle when there is none. A loadout survives a
   respawn.
+* **Set Tool** from a client is handled as in the base game until its Loadout
+  arrives; the Hold that follows the Loadout settles the slot. Once a loadout is
+  set, the server reads a client's Set Tool as a Hold for the first slot of that
+  Tool, and handles Change Weapon as it sees fit.
 * **Kill Action** keeps its kill types. For a weapon or headshot kill, a client
   draws the kill icon of the killer's slot as last told by Hold; the other types
   keep their own.
