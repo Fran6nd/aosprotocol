@@ -127,7 +127,9 @@ Damage to players stays the server's: the client reports hits with the
 These are the vanilla guns' own values and work as the vanilla clients use them.
 
 * **Spread.** Each pellet flies along the player's view direction plus a random
-  offset of up to `2 × Spread` on each axis. Aiming down the sights halves it,
+  offset of up to `2 × Spread` on each axis. OpenSpades and ZeroSpades add each
+  pellet's offset to the previous pellet's direction, as 0.75 does;
+  BetterSpades starts every pellet from the view direction. Aiming down the sights halves it,
   and so does crouching with a `STEADIED` firearm, as ZeroSpades and BetterSpades
   do for every vanilla gun but the shotgun.
 * **Recoil Up** and **Recoil Side** are the constants the vanilla clients
