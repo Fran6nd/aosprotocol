@@ -178,12 +178,8 @@ server as any over-long chat.
 ### Language
 
 Themes, Labels and Tooltips **should** be in the player's User locale, from a
-[Version Response (Extended)](../protocol075.md#version-response-extended-ep): the
-server matches the language and region, then the language alone, then falls back
-to its own default, which it also uses with no locale. The Text of a `CHAT` or
-`PING` slice may be translated too, since it is what the player says; the Text
-of a `COMMAND` slice never is, so such a slice gives a Label. A Menu sent before
-the locale arrives is sent again after it.
+[Version Response (Extended)](../protocol075.md#version-response-extended-ep). A
+Menu sent before the locale arrives is sent again after it.
 
 ## Opening the menu
 
