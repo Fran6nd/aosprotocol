@@ -190,8 +190,11 @@ client's.
 fills the magazine, may fire at once, and sends its Weapon State. It sends one
 too when primary fire is released, and after each round of a one-round-at-a-time
 reload. Each slot counts its own Sequence: a Loadout or a respawn sets it to
-`0`, and each claim carries the next number, wrapping after `255` and skipping
-`0`. A server state with Sequence `0` answers no claim and describes the slot as
+`0`, the first claim after it carries `1`, and later claims count on from `2`,
+wrapping after `255` back to `2`. After a Loadout or respawn the server ignores
+a slot's claims until one with `1` arrives, so a claim still in transit from
+before is not taken for a new one. A Weapon State for a Slot beyond Slot Count,
+or that is not a firearm, is ignored. A server state with Sequence `0` answers no claim and describes the slot as
 of the Loadout or respawn.
 
 **The server corrects.** It keeps its own count and never takes the client's.
