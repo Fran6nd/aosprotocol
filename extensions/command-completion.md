@@ -1,4 +1,4 @@
-# Command List
+# Command Completion
 
 The server tells the client which chat commands it accepts and what each one
 takes, so that a client can complete them as they are typed, show their help,
@@ -23,7 +23,7 @@ Server to client only; a server that receives one drops it.
 
 ## Sub ID 0: Commands
 
-Replaces the client's whole list.
+Replaces the client's whole command list.
 
 | Field Name    | Field Type | Example | Notes                                         |
 |---------------|------------|---------|-----------------------------------------------|
