@@ -208,12 +208,14 @@ without the extension get Weapon Reload as today.
 
 ## Base packets
 
-* **Create Player** and **Existing Player** carry the base weapon nearest the
-  player's first firearm, or the rifle when there is none, for clients without
-  the extension. A loadout survives a respawn.
-* **Change Weapon** means nothing while a loadout is set.
-* **Kill Action** keeps its kill types; a client draws the kill icon of the
-  killer's held slot.
+* **Create Player** and **Existing Player** carry, for clients without the
+  extension, the vanilla weapon the player's first firearm is
+  [drawn as](#models), or the rifle when there is none. A loadout survives a
+  respawn.
+* **Change Weapon** is the server's to handle as it sees fit while a loadout is
+  set.
+* **Kill Action** keeps its kill types. For a weapon or headshot kill, a client
+  draws the kill icon of the slot that fired; the other types keep their own.
 
 Clients without the extension see only base packets: the vanilla weapon above,
 and Set Tool as the server translates it.
