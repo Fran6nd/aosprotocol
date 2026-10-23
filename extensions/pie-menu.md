@@ -154,12 +154,12 @@ here asks the server to, and a server is free to.
 The Text of a slice may name what the menu was opened on, so that a command can
 be told which player, which block or where the player was looking.
 
-| Token | Expands to          | Values           | Type                                   | Empty when                  |
-|-------|---------------------|------------------|----------------------------------------|-----------------------------|
-| `%p`  | The player aimed at | `#id`            | `#` and an integer                     | No player is aimed at.      |
-| `%b`  | The block aimed at  | `x y z`          | 3 integers                             | No block is aimed at.       |
-| `%r`  | The camera ray      | `x y z dx dy dz` | 3 fixed-point with 2 places, then 3 with 4 | Never.                  |
-| `%%`  | A percent sign      | `%`              |                                        | Never.                      |
+| Token | Expands to          | Example                                     | Type                                                                                     | Empty when             |
+|-------|---------------------|---------------------------------------------|------------------------------------------------------------------------------------------|------------------------|
+| `%p`  | The player aimed at | `#7`                                        | `#` then an integer, the player id                                                      | No player is aimed at. |
+| `%b`  | The block aimed at  | `257 298 40`                                | 3 integers: `x y z`                                                                      | No block is aimed at.  |
+| `%r`  | The camera ray      | `255.50 300.12 40.25 0.7071 -0.7071 0.0000` | 6 fixed-point numbers: the position `x y z` with 2 decimal places, then the direction `dx dy dz` with 4 | Never.      |
+| `%%`  | A percent sign      | `%`                                         |                                                                                          | Never.                 |
 
 So `/votekick %p` reaches the server as `/votekick #7`, the form a command's
 player argument takes, and `/dig %b` as `/dig 257 298 40`. A `%` followed by
