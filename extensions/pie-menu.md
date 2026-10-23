@@ -35,8 +35,9 @@ Server to client only; a server that receives one drops it.
 Theme, Text, Label and Tooltip are of type **String**: NUL-terminated, as
 elsewhere in the protocol, and encoded the way a
 [Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
-behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each limit below is in
-bytes, counting a `0xff` prefix but not the NUL.
+behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). A client draws them as
+it draws chat, colour codes included. Each limit below is in bytes, counting a
+`0xff` prefix but not the NUL.
 
 ### Pie
 
@@ -223,7 +224,6 @@ the client logs it rather than disconnecting. A Menu is refused when:
   the last pie.
 * Pie Count is outside its range, or a string is longer than its limit.
 * A string behind the `0xff` prefix is not well-formed UTF-8.
-* A string holds a control character, `0x01`-`0x1f` or `0x7f`.
 
 ## Connection state
 
