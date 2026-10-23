@@ -1,10 +1,10 @@
 # Weapon and Tool State
 
-Keeps a player's ammunition, blocks and grenades in step between client and
-server. Today each side counts on its own: the server from how long fire is
-held, the client from the rounds it fires, and a reload the server refuses
-silently is finished by the client anyway. Here the client predicts and the
-server corrects.
+Keeps the counts of the tool a player holds in step between client and server:
+the gun's rounds, the blocks or the grenades. Today each side counts on its own:
+the server from how long fire is held, the client from the rounds it fires, and
+a reload the server refuses silently is finished by the client anyway. Here the
+client predicts and the server corrects.
 
 | ------------: | ------------- |
 | Extension ID: | `0x39`        |
@@ -16,12 +16,13 @@ server corrects.
 
 | Sub ID | Name  | Direction         | Size |
 |--------|-------|-------------------|------|
-| 0      | State | Client <-> Server | 10   |
+| 0      | State | Client <-> Server | 8    |
 
 ## Sub ID 0: State
 
-A player's counts. From a client it is a claim, which lets the client act at
-once; from the server it is the truth, which replaces the client's.
+The counts of the tool a player holds. From a client it is a claim, which lets
+the client act at once; from the server it is the truth, which replaces the
+client's.
 
 | Field Name    | Field Type | Example | Notes                                          |
 |---------------|------------|---------|------------------------------------------------|
@@ -29,25 +30,20 @@ once; from the server it is the truth, which replaces the client's.
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.                |
 | Player ID     | UByte      | `7`     | Ignored from a client; the server fills it in. |
 | Sequence      | UByte      | `41`    | See [Sequence](#sequence).                     |
-| Slot          | UByte      | `2`     | The gun slot these rounds belong to, see [Slots](#slots). |
-| Reloading     | UByte      | `0`     | `1` while that gun reloads, else `0`. Other values read as `0`. |
-| Magazine      | UByte      | `10`    | Rounds in that gun's magazine.                 |
-| Reserve       | UByte      | `50`    | Rounds carried beyond it.                      |
-| Blocks        | UByte      | `50`    | Blocks carried.                                |
-| Grenades      | UByte      | `3`     | Grenades carried.                              |
+| Tool          | UByte      | `2`     | The held tool, as in [Set Tool](../protocol075.md#set-tool). |
+| Reloading     | UByte      | `0`     | Gun only: `1` while it reloads, else `0`. Other values read as `0`. |
+| Count         | UByte      | `10`    | Rounds in the gun's magazine, blocks, or grenades. |
+| Reserve       | UByte      | `50`    | Gun only: rounds carried beyond the magazine.  |
 
-### Slots
-
-A player's tools are numbered by slot. Without a [Loadout](loadout.md) there are
-four, one per base tool, and slot `n` is the tool `n` of
-[Set Tool](../protocol075.md#set-tool), so the gun is slot `2`. With one, each gun
-slot keeps its own magazine and reserve. Blocks and grenades are one pool each,
-whatever the slots. A State with a Slot that is not a gun is ignored.
+Only the held tool is described; which tool that is, and how a player switches,
+is the business of [Set Tool](../protocol075.md#set-tool) or whatever extension
+chooses it. A State for the spade, or whose Tool is not the one the receiver
+thinks is held, is ignored: it was sent across a switch.
 
 ### The client predicts
 
 It counts on its own clock: when its reload ends it fills the magazine and may
-fire at once. A claim is about the gun slot the player holds. It sends a State when its reload ends, when primary fire is
+fire at once. It sends a State when its reload ends, when primary fire is
 released, after each round of the shotgun's reload, and after it places blocks
 or throws a grenade. It still asks for a reload with
 [Weapon Reload](../protocol075.md#weapon-reload).
@@ -55,11 +51,11 @@ or throws a grenade. It still asks for a reload with
 ### The server corrects
 
 It keeps its own counts and never takes the client's. It answers a claim when
-they differ by more than it tolerates; how much that is, in rounds, blocks or
-grenades, and how long after a reload Reloading may still differ, is the
-server's choice. It also sends its own State when it changes the counts itself:
-when a reload starts, ends or is cancelled, a Restock, a pickup, a respawn, and
-to a joining client.
+they differ by more than it tolerates; how much that is, and how long after a
+reload Reloading may still differ, is the server's choice. It also sends its
+own State when the player switches tools, and when it changes the counts
+itself: when a reload starts, ends or is cancelled, a Restock, a pickup, a
+respawn, and to a joining client.
 
 To a client with the extension the server answers a Weapon Reload with a State,
 not a Weapon Reload. To other clients with the extension it sends its own State
@@ -69,17 +65,16 @@ Weapon Reload as today.
 
 ### Sequence
 
-A respawn or a new Loadout sets the Sequence to `0`. The client's first claim after it carries
-`1`, and later claims count on from `2`, wrapping after `255` back to `2`. After
-a respawn the server ignores claims until one with `1` arrives, so a claim still
-in transit from before is not taken for a new one.
+A respawn or a tool switch sets the Sequence to `0`. The client's first claim
+after it carries `1`, and later claims count on from `2`, wrapping after `255`
+back to `2`. After a reset the server ignores claims until one with `1` arrives,
+so a claim still in transit from before is not taken for a new one.
 
 The server's State carries the Sequence of the last claim it received, or `0`
-when there has been none since the respawn. It describes the counts as they
-were at that claim, or at the respawn for `0`, with only the server's own changes
-since applied. Rounds fired, blocks placed and grenades thrown after the claim
-are left out. The client adopts it and takes off what it has used since that
-claim, so nothing is counted twice.
+when there has been none since the reset. It describes the counts as they were
+at that claim, or at the reset for `0`, with only the server's own changes since
+applied. What was used after the claim is left out. The client adopts it and
+takes off what it has used since that claim, so nothing is counted twice.
 
 ### Reloads
 
