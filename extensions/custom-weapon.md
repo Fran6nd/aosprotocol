@@ -43,7 +43,7 @@ receiving one drops it.
 
 Blocks and grenades are one pool each, shared by every slot that uses them, as
 in the base game. A Restock refills them to these counts and refills every
-firearm.
+firearm's reserve, leaving its magazine as it is, as in the base game.
 
 The server sends a player's Loadout after their
 [Create Player](../protocol075.md#create-player) or
