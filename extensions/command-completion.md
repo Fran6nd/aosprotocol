@@ -4,8 +4,8 @@ The server tells the client which chat commands it accepts and what each one
 takes, so that a client can complete them as they are typed, show their help,
 and ask for a missing argument.
 
-Commands stay `/` [Chat Messages](../protocol075.md#chat-message). The extension only
-describes them, and the server parses and checks them as before.
+Commands stay `/` [Chat Messages](../protocol075.md#chat-message). The extension
+only describes them, and the server parses and checks them as before.
 
 | ------------: | ------------- |
 | Extension ID: | `0x38`        |
@@ -143,8 +143,8 @@ Removes every command, for example after a logout.
 
 Help and param Names **should** be in the player's User locale, from a
 [Version Response (Extended)](../protocol075.md#version-response-extended-ep).
-Command Names, Aliases and Choices are never translated. Commands sent before the locale
-arrives are sent again after it.
+Command Names, Aliases and Choices are never translated. Commands sent before
+the locale arrives are sent again after it.
 
 ## The line a client sends
 
@@ -159,9 +159,9 @@ one argument:
 for a command `kick` with params `PLAYER player` and `TEXT reason`. It goes out
 however the client normally sends chat.
 
-The commands are advisory. A client **must not** refuse to send a command that is not
-on it, or an argument that does not fit its type, since the server may accept
-commands it does not list. A client that has no commands behaves as it would
+The commands are advisory. A client **must not** refuse to send a command it was
+not told about, or an argument that does not fit its type, since the server may
+accept commands it does not list. A client that has no commands behaves as it would
 without the extension.
 
 ## Validation
