@@ -84,7 +84,9 @@ takes off what it has used since that claim, so nothing is counted twice.
 
 ### Reloads
 
-Switching away from a gun cancels its reload on both sides.
+Switching away from a gun cancels its reload on both sides. Only OpenSpades
+does so today: other clients and the servers let the reload run on, so this is
+new behaviour for them.
 
 Jitter can make a magazine reload end on the client a moment before the
 server's. A fire press that reaches the server in the last moment of such a
