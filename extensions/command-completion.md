@@ -56,6 +56,10 @@ bytes, counting a `0xff` prefix but not the NUL.
 Each Alias is a String like the Name. A client completes an alias like the
 command, and lists the command once.
 
+A client looks commands up by Name and Alias, and completes them by prefix. In a
+language with no built-in map, a [crit-bit tree](https://cr.yp.to/critbit.html)
+does both, more lightly than a hash table.
+
 A client shows commands in the order they were first added. A server lists only
 the commands this player may run now, and adds or removes some when that
 changes, say after a login.
