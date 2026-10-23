@@ -36,8 +36,8 @@ changes them. A server receiving one drops it.
 |-------------|------------|---------|----------------------------------------------|
 | Slot        | LE UShort  | `3`     | Which slot, see [Slots](#slots).             |
 | Model       | UByte      | `2`     | See [Models](#models).                       |
-| Flags       | UByte      | `0b1`   | Bit `0` `TINTED`: draw the tool in Colour. Bits `1`-`7` must be `0` and are ignored. |
-| Colour      | UByte[3]   |         | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). Used only with `TINTED`. |
+| Flags       | UByte      | `0b1`   | Bit `0` `TINTED`: multiply the model's colours by Colour. Bits `1`-`7` must be `0` and are ignored. |
+| Colour      | UByte[3]   |         | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). Used only with `TINTED`; a block slot keeps its Set Colour, which a tint does not change. |
 
 ### Slots
 
