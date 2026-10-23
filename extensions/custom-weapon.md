@@ -194,8 +194,7 @@ reload. Each slot counts its own Sequence: a Loadout or a respawn sets it to
 wrapping after `255` back to `2`. After a Loadout or respawn the server ignores
 a slot's claims until one with `1` arrives, so a claim still in transit from
 before is not taken for a new one. A Weapon State for a Slot beyond Slot Count,
-or that is not a firearm, is ignored. A server state with Sequence `0` answers no claim and describes the slot as
-of the Loadout or respawn.
+or that is not a firearm, is ignored.
 
 **The server corrects.** It keeps its own count and never takes the client's.
 It answers a claim when they differ by more than it tolerates. How much that
@@ -207,8 +206,10 @@ it was asked for starts or ends, a Restock, a pickup, a new Loadout, and to a
 joining client.
 
 The server's Weapon State carries the Sequence of the last claim it received
-for that slot, and describes the slot as it was at that claim, with only the
-server's own changes since applied: a reload, a Restock, a pickup. Rounds fired
+for that slot, or `0` when there has been none since the Loadout or respawn. It
+describes the slot as it was at that claim, or at the Loadout or respawn for
+`0`, with only the server's own changes since applied: a reload, a Restock, a
+pickup. Rounds fired
 after the claim are left out. The client adopts it and takes off the rounds it
 has fired since that claim, so none is counted twice.
 
