@@ -107,7 +107,7 @@ rather than `0.1`, which is part of the drift Weapon State corrects.
 Each firearm slot keeps its own magazine and reserve, and its counts travel in
 [Weapon State](#sub-id-2-weapon-state). A client asks to reload the slot it holds
 with [Weapon Reload](../protocol075.md#weapon-reload); switching to another slot
-cancels a reload in progress, unlike pyspades, which keeps reloading. The
+cancels a reload in progress. The
 ammunition in [Player Properties](player-properties.md) is that of the slot the
 player holds; its counts are bytes, so they are capped at `255`, and an infinite
 count is sent as `255`.
