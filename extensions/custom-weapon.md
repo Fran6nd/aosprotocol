@@ -183,7 +183,10 @@ client's.
 **The client predicts.** It reloads on its own clock: when its reload ends it
 fills the magazine, may fire at once, and sends its Weapon State. It sends one
 too when primary fire is released, and after each round of a one-round-at-a-time
-reload. Each claim carries the next Sequence, wrapping after `255`.
+reload. Each slot counts its own Sequence: a Loadout or a respawn sets it to
+`0`, and each claim carries the next number, wrapping after `255` and skipping
+`0`. A server state with Sequence `0` answers no claim and describes the slot as
+of the Loadout or respawn.
 
 **The server corrects.** It keeps its own count and never takes the client's.
 It answers a claim when they differ by more than it tolerates. How much that
