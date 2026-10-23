@@ -108,7 +108,7 @@ their words go.
 | `0`       | `NONE`    | Nothing. The slice cannot be chosen.                       |
 | `1`       | `CHAT`    | Text, as a [Chat Message](../protocol075.md#chat-message). |
 | `2`       | `PING`    | A [Teamplay Ping](teamplay.md#sub-id-1-ping), Text as its Reason. |
-| `3`       | `COMMAND` | Text, as a chat message the server reads as a command.     |
+| `3`       | `COMMAND` | Text, as a [Chat Message](../protocol075.md#chat-message), meant as a command. |
 | `4`-`255` | reserved  | A client treats an unknown Action as `NONE`.               |
 
 The Action is also what a client styles a slice by. Whatever a slice sends goes
@@ -120,8 +120,9 @@ to UTF-8 as its Reason, which may be empty for a neutral marker. It needs
 an aim that met a block or a player. Failing any of these, the client sends the
 Text as chat instead, so only the marker is lost.
 
-**`COMMAND`** always goes on the team channel, whatever `GLOBAL` says. The client
-interprets none of it and does not look for a leading `/`.
+**`COMMAND`** is sent exactly as `CHAT` is, `GLOBAL` included; servers find a
+command by its leading `/` on either channel. It exists so that a client can
+style a command apart from a line of chat. The client interprets none of it.
 
 **`NONE`** cannot be chosen: aiming at it selects nothing, as the centre does. It
 may still carry a Label to show something, such as `Airstrikes: 2` beside the
