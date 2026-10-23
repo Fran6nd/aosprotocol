@@ -227,7 +227,8 @@ without the extension get Weapon Reload as today.
 * **Change Weapon** is the server's to handle as it sees fit while a loadout is
   set.
 * **Kill Action** keeps its kill types. For a weapon or headshot kill, a client
-  draws the kill icon of the slot that fired; the other types keep their own.
+  draws the kill icon of the killer's slot as last told by Hold; the other types
+  keep their own.
 
 Clients without the extension see only base packets: the vanilla weapon above,
 and Set Tool as the server translates it.
