@@ -34,7 +34,7 @@ listed are left as they are.
 | Packet ID     | UByte      | `0x78`  | Always `0x78`.                                |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.               |
 | Command Count | UByte      | `12`    | Commands that follow.                         |
-| Commands      | Command[]  |         | The remaining bytes, see [Command](#command). |
+| Commands      | Command[]  |         | See [Command](#command).                      |
 
 Names, Aliases, Help, param Names and Choices are of type **String**:
 NUL-terminated, as elsewhere in the protocol, and encoded the way a
