@@ -21,7 +21,7 @@ grenade and an empty hand, or a rifle, a shotgun and a spade.
 ## Sub ID 0: Loadout
 
 One player's tools. The server sends it to every client, for every player:
-others need it to draw what a player holds and to time their reloads. A client
+others need it to draw what a player holds and to time their reloads. A server
 receiving one drops it.
 
 | Field Name    | Field Type | Example | Notes                                   |
@@ -72,15 +72,15 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 | `2`       | Firearm    | See [Firearm](#firearm).    |
 | `3`       | Grenade    | As in the base game.        |
 | `4`       | Empty hand | Nothing.                    |
-| `5`-`255` | reserved   | A server does not send them. |
+| `5`-`255` | reserved   | A client treats the slot as an empty hand. |
 
 ### Firearm
 
 | Field Name   | Field Type | Example  | Notes                                                |
 |--------------|------------|----------|------------------------------------------------------|
 | Model        | UByte      | `0`      | Look, sounds and scope, see [Models](#models).       |
-| Flags        | UByte      | `0b1`    | See below.                                           |
-| Reload       | UByte      | `0`      | `0` whole magazine, `1` one round at a time.         |
+| Flags        | UByte      | `0b0`    | See below.                                           |
+| Reload       | UByte      | `0`      | `0` whole magazine, `1` one round at a time; other values are reserved and read as `0`. |
 | Magazine     | UByte      | `10`     | Rounds in a full magazine.                           |
 | Reserve      | UByte      | `50`     | Rounds carried beyond it.                            |
 | Pellets      | UByte      | `1`      | Shots per round fired.                               |
@@ -93,9 +93,8 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 
 | Bit | Name       | Meaning                                         |
 |-----|------------|-------------------------------------------------|
-| 0   | `STEADIED` | Crouching halves the spread.                    |
-| 1   | `INFINITE_RESERVE` | Reloading never uses up the reserve.    |
-| 2-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits. |
+| 0   | `INFINITE_RESERVE` | Reloading never uses up the reserve.    |
+| 1-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits. |
 
 Every firearm fires for as long as primary fire is held, one round per Interval,
 as the vanilla guns do and as servers count ammunition.
@@ -109,8 +108,8 @@ The three vanilla guns, in these terms:
 
 | Gun     | Model | Flags | Reload | Magazine | Reserve | Pellets | Block Damage | Interval | Reload Time | Spread  | Recoil Up | Recoil Side |
 |---------|-------|-------|--------|----------|---------|---------|--------------|----------|-------------|---------|-----------|-------------|
-| Rifle   | `0`   | `1`   | `0`    | `10`     | `50`    | `1`     | `50`         | `0.5`    | `2.5`       | `0.006` | `0.05`    | `0.0001`    |
-| SMG     | `1`   | `1`   | `0`    | `30`     | `120`   | `1`     | `34`         | `0.1`    | `2.5`       | `0.012` | `0.0125`  | `0.00005`   |
+| Rifle   | `0`   | `0`   | `0`    | `10`     | `50`    | `1`     | `50`         | `0.5`    | `2.5`       | `0.006` | `0.05`    | `0.0001`    |
+| SMG     | `1`   | `0`   | `0`    | `30`     | `120`   | `1`     | `34`         | `0.1`    | `2.5`       | `0.012` | `0.0125`  | `0.00005`   |
 | Shotgun | `2`   | `0`   | `1`    | `6`      | `48`    | `8`     | `34`         | `1.0`    | `0.5`       | `0.024` | `0.1`     | `0.0002`    |
 
 Damage to players stays the server's: the client reports hits with the
@@ -123,8 +122,7 @@ the guns.
 These are the vanilla guns' own values and work as the vanilla clients use them.
 
 * **Spread.** Each pellet flies along the player's view direction plus a random
-  offset of up to `2 × Spread` on each axis. Aiming down the sights halves it,
-  and so does crouching with a `STEADIED` firearm.
+  offset of up to `2 × Spread` on each axis. Aiming down the sights halves it.
 * **Recoil Up.** Each round raises the view by this many radians.
 * **Recoil Side.** Each round turns the view sideways by up to this many
   radians, alternating sides as the vanilla guns do.
