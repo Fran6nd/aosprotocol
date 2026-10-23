@@ -112,7 +112,9 @@ their words go.
 | `4`-`255` | reserved  | A client treats an unknown Action as `NONE`.               |
 
 The Action is also what a client styles a slice by. Whatever a slice sends goes
-out as the client normally sends chat.
+out as the client normally sends chat. A server should keep control bytes out of
+a Text: a client may re-encode it, and `0x01`-`0x1f` mean symbols in Code Page
+437 but colours in UTF-8.
 
 **`PING`** marks the point the [aim](#substitutions) met, with the Text decoded
 to UTF-8 as its Reason, which may be empty for a neutral marker. It needs
