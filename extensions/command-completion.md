@@ -142,10 +142,8 @@ Removes every command, for example after a logout.
 ## Language
 
 Help and param Names **should** be in the player's User locale, from a
-[Version Response (Extended)](../protocol075.md#version-response-extended-ep):
-the server matches the language and region, then the language alone, then falls
-back to its own default, which it also uses with no locale. Command Names,
-Aliases and Choices are never translated. Commands sent before the locale
+[Version Response (Extended)](../protocol075.md#version-response-extended-ep).
+Command Names, Aliases and Choices are never translated. Commands sent before the locale
 arrives are sent again after it.
 
 ## The line a client sends
