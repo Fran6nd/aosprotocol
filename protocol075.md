@@ -954,6 +954,7 @@ registered so far.
 | 0x39 | [Custom Weapon](extensions/custom-weapon.md)         | `HAS_PACKETS` | The server sets each player's tools and how each firearm behaves |
 | 0x39 | [Weapon and Tool State](extensions/weapon-tool-state.md) | `HAS_PACKETS` | Keeps ammunition, blocks and grenades in step between client and server |
 | 0x3A | [Cosmetic Weapon and Tool](extensions/cosmetic-weapon-tool.md) | `HAS_PACKETS` | What each player's gun, grenade and spade look like |
+| 0x3B | [Loadout](extensions/loadout.md)                     | `HAS_PACKETS` | The server sets which tools a player carries, in which order     |
 | 192  | [Player Limit](extensions/player-limit.md)           | `PACKETLESS`  | Support for up to 255 players                                    |
 | 193  | [Message Types](extensions/message-types.md)         | `PACKETLESS`  | Additional message types such as warnings and statuses           |
 | 194  | [Kick Reason](extensions/kick-reason.md)             | `PACKETLESS`  | Repurposes the chat to send a disconnect reason text             |
