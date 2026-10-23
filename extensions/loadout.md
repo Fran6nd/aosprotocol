@@ -15,8 +15,8 @@ base tool does.
 
 | Sub ID | Name    | Direction         | Size |
 |--------|---------|-------------------|------|
-| 0      | Loadout | Server -> Client  | 7+   |
-| 1      | Hold    | Client <-> Server | 4    |
+| 0      | Loadout | Server -> Client  | 8+   |
+| 1      | Hold    | Client <-> Server | 5    |
 
 ## Sub ID 0: Loadout
 
@@ -31,7 +31,7 @@ that each can draw what others hold. A server receiving one drops it.
 | Flags         | UByte      | `0b00`  | See below.                              |
 | Blocks        | UByte      | `50`    | Blocks after a [Restock](../protocol075.md#restock). |
 | Grenades      | UByte      | `3`     | Grenades after a Restock.               |
-| Slot Count    | UByte      | `3`     | Slots that follow.                      |
+| Slot Count    | LE UShort  | `3`     | Slots that follow.                      |
 | Slots         | Slot[]     |         | See [Slot](#slot).                      |
 
 | Bit | Name                | Meaning                                              |
@@ -67,10 +67,11 @@ effect at once and starts full.
 | `4`       | Empty hand | Nothing.                                   |
 | `5`-`255` | reserved   | A client treats the slot as an empty hand. |
 
-Slots are in the order the player cycles through them. Each gun slot keeps its
-own magazine and reserve; [Weapon and Tool State](weapon-tool-state.md) counts
-them by slot, and [Cosmetic Weapon and Tool](cosmetic-weapon-tool.md) gives each
-slot its look.
+Slots are numbered from `0` in the order the player cycles through them. A
+Loadout says what each slot does; [Cosmetic Weapon and
+Tool](cosmetic-weapon-tool.md) can give each one its look, by the same numbers,
+and is sent after the Loadout. Each gun slot keeps its own magazine and reserve,
+and [Weapon and Tool State](weapon-tool-state.md) counts the one held.
 
 ## Sub ID 1: Hold
 
@@ -82,7 +83,7 @@ Which slot a player holds. A client with a loadout sends Hold rather than
 | Packet ID     | UByte      | `0x7B`  | Always `0x7B`.                                 |
 | Sub Packet ID | UByte      | `1`     | Always `1` for this sub-packet.                |
 | Player ID     | UByte      | `7`     | Ignored from a client; the server fills it in. |
-| Slot          | UByte      | `2`     | An index into the player's Slots.              |
+| Slot          | LE UShort  | `2`     | An index into the player's Slots.              |
 
 The server relays it to clients with the extension, and sends the others a base
 Set Tool for the slot's Tool, with an empty hand as the spade. A Slot beyond the
