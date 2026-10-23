@@ -206,7 +206,8 @@ is, in rounds and in how long after a reload a State may still differ, is the
 server's choice: network jitter decides it, and piqueserver already tolerates
 some drift in its count.
 It also sends its own Weapon State when it changes a slot itself: when a reload
-it was asked for starts or ends, a Restock, a pickup, and to a joining client.
+it was asked for starts, ends or is cancelled by a slot switch, a Restock, a
+pickup, and to a joining client.
 A new Loadout needs none: it starts full.
 
 The server's Weapon State carries the Sequence of the last claim it received
