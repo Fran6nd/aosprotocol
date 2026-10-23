@@ -94,7 +94,10 @@ Its explosion is the base grenade's whatever the look.
 A [Grenade Packet](../protocol075.md#grenade-packet) the server sends for a
 player holding a slot whose model is `Launcher` is drawn as a `Rocket`,
 tinted as that slot. This lets a server fire rockets from a launcher; they still
-fly as grenades do.
+fly as grenades do. The rule covers every Grenade Packet sent for that player
+while the launcher is held, an airstrike included, so a server that does not
+want rockets there sends those for no player. A look changes nothing, so the
+gun underneath still fires as its base weapon unless the server stops it.
 
 A model is the tool's look, animation, sounds and kill icon. Clients without
 the extension draw the vanilla tools.
