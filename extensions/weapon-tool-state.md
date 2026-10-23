@@ -63,7 +63,8 @@ To a client with the extension the server answers a Weapon Reload with a State,
 not a Weapon Reload. To other clients with the extension it sends its own State
 when a player's reload starts and ends, for their animation, and never relays a
 client's claims; they may ignore the counts. Clients without the extension get
-Weapon Reload as today.
+Weapon Reload as today. A server with the extension sends these counts to a
+client that has it in State only, not in [Player Properties](player-properties.md).
 
 ### Sequence
 
