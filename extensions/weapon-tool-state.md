@@ -43,9 +43,10 @@ thinks is held, is ignored: it was sent across a switch.
 ### The client predicts
 
 It counts on its own clock: when its reload ends it fills the magazine and may
-fire at once. It sends a State when its reload ends, when primary fire is
-released, after each round of the shotgun's reload, and after it places blocks
-or throws a grenade. It still asks for a reload with
+fire at once. It claims only the gun: it sends a State when its reload ends,
+when primary fire is released, and after each round of the shotgun's reload.
+Blocks and grenades it does not claim, since the server counts every Block
+Action and Grenade Packet exactly; their State comes from the server alone. It still asks for a reload with
 [Weapon Reload](../protocol075.md#weapon-reload).
 
 ### The server corrects
