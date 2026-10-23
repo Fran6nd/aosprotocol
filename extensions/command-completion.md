@@ -33,24 +33,24 @@ listed are left as they are.
 |---------------|------------|---------|-----------------------------------------------|
 | Packet ID     | UByte      | `0x78`  | Always `0x78`.                                |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.               |
-| Command Count | UByte      | `12`    | Commands that follow, `0`-`255`.              |
+| Command Count | UByte      | `12`    | Commands that follow.                         |
 | Commands      | Command[]  |         | The remaining bytes, see [Command](#command). |
 
 Names, Aliases, Help, param Names and Choices are of type **String**:
 NUL-terminated, as elsewhere in the protocol, and encoded the way a
 [Chat Message](../protocol075.md#chat-message) is: Code Page 437, or UTF-8
-behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each range below is in
-bytes, counting a `0xff` prefix but not the NUL.
+behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). No String has a length
+limit of its own.
 
 ### Command
 
 | Field Name  | Field Type | Example              | Notes                                 |
 |-------------|------------|----------------------|---------------------------------------|
-| Name        | String     | `"teleport"`         | Without the `/`, `1`-`32` bytes, see [Names](#names). |
-| Alias Count | UByte      | `1`                  | `0`-`8`.                              |
+| Name        | String     | `"teleport"`         | Without the `/`, not empty, see [Names](#names). |
+| Alias Count | UByte      | `1`                  | Aliases that follow.                  |
 | Aliases     | String[]   | `"tp"`               | Other names for the same command.     |
-| Help        | String     | `"Moves a player"`   | `0`-`255` bytes. No line breaks; a client may cut it. |
-| Param Count | UByte      | `2`                  | `0`-`8`.                              |
+| Help        | String     | `"Moves a player"`   | No line breaks; a client may cut it. |
+| Param Count | UByte      | `2`                  | Params that follow.                   |
 | Params      | Param[]    |                      | See [Param](#param).                  |
 
 Each Alias is a String like the Name. A client completes an alias like the
@@ -70,8 +70,8 @@ changes, say after a login.
 |--------------|------------|------------|-----------------------------------------------|
 | Type         | UByte      | `1`        | See [Types](#types).                          |
 | Flags        | UByte      | `0b000`    | See below.                                    |
-| Name         | String     | `"player"` | What a prompt or a hint calls it, `1`-`24` bytes. |
-| Choice Count | UByte      | `0`        | `0` unless Type is `CHOICE`, then `1`-`32`.   |
+| Name         | String     | `"player"` | What a prompt or a hint calls it. |
+| Choice Count | UByte      | `0`        | `0` unless Type is `CHOICE`.                  |
 | Choices      | String[]   | `"blue"`   | See [Choices](#choices).                      |
 
 | Bit | Name       | Meaning                                                         |
@@ -105,7 +105,7 @@ A `CHOICE` param takes one value from a fixed set the server lists with it: a
 team, a mode, `on` or `off`. The client offers exactly those, as completions or
 a picker, and sends the one picked as it is spelled here.
 
-Each Choice is a String of `1`-`24` bytes, see [Names](#names).
+Each Choice is a String, see [Names](#names).
 
 So `/switch` with params `PLAYER player` and `CHOICE team` listing `blue`,
 `green` and `spectator` lets a client offer those three, and sends
@@ -174,7 +174,6 @@ the client logs it rather than disconnecting. A list is refused when:
 
 * A record or a string runs past the end of the packet, or bytes remain after
   the last command.
-* A count or a length is outside the range in its Notes.
 * A Help or param Name behind the `0xff` prefix is not well-formed UTF-8.
 * A Name or Alias appears twice in the list, as either.
 * A `CHOICE` param has no choices, or a param of another type has some.
