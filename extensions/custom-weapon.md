@@ -18,6 +18,7 @@ grenade and an empty hand, or a rifle, a shotgun and a spade.
 | 1      | Hold       | Client <-> Server | 4    |
 | 2      | Trace      | Server -> Client  | 20   |
 | 3      | Hit Effect | Server -> Client  | 27   |
+| 4      | Weapon State | Client <-> Server | 7  |
 
 ## Sub ID 0: Loadout
 
@@ -92,11 +93,9 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 Every firearm fires for as long as primary fire is held, one round per Interval,
 as the vanilla guns do and as servers count ammunition.
 
-Each firearm slot keeps its own magazine and reserve. [Weapon
-Reload](../protocol075.md#weapon-reload) and the ammunition of
-[Restock](../protocol075.md#restock) refer to the slot the player holds. The
-server times a reload from Reload Time and sends Weapon Reload when it is done,
-as it does today; no packet from the client says a reload finished.
+Each firearm slot keeps its own magazine and reserve, and its counts travel in
+[Weapon State](#sub-id-4-weapon-state). A client still asks for a reload with
+[Weapon Reload](../protocol075.md#weapon-reload).
 
 The three vanilla guns, in these terms:
 
@@ -203,6 +202,40 @@ Trace and Hit Effect follow TigerSpades' Trace Bullets and Hit Effects
 extensions, used by the [aos-milsim](https://github.com/rzrn/aos-milsim) server
 for its simulated ballistics, field for field, so that both can move here.
 
+## Sub ID 4: Weapon State
+
+One firearm slot's ammunition. From a client it is a claim, which lets the
+client act at once; from the server it is the truth, which replaces the
+client's.
+
+| Field Name    | Field Type | Example | Notes                                           |
+|---------------|------------|---------|-------------------------------------------------|
+| Packet ID     | UByte      | `0x79`  | Always `0x79`.                                  |
+| Sub Packet ID | UByte      | `4`     | Always `4` for this sub-packet.                 |
+| Player ID     | UByte      | `7`     | Ignored from a client; the server fills it in.  |
+| Slot          | UByte      | `1`     | A firearm slot of that player.                  |
+| State         | UByte      | `0`     | `0` ready, `1` reloading.                       |
+| Magazine      | UByte      | `30`    | Rounds in the magazine.                         |
+| Reserve       | UByte      | `64`    | Rounds carried beyond it.                       |
+
+**The client predicts.** It reloads on its own clock: when its reload ends it
+fills the magazine, may fire at once, and sends its Weapon State. It sends one
+too when primary fire is released, and after each round of a one-round-at-a-time
+reload.
+
+**The server corrects.** It keeps its own count and never takes the client's.
+When a claim differs from its count by more than one round, or in State, it
+sends its own Weapon State back, and the client adopts it at once; otherwise it
+says nothing. It also sends one whenever it changes a slot itself: a Restock, a
+pickup, a new Loadout, and to a joining client.
+
+**Both clocks end together.** The server starts a reload half a round trip
+earlier than the request arrived, from the latency it measures, so that it is
+done when the client's is and the first rounds fired are not refused.
+
+The server relays State to the other clients, for their animation; they may
+ignore the counts.
+
 ## Base packets
 
 * **Create Player** and **Existing Player** carry the base weapon nearest the
@@ -213,7 +246,7 @@ for its simulated ballistics, field for field, so that both can move here.
   killer's held slot.
 
 Clients without the extension see only base packets: the vanilla weapon above,
-and Set Tool as the server translates it.
+Set Tool as the server translates it, and Weapon Reload as today.
 
 ## Connection state
 
