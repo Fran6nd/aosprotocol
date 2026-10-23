@@ -119,9 +119,7 @@ The three vanilla guns, in these terms:
 | Shotgun | `2`   | `0`   | `1`    | `6`      | `48`    | `8`     | `34`         | `1.0`    | `0.5`       | `0.024` | `0.1`     | `0.0002`    |
 
 Damage to players stays the server's: the client reports hits with the
-[Hit Packet](../protocol075.md#hit-packet) as it does today. A server that flies
-projectiles itself says so through its own extension; this one only describes
-the guns.
+[Hit Packet](../protocol075.md#hit-packet) as it does today.
 
 ### Aim
 
@@ -183,7 +181,7 @@ client's.
 | Player ID     | UByte      | `7`     | Ignored from a client; the server fills it in.  |
 | Sequence      | UByte      | `41`    | See below.                                      |
 | Slot          | UByte      | `1`     | A firearm slot of that player.                  |
-| State         | UByte      | `0`     | `0` ready, `1` reloading. Other values are reserved. |
+| State         | UByte      | `0`     | `0` ready, `1` reloading. Other values are reserved and read as `0`. |
 | Magazine      | LE UShort  | `30`    | Rounds in the magazine.                         |
 | Reserve       | LE UShort  | `64`    | Rounds carried beyond it.                       |
 
@@ -229,8 +227,6 @@ without the extension get Weapon Reload as today, its byte counts capped at
   extension, the vanilla weapon the player's first firearm is
   [drawn as](#models), or the rifle when there is none. A loadout survives a
   respawn.
-* **Change Weapon** is the server's to handle as it sees fit while a loadout is
-  set.
 * **Kill Action** keeps its kill types. For a weapon or headshot kill, a client
   draws the kill icon of the killer's slot as last told by Hold; the other types
   keep their own.
