@@ -53,6 +53,10 @@ new Loadout resets every look to vanilla until the next Look, and an entry for a
 slot the player does not have is ignored. A Look can change a skin at any time
 without resending the Loadout.
 
+A client without the Loadout extension knows only the four base slots, so the
+server sends it a Look in base-tool numbering: the look of the player's held
+slot on that slot's base tool.
+
 ## Models
 
 One list for every slot: any slot can be drawn as any model, whatever its tool.
