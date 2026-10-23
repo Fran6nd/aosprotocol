@@ -65,7 +65,10 @@ Weapon Reload as today.
 
 ### Sequence
 
-A respawn or a tool switch sets the Sequence to `0`. The client's first claim
+A respawn, any switch of the held tool, even between two guns of a
+[Loadout](loadout.md), or a new Loadout sets the Sequence to `0`. After it the
+client ignores server States until the one the server sends for the switch
+arrives, so a State about the gun it left is never applied to the new one. The client's first claim
 after it carries `1`, and later claims count on from `2`, wrapping after `255`
 back to `2`. After a reset the server ignores claims until one with `1` arrives,
 so a claim still in transit from before is not taken for a new one.
