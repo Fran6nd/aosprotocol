@@ -37,8 +37,8 @@ client's.
 
 Only the held tool is described; which tool that is, and how a player switches,
 is the business of [Set Tool](../protocol075.md#set-tool) or whatever extension
-chooses it. A State for the spade, or whose Tool is not the one the receiver
-thinks is held, is ignored: it was sent across a switch.
+chooses it. A State whose Tool is not the one the receiver
+thinks is held is ignored: it was sent across a switch.
 
 ### The client predicts
 
@@ -54,7 +54,8 @@ Action and Grenade Packet exactly; their State comes from the server alone. It s
 It keeps its own counts and never takes the client's. It answers a claim when
 they differ by more than it tolerates; how much that is, and how long after a
 reload Reloading may still differ, is the server's choice. It also sends its
-own State when the player switches tools, and when it changes the counts
+own State when the player switches to a gun, the block or a grenade, never to
+a tool with nothing to count, and when it changes the counts
 itself: when a reload starts, ends or is cancelled, a Restock, a pickup, a
 respawn, and to a joining client.
 
