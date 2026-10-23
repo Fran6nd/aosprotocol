@@ -32,28 +32,25 @@ Replaces the client's whole command list.
 | Command Count | UByte      | `12`    | Commands that follow, `0`-`255`.              |
 | Commands      | Command[]  |         | The remaining bytes, see [Command](#command). |
 
-Text fields carry text the way a
-[Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
-behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each follows a UByte
-giving its length in bytes, prefix included, and every range below is in bytes,
-so a parser can check it before decoding. Command Names, Aliases and Choices are
-ASCII, see [Names](#names).
+Names, Aliases, Help, param Names and Choices are of type **String**:
+NUL-terminated, as elsewhere in the protocol, and encoded the way a
+[Chat Message](../protocol075.md#chat-message) is: Code Page 437, or UTF-8
+behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each range below is in
+bytes, counting a `0xff` prefix but not the NUL.
 
 ### Command
 
 | Field Name  | Field Type | Example              | Notes                                 |
 |-------------|------------|----------------------|---------------------------------------|
-| Name Length | UByte      | `8`                  | `1`-`32`.                             |
-| Name        | Text       | `"teleport"`         | Without the `/`, see [Names](#names). |
+| Name        | String     | `"teleport"`         | Without the `/`, `1`-`32` bytes, see [Names](#names). |
 | Alias Count | UByte      | `1`                  | `0`-`8`.                              |
-| Aliases     | Alias[]    |                      | Other names for the same command.     |
-| Help Length | UByte      | `16`                 | `0`-`255`.                            |
-| Help        | Text       | `"Moves a player"`   | No line breaks; a client may cut it.  |
+| Aliases     | String[]   | `"tp"`               | Other names for the same command.     |
+| Help        | String     | `"Moves a player"`   | `0`-`255` bytes. No line breaks; a client may cut it. |
 | Param Count | UByte      | `2`                  | `0`-`8`.                              |
 | Params      | Param[]    |                      | See [Param](#param).                  |
 
-Each Alias is a Name Length and a Name, as above. A client completes an alias
-like the command, and lists the command once.
+Each Alias is a String like the Name. A client completes an alias like the
+command, and lists the command once.
 
 Commands are listed in the order the server prefers to show them. A server lists
 only the commands this player may run now, and sends the list again when that
@@ -65,10 +62,9 @@ changes, say after a login.
 |--------------|------------|------------|-----------------------------------------------|
 | Type         | UByte      | `3`        | See [Types](#types).                          |
 | Flags        | UByte      | `0b000`    | See below.                                    |
-| Name Length  | UByte      | `6`        | `1`-`24`.                                     |
-| Name         | Text       | `"player"` | What a prompt or a hint calls it.             |
+| Name         | String     | `"player"` | What a prompt or a hint calls it, `1`-`24` bytes. |
 | Choice Count | UByte      | `0`        | `0` unless Type is `CHOICE`, then `1`-`32`.   |
-| Choices      | Choice[]   |            | See [Choices](#choices).                      |
+| Choices      | String[]   | `"blue"`   | See [Choices](#choices).                      |
 
 | Bit | Name       | Meaning                                                         |
 |-----|------------|-----------------------------------------------------------------|
@@ -98,10 +94,7 @@ A `CHOICE` param takes one value from a fixed set the server lists with it: a
 team, a mode, `on` or `off`. The client offers exactly those, as completions or
 a picker, and sends the one picked as it is spelled here.
 
-| Field Name    | Field Type | Example  | Notes      |
-|---------------|------------|----------|------------|
-| Choice Length | UByte      | `4`      | `1`-`24`.  |
-| Choice        | Text       | `"blue"` | See [Names](#names). |
+Each Choice is a String of `1`-`24` bytes, see [Names](#names).
 
 So `/switch` with params `PLAYER player` and `CHOICE team` listing `blue`,
 `green` and `spectator` lets a client offer those three, and sends
@@ -150,8 +143,8 @@ A client parses the whole packet before applying any of it, and **a list is
 applied whole or not at all**. Where one is refused the previous list stands and
 the client logs it rather than disconnecting. A list is refused when:
 
-* A record runs past the end of the packet, or bytes remain after the last
-  command.
+* A record or a string runs past the end of the packet, or bytes remain after
+  the last command.
 * A count or a length is outside the range in its Notes.
 * A Help or param Name behind the `0xff` prefix is not well-formed UTF-8.
 * A Name, Alias or Choice holds a character outside those in [Names](#names).
