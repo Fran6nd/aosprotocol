@@ -16,7 +16,7 @@ server corrects.
 
 | Sub ID | Name  | Direction         | Size |
 |--------|-------|-------------------|------|
-| 0      | State | Client <-> Server | 9    |
+| 0      | State | Client <-> Server | 10   |
 
 ## Sub ID 0: State
 
@@ -29,16 +29,25 @@ once; from the server it is the truth, which replaces the client's.
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.                |
 | Player ID     | UByte      | `7`     | Ignored from a client; the server fills it in. |
 | Sequence      | UByte      | `41`    | See [Sequence](#sequence).                     |
-| Reloading     | UByte      | `0`     | `1` while the gun reloads, else `0`. Other values read as `0`. |
-| Magazine      | UByte      | `10`    | Rounds in the gun's magazine.                  |
+| Slot          | UByte      | `2`     | The gun slot these rounds belong to, see [Slots](#slots). |
+| Reloading     | UByte      | `0`     | `1` while that gun reloads, else `0`. Other values read as `0`. |
+| Magazine      | UByte      | `10`    | Rounds in that gun's magazine.                 |
 | Reserve       | UByte      | `50`    | Rounds carried beyond it.                      |
 | Blocks        | UByte      | `50`    | Blocks carried.                                |
 | Grenades      | UByte      | `3`     | Grenades carried.                              |
 
+### Slots
+
+A player's tools are numbered by slot. Without a [Loadout](loadout.md) there are
+four, one per base tool, and slot `n` is the tool `n` of
+[Set Tool](../protocol075.md#set-tool), so the gun is slot `2`. With one, each gun
+slot keeps its own magazine and reserve. Blocks and grenades are one pool each,
+whatever the slots. A State with a Slot that is not a gun is ignored.
+
 ### The client predicts
 
 It counts on its own clock: when its reload ends it fills the magazine and may
-fire at once. It sends a State when its reload ends, when primary fire is
+fire at once. A claim is about the gun slot the player holds. It sends a State when its reload ends, when primary fire is
 released, after each round of the shotgun's reload, and after it places blocks
 or throws a grenade. It still asks for a reload with
 [Weapon Reload](../protocol075.md#weapon-reload).
@@ -60,7 +69,7 @@ Weapon Reload as today.
 
 ### Sequence
 
-A respawn sets the Sequence to `0`. The client's first claim after it carries
+A respawn or a new Loadout sets the Sequence to `0`. The client's first claim after it carries
 `1`, and later claims count on from `2`, wrapping after `255` back to `2`. After
 a respawn the server ignores claims until one with `1` arrives, so a claim still
 in transit from before is not taken for a new one.
@@ -74,7 +83,7 @@ claim, so nothing is counted twice.
 
 ### Reloads
 
-Switching away from the gun cancels its reload on both sides.
+Switching away from a gun cancels its reload on both sides.
 
 Jitter can make a magazine reload end on the client a moment before the
 server's. A fire press that reaches the server in the last moment of such a
