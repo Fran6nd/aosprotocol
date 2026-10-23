@@ -31,10 +31,10 @@ that each can draw what others hold. A server receiving one drops it.
 | Slot Count    | LE UShort  | `3`     | Slots that follow.                      |
 | Slots         | Slot[]     |         | See [Slot](#slot).                      |
 
-The server sends a player's Loadout after their
-[Create Player](../protocol075.md#create-player) or
-[Existing Player](../protocol075.md#existing-player), and again whenever it
-changes it, each time followed by a [Hold](#sub-id-1-hold). A new Loadout takes
+The server sends a player's Loadout once after their
+[Existing Player](../protocol075.md#existing-player) or first
+[Create Player](../protocol075.md#create-player), and then only when it changes
+it, each time followed by a [Hold](#sub-id-1-hold). A new Loadout takes
 effect at once and starts full.
 
 ### Slot
@@ -97,11 +97,11 @@ server's Hold corrects it. A Slot beyond the player's Slot Count is ignored.
 
 * **Create Player** and **Existing Player** carry, for clients without the
   extension, the weapon of the player's first gun slot, or the rifle when there
-  is none. A respawn refills the loadout, magazines included.
+  is none, and base packets carry the held slot's counts. A respawn refills the
+  loadout, magazines included.
 * **Set Tool** from a client is handled as in the base game until its Loadout
   arrives. Once a loadout is set, the server reads it as a Hold for the first
-  slot of that Tool.
-* **Kill Action** keeps its kill types.
+  slot of that Tool, and ignores it when no slot has that Tool.
 
 ## Connection state
 
