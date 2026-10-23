@@ -66,9 +66,11 @@ A bitmask, so a pie that suits more than one context is sent once.
 | 1   | `TEAMMATE`  | A player on the opening player's own team.         |
 | 2   | `ENEMY`     | A player on the other team.                        |
 | 3   | `SPECTATOR` | Anything, while the opening player is a spectator. |
-| 4-7 | reserved    | Must be `0`. Clients **must** ignore unknown bits. |
+| 4   | `DEAD`      | Anything, while the opening player is dead.        |
+| 5-7 | reserved    | Must be `0`. Clients **must** ignore unknown bits. |
 
-A spectator is offered `SPECTATOR` pies alone. A staff member spectating from a
+A spectator is offered `SPECTATOR` pies alone, and a player who is dead and
+waiting to respawn `DEAD` pies alone, such as a choice of where to spawn. A staff member spectating from a
 team counts as a spectator; the server knows
 its staff and offers them `SPECTATOR` pies to suit. A context with no pies has no
 menu, and no other context's pies stand in.
