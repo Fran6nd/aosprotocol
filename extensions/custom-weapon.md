@@ -128,17 +128,19 @@ These are the vanilla guns' own values and work as the vanilla clients use them.
 
 ### Models
 
-| Value     | Model       | Drawn without it as |
-|-----------|-------------|---------------------|
-| `0`       | Rifle       |                     |
-| `1`       | SMG         |                     |
-| `2`       | Shotgun     |                     |
-| `3`       | Bolt-action | Rifle               |
-| `4`       | Pistol      | Rifle               |
-| `5`       | Machine gun | SMG                 |
-| `6`-`255` | reserved    | Rifle               |
+| Value     | Model       | Looks and animates like                          | Drawn without it as |
+|-----------|-------------|--------------------------------------------------|---------------------|
+| `0`       | Rifle       | The vanilla rifle.                               |                     |
+| `1`       | SMG         | The vanilla SMG.                                 |                     |
+| `2`       | Shotgun     | The vanilla shotgun, pumped between rounds.      |                     |
+| `3`       | Bolt-action | A long rifle whose bolt is worked between rounds. | Rifle              |
+| `4`       | Pistol      | A handgun, held in one hand.                     | Rifle               |
+| `5`       | Machine gun | A heavy belt-fed gun.                            | SMG                 |
+| `6`-`255` | reserved    |                                                  | Rifle               |
 
-A Model is the firearm's look, sounds, scope and kill icon, nothing else.
+A Model is the firearm's look, animation, sounds, scope and kill icon, nothing
+else: how it fires comes from the other fields. A client draws a model it lacks
+as the one in the last column.
 
 ## Sub ID 1: Hold
 
