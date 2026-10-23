@@ -88,8 +88,10 @@ Which slot a player holds. A client with a loadout sends Hold rather than
 | Slot          | LE UShort  | `2`     | An index into the player's Slots.              |
 
 The server relays it to clients with the extension, and sends the others a base
-Set Tool for the slot's Tool, with an empty hand as the spade. A Slot beyond the
-player's Slot Count is ignored.
+Set Tool for the slot's Tool, with an empty hand as the spade. It also sends the
+Hold it settles on back to the sender: a Hold sent just before a new Loadout
+arrived can name a slot that still exists but now holds something else, and the
+server's Hold corrects it. A Slot beyond the player's Slot Count is ignored.
 
 ## Base packets
 
