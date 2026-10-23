@@ -16,7 +16,7 @@ grenade and an empty hand, or a rifle, a shotgun and a spade.
 |--------|------------|-------------------|------|
 | 0      | Loadout    | Server -> Client  | 7+   |
 | 1      | Hold       | Client <-> Server | 4    |
-| 2      | Weapon State | Client <-> Server | 7  |
+| 2      | Weapon State | Client <-> Server | 8  |
 
 ## Sub ID 0: Loadout
 
@@ -99,8 +99,9 @@ Every firearm fires for as long as primary fire is held, one round per Interval,
 as the vanilla guns do and as servers count ammunition.
 
 Each firearm slot keeps its own magazine and reserve, and its counts travel in
-[Weapon State](#sub-id-2-weapon-state). A client still asks for a reload with
-[Weapon Reload](../protocol075.md#weapon-reload).
+[Weapon State](#sub-id-2-weapon-state). A client asks to reload the slot it holds
+with [Weapon Reload](../protocol075.md#weapon-reload); switching to another slot
+cancels a reload in progress.
 
 The three vanilla guns, in these terms:
 
@@ -170,28 +171,38 @@ client's.
 | Packet ID     | UByte      | `0x79`  | Always `0x79`.                                  |
 | Sub Packet ID | UByte      | `2`     | Always `2` for this sub-packet.                 |
 | Player ID     | UByte      | `7`     | Ignored from a client; the server fills it in.  |
+| Sequence      | UByte      | `41`    | See below.                                      |
 | Slot          | UByte      | `1`     | A firearm slot of that player.                  |
-| State         | UByte      | `0`     | `0` ready, `1` reloading.                       |
+| State         | UByte      | `0`     | `0` ready, `1` reloading. Other values are reserved. |
 | Magazine      | UByte      | `30`    | Rounds in the magazine.                         |
 | Reserve       | UByte      | `64`    | Rounds carried beyond it.                       |
 
 **The client predicts.** It reloads on its own clock: when its reload ends it
 fills the magazine, may fire at once, and sends its Weapon State. It sends one
 too when primary fire is released, and after each round of a one-round-at-a-time
-reload.
+reload. Each claim carries the next Sequence, wrapping after `255`.
 
 **The server corrects.** It keeps its own count and never takes the client's.
-When a claim differs from its count by more than one round, or in State, it
-sends its own Weapon State back, and the client adopts it at once; otherwise it
-says nothing. It also sends one whenever it changes a slot itself: a Restock, a
-pickup, a new Loadout, and to a joining client.
+It answers a claim only when they differ: in State, or by more rounds than the
+firearm fires in `0.2` seconds, at least one. A State that differs only because
+one side finished a reload within the last `0.5` seconds is not a difference.
+It also sends its own Weapon State when it changes a slot itself: when a reload
+it was asked for starts or ends, a Restock, a pickup, a new Loadout, and to a
+joining client.
 
-**Both clocks end together.** The server starts a reload half a round trip
-earlier than the request arrived, from the latency it measures, so that it is
-done when the client's is and the first rounds fired are not refused.
+The server's Weapon State carries the Sequence of the last claim it received
+for that slot. The client adopts it as the state at that claim: the magazine it
+keeps is the server's less the rounds it has fired since.
 
-The server relays State to the other clients, for their animation; they may
-ignore the counts.
+**A press during the server's reload.** The client's reload can end a moment
+before the server's. A fire press that reaches the server in the last `0.5`
+seconds of its reload starts counting rounds from the reload's end, rather than
+being refused.
+
+**Replies and relays.** To clients with the extension the server answers a
+Weapon Reload with Weapon State, not Weapon Reload, and relays only Weapon
+State to the others, for their animation; they may ignore the counts. Clients
+without the extension get Weapon Reload as today.
 
 ## Base packets
 
@@ -203,7 +214,7 @@ ignore the counts.
   killer's held slot.
 
 Clients without the extension see only base packets: the vanilla weapon above,
-Set Tool as the server translates it, and Weapon Reload as today.
+and Set Tool as the server translates it.
 
 ## Connection state
 
