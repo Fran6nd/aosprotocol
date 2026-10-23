@@ -126,7 +126,7 @@ style a command apart from a line of chat. The client interprets none of it.
 **`NONE`** cannot be chosen: aiming at it selects nothing, as the centre does. It
 may still carry a Label to show something, such as `Airstrikes: 2` beside the
 slice that calls one. How it looks is the client's business, but a client must
-not invent a slice to fill it.
+not make it choosable.
 
 ### Substitutions
 
@@ -194,8 +194,7 @@ itself. None of it changes while the menu is held.
   own menu does not come back.
 
 A client **must not** add slices, reorder them, or drop one it dislikes. It may
-refuse the menu outright, but it may not show a menu that claims to be the
-server's and is not.
+refuse the menu outright.
 
 ## Geometry
 
