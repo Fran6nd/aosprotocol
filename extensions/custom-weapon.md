@@ -16,7 +16,7 @@ grenade and an empty hand, or a rifle, a shotgun and a spade.
 |--------|------------|-------------------|------|
 | 0      | Loadout    | Server -> Client  | 7+   |
 | 1      | Hold       | Client <-> Server | 4    |
-| 2      | Weapon State | Client <-> Server | 8  |
+| 2      | Weapon State | Client <-> Server | 10 |
 
 ## Sub ID 0: Loadout
 
@@ -84,8 +84,8 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 | Model        | UByte      | `0`      | Look, sounds and scope, see [Models](#models).       |
 | Flags        | UByte      | `0b0`    | See below.                                           |
 | Reload       | UByte      | `0`      | `0` whole magazine, `1` one round at a time; other values are reserved and read as `0`. |
-| Magazine     | UByte      | `10`     | Rounds in a full magazine.                           |
-| Reserve      | UByte      | `50`     | Rounds carried beyond it.                            |
+| Magazine     | LE UShort  | `10`     | Rounds in a full magazine.                           |
+| Reserve      | LE UShort  | `50`     | Rounds carried beyond it.                            |
 | Pellets      | UByte      | `1`      | Shots per round fired.                               |
 | Block Damage | UByte      | `50`     | Taken off a block's health per hit; the client sends the destroy, as in the base game. |
 | Interval     | LE Float   | `0.5`    | Seconds between rounds while primary fire is held.   |
@@ -182,8 +182,8 @@ client's.
 | Sequence      | UByte      | `41`    | See below.                                      |
 | Slot          | UByte      | `1`     | A firearm slot of that player.                  |
 | State         | UByte      | `0`     | `0` ready, `1` reloading. Other values are reserved. |
-| Magazine      | UByte      | `30`    | Rounds in the magazine.                         |
-| Reserve       | UByte      | `64`    | Rounds carried beyond it.                       |
+| Magazine      | LE UShort  | `30`    | Rounds in the magazine.                         |
+| Reserve       | LE UShort  | `64`    | Rounds carried beyond it.                       |
 
 **The client predicts.** It reloads on its own clock: when its reload ends it
 fills the magazine, may fire at once, and sends its Weapon State. It sends one
@@ -218,7 +218,8 @@ one-round-at-a-time reload a press stops the reload, as in every client.
 Weapon Reload with Weapon State, not Weapon Reload. To the other clients it
 sends its own Weapon State when a reload starts and ends, for their animation,
 and never relays a client's claims; they may ignore the counts. Clients
-without the extension get Weapon Reload as today.
+without the extension get Weapon Reload as today, its byte counts capped at
+`255`.
 
 ## Base packets
 
