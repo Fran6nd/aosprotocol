@@ -72,8 +72,7 @@ A bitmask, so a pie that suits more than one context is sent once.
 
 A spectator is offered `SPECTATOR` pies alone, and a player who is dead and
 waiting to respawn `DEAD` pies alone, such as a choice of where to spawn. A staff member spectating from a
-team counts as a spectator; the server knows
-its staff and offers them `SPECTATOR` pies to suit. A context with no pies has no
+team counts as a spectator. A context with no pies has no
 menu, and no other context's pies stand in.
 
 ### Slice
