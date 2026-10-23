@@ -134,9 +134,10 @@ These are the vanilla guns' own values and work as the vanilla clients use them.
   do for every vanilla gun but the shotgun.
 * **Recoil Up** and **Recoil Side** are the constants the vanilla clients
   scale per round: Recoil Up raises the view, in radians, and Recoil Side is
-  multiplied by the clients' alternating wave before it turns the view. Both are
-  doubled while walking without aiming or in the air, and halved while
-  crouching, as for the vanilla guns.
+  multiplied by a triangle wave running between `-255.5` and `255.5` over
+  1024 milliseconds before it turns the view. Both are doubled while walking
+  without aiming and doubled again in the air, and halved while crouching on the
+  ground, as for the vanilla guns.
 
 ### Models
 
