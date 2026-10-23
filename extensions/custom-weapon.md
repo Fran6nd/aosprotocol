@@ -53,7 +53,7 @@ The server sends a player's Loadout after their
 changes it, each time followed by a [Hold](#sub-id-1-hold) for the slot the player
 holds. A new Loadout takes effect at once and starts full: every magazine and
 reserve, the blocks and the grenades at their counts. A Create Player refills
-the loadout, as a Restock does.
+it the same way, magazines included, as a respawn does in the base game.
 
 ### Slot
 
@@ -202,8 +202,8 @@ is, in rounds and in how long after a reload a State may still differ, is the
 server's choice: network jitter decides it, and piqueserver already tolerates
 some drift in its count.
 It also sends its own Weapon State when it changes a slot itself: when a reload
-it was asked for starts or ends, a Restock, a pickup, a new Loadout, and to a
-joining client.
+it was asked for starts or ends, a Restock, a pickup, and to a joining client.
+A new Loadout needs none: it starts full.
 
 The server's Weapon State carries the Sequence of the last claim it received
 for that slot, or `0` when there has been none since the Loadout or respawn. It
