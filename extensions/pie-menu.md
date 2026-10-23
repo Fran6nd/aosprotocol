@@ -35,8 +35,8 @@ entire.
 | Pie Count     | UByte      | `4`     | Pies that follow, `0`-`10`.           |
 | Pies          | Pie[]      |         | The remaining bytes, see [Pie](#pie). |
 
-Theme, Text, Label and Tooltip are NUL-terminated strings, as elsewhere in the
-protocol, and carry text the way a
+Theme, Text, Label and Tooltip are of type **String**: NUL-terminated, as
+elsewhere in the protocol, and encoded the way a
 [Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
 behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). Each limit below is in
 bytes, counting a `0xff` prefix but not the NUL.
@@ -54,7 +54,7 @@ One ring, captioned in the middle by its theme.
 
 Every pie has exactly six slices, so there is no slice count on the wire: a
 direction only means something if it means the same thing every time. A server
-wanting fewer fills the spare wedges with [`NONE`](#actions); one wanting more
+wanting fewer fills the spare slices with [`NONE`](#actions); one wanting more
 uses another pie.
 
 Pies are offered in the order sent, within each context. Which opens first is the
@@ -62,8 +62,8 @@ client's business.
 
 ### Contexts
 
-What the crosshair is on when the menu opens decides which pies are offered. A
-bitmask, so a ring that suits more than one context is sent once.
+What is [aimed at](#substitutions) when the menu opens decides which pies are
+offered. A bitmask, so a pie that suits more than one context is sent once.
 
 | Bit | Name        | Offered when the menu opens on                     |
 |-----|-------------|----------------------------------------------------|
@@ -79,11 +79,11 @@ no team, so bits `0`-`2` never apply to one and a spectator is offered
 here too; the server knows its staff and offers them `SPECTATOR` pies to suit.
 
 The context is fixed when the menu opens and does not change while it is held. A
-context with no pies has no menu, and no other context's rings stand in.
+context with no pies has no menu, and no other context's pies stand in.
 
 ### Slice
 
-One wedge. It draws a Label and sends exactly one thing.
+One slice. It draws a Label and sends exactly one thing.
 
 | Field Name   | Field Type | Example   | Notes                                      |
 |--------------|------------|-----------|--------------------------------------------|
@@ -91,7 +91,7 @@ One wedge. It draws a Label and sends exactly one thing.
 | Message ID   | UByte      | `0`       | Reserved. Must be `0`; a client ignores it. |
 | Flags        | UByte      | `0b0`     | See below.                                 |
 | Text         | String     | `"/apoc"` | What it sends, up to `255` bytes.          |
-| Label        | String     | `"Nuke"`  | What it draws, up to `48` bytes. **Empty means draw the Text.** |
+| Label        | String     | `"Nuke"`  | What it draws, up to `48` bytes. **Empty means draw the Text**, as sent, before expansion. |
 | Tooltip      | String     | `"Calls in an airstrike"` | Up to `128` bytes. Empty means none. |
 
 The Tooltip says more about the slice than its Label can. A client shows it
@@ -106,7 +106,7 @@ tooltips out.
 
 `GLOBAL` is the team/global bit of the base
 [Chat Message](../protocol075.md#chat-message) and nothing more, kept per slice
-so that one ring may hold a line for the room and a line for the team. **There is
+so that one pie may hold a line for the room and a line for the team. **There is
 no enemy channel**, so the [`ENEMY`](#contexts) context decides which pies are
 offered, never where their words go.
 
@@ -120,29 +120,29 @@ offered, never where their words go.
 | `3`       | `COMMAND` | Text, as a chat message the server reads as a command.     |
 | `4`-`255` | reserved  | A client treats an unknown Action as `NONE`.               |
 
-The Action is also what a client styles a slice by, so that a wedge which pings,
+The Action is also what a client styles a slice by, so that a slice which pings,
 one which speaks and one which runs a command need not look alike.
 
 What a slice sends goes out however the client normally sends chat.
 
-**`PING`** marks the world position the crosshair was on when the menu opened,
+**`PING`** marks the point the [aim](#substitutions) met when the menu opened,
 not where it points when the slice is chosen. The Text becomes the ping's Reason,
 which is plain UTF-8: the client drops a `0xff` prefix, or decodes Code Page 437.
-It may be empty for a neutral marker. It needs
-[Teamplay](teamplay.md) negotiated with its `PING` bit set; without either, the
-client sends the Text as chat instead, so the words still arrive and only the
-marker is lost.
+It may be empty for a neutral marker. It needs [Teamplay](teamplay.md)
+negotiated with its `PING` bit set, a living player, and an aim that met a block
+or a player. Failing any of these, the client sends the Text as chat instead, so
+the words still arrive and only the marker is lost.
 
 **`COMMAND`** always goes on the team channel, whatever `GLOBAL` says. On the
 wire it is an ordinary chat packet: the client interprets none of it, does not
 look for a leading `/`, and has no local command language reachable from here.
 
 A `NONE` slice does nothing at all — no packet, no message, no sound, no error.
-How an empty wedge looks is the client's business, but it must not stand in for a
+How an empty slice looks is the client's business, but it must not stand in for a
 slice that is missing by inventing one.
 
 A menu sends ordinary chat, so rate-limiting it is the server's business. Nothing
-here asks for a limit, and a server is free to apply one.
+here asks the server to, and a server is free to.
 
 ### Substitutions
 
@@ -151,29 +151,42 @@ be told which player, which block or where the player was looking.
 
 | Token | Expands to                                                            |
 |-------|-----------------------------------------------------------------------|
-| `%p`  | The player aimed at, as `#` and its id in decimal.                    |
-| `%b`  | The block aimed at, as `x y z` in decimal.                            |
+| `%p`  | The player aimed at, as `#` followed by its id.                       |
+| `%b`  | The block aimed at, as `x y z`.                                       |
 | `%r`  | The camera ray, as `x y z dx dy dz`.                                  |
 | `%%`  | A literal percent sign.                                               |
 
 So `/votekick %p` reaches the server as `/votekick #7`, the form a command's
-player argument takes, and `/dig %b` as `/dig 256 301 40`. A `%` followed by
-anything else is reserved, and version 1 leaves both characters as they are.
+player argument takes, and `/dig %b` as `/dig 257 298 40`. A `%` followed by
+anything else, or by nothing, is reserved, and version 1 leaves it as it is.
 
 Every token describes the moment the menu opened, whether the opening player is
-playing or spectating, so a [`SPECTATOR`](#contexts) pie can use them too. The
-aim is a ray from the camera along its view direction, out to the
-[fog](../protocol075.md#about-coordinates), `128` blocks:
+playing or spectating, so a [`SPECTATOR`](#contexts) pie can use them too.
 
-* **`%p`** is the player under the crosshair. It expands to nothing when no
-  player was aimed at, as always in the [`WORLD`](#contexts) context, leaving the
-  argument missing rather than a bare `#`.
-* **`%b`** is the first solid block the ray meets, as three integers. It expands
-  to nothing when the ray meets none.
-* **`%r`** is the ray itself, and is never empty. `x y z` is the camera position
-  with two decimals, the free camera's for a spectator, and `dx dy dz` is the
-  view direction, of length `1`, with four. The decimal point is always `.`, with
-  no exponent, as in `255.50 300.12 40.25 0.7071 -0.7071 0.0000`.
+**The aim** is a ray from the camera the player was viewing through, their eyes
+while playing, or the free camera or the followed view while spectating, along
+its view direction, out to `128` blocks measured
+horizontally, the fog distance. **What is aimed at** is the first
+player or solid block it meets.
+
+* **`%p`** is the player aimed at. It expands to nothing when no player was aimed
+  at, as always in the [`WORLD`](#contexts) context, leaving the argument missing
+  rather than a bare `#`.
+* **`%b`** is the block aimed at. It expands to nothing when the aim meets no
+  block.
+* **`%r`** is the aim itself, and is never empty: the camera position `x y z`,
+  then the view direction `dx dy dz`, a vector of length `1` in the same
+  [coordinates](../protocol075.md#about-coordinates), so `dz` above `0` looks
+  down.
+
+**Numbers.** The values of a token are separated by single spaces. Integers are
+written in base 10, with no sign, leading zeros or padding. In `%r`, the
+position has exactly two decimal places and the direction exactly four, each
+rounded to nearest, with `-` when negative and no `+`, at least one digit before
+the decimal point, `.` as the decimal point whatever the locale, and no
+exponent. A value that rounds to zero has no sign, as in
+`255.50 300.12 40.25 0.7071 -0.7071 0.0000`. Rounded, the direction is only close
+to length `1`, so a server normalises it again before use.
 
 `%b` suits a simple command. `%r` lets the server cast the ray against its own
 map, which is the one that counts, to find the block hit, the face to build
@@ -186,9 +199,11 @@ never learns where a spectator is or looks; and better accuracy when the
 client's map and the server's have drifted apart, since with `%r` the server
 finds the block on its own map rather than taking the client's.
 
-The client expands once, immediately before sending, and never re-scans the
-result, so a name that looks like a token is not one. The Text limit counts the
-bytes in the packet, before expansion.
+Only the Text is expanded; Theme, Label and Tooltip are shown as sent. The
+client expands once, immediately before sending, and never re-scans the result,
+so a name that looks like a token is not one. The Text limit counts the bytes in
+the packet, before expansion. Expansion can make the line sent longer than `255`
+bytes, and a server treats an over-long line as it does any chat.
 
 ### Language
 
@@ -214,7 +229,7 @@ server's and is not.
 
 A server sends a Menu whenever it likes; each one replaces the whole menu, so the
 last to arrive is the menu. The client applies a new one **the next time the menu
-is opened**, not the instant it arrives, so that a ring cannot change under a held
+is opened**, not the instant it arrives, so that a pie cannot change under a held
 thumb.
 
 ## Geometry
