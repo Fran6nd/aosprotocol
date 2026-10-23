@@ -32,7 +32,14 @@ changes them. A server receiving one drops it.
 | Entry Count   | UByte      | `2`     | Entries that follow.            |
 | Entries       | Entry[]    |         | See below.                      |
 
-Each Entry is two UBytes: a **Slot** and a **Model**. Slots are numbered as in
+| Entry Field | Field Type | Example | Notes                                        |
+|-------------|------------|---------|----------------------------------------------|
+| Slot        | UByte      | `3`     | Which slot, see below.                       |
+| Model       | UByte      | `2`     | See [Models](#models).                       |
+| Flags       | UByte      | `0b1`   | Bit `0` `TINTED`: draw the tool in Colour. Bits `1`-`7` must be `0` and are ignored. |
+| Colour      | UByte[3]   |         | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). Used only with `TINTED`. |
+
+Slots are numbered as in
 [Weapon and Tool State](weapon-tool-state.md#slots): without a
 [Loadout](loadout.md) the four base tools, so the gun is slot `2` and the grenade
 slot `3`; with one, its slots. A slot with no entry keeps its vanilla look, and
@@ -51,7 +58,14 @@ on the tool, and a client draws one it lacks, or one meant for another tool, as
 | `1`       | Bolt-action | A long rifle whose bolt is worked between rounds. |
 | `2`       | Pistol      | A handgun, held in one hand.                      |
 | `3`       | Machine gun | A heavy belt-fed gun.                             |
-| `4`-`255` | reserved    |                                                   |
+| `4`       | SMG         | The vanilla SMG.                                  |
+| `5`       | Shotgun     | The vanilla shotgun.                              |
+| `6`       | DMR         | A scoped semi-automatic marksman rifle.           |
+| `7`       | Launcher    | A tube that fires rockets, see below.             |
+| `8`-`255` | reserved    |                                                   |
+
+`SMG` and `Shotgun` let any gun look like those vanilla guns, whatever it is
+underneath.
 
 An animation between rounds, such as working a bolt, lasts the time between
 rounds of the gun underneath.
@@ -62,10 +76,17 @@ rounds of the gun underneath.
 |-----------|----------------|------------------------------------------|
 | `1`       | Stick grenade  | A grenade on a wooden handle.            |
 | `2`       | Smoke canister | A cylinder, as a smoke grenade.          |
-| `3`-`255` | reserved       |                                          |
+| `3`       | Rocket         | A finned rocket.                         |
+| `4`-`255` | reserved       |                                          |
 
-A thrown grenade keeps its thrower's look in flight. Its explosion is the base
-grenade's whatever the look.
+A thrown grenade keeps its thrower's look in flight, colour included, so a server
+can make any grenade it wants: a red smoke canister, a white flash, a green gas.
+Its explosion is the base grenade's whatever the look.
+
+A [Grenade Packet](../protocol075.md#grenade-packet) the server sends for a
+player holding a gun slot whose model is `Launcher` is drawn as a `Rocket`,
+tinted as that slot. This lets a server fire rockets from a launcher; they still
+fly as grenades do.
 
 ### Spades
 
