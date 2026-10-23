@@ -95,7 +95,9 @@ There is no number type: the arguments servers take that are not words are
 durations such as `30min` or `perma`, which no number type fits. A toggle is a
 `CHOICE` of `on` and `off`.
 
-`PLAYER` is sent as `#id`, since names repeat and hold spaces.
+A client's player picker inserts `#id`, since names repeat and hold spaces. A
+name the player types goes out as typed: piqueserver and LSD also accept part of
+a name.
 
 ### Choices
 
