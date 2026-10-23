@@ -77,9 +77,8 @@ changes, say after a login.
 | Bit | Name       | Meaning                                                         |
 |-----|------------|-----------------------------------------------------------------|
 | 0   | `OPTIONAL` | The command runs without it. Every param after it is optional too. |
-| 1   | `REST`     | Takes the rest of the line, spaces included. Last param, `WORD` only. |
-| 2   | `SECRET`   | A password or the like: masked while typed, kept out of history. |
-| 3-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits.              |
+| 1   | `SECRET`   | A password or the like: masked while typed, kept out of history. |
+| 2-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits.              |
 
 Arguments are positional.
 
@@ -87,12 +86,12 @@ Arguments are positional.
 
 | Value     | Name      | The client sends                                       |
 |-----------|-----------|--------------------------------------------------------|
-| `0`       | `WORD`    | Any text without a space.                              |
+| `0`       | `TEXT`    | Any text, quoted if it holds a space.                  |
 | `1`       | `INTEGER` | A decimal integer, `-` allowed.                        |
 | `2`       | `NUMBER`  | A decimal number, `-` and one `.` allowed.             |
 | `3`       | `PLAYER`  | `#` and the player id in decimal, as in `#7`.          |
 | `4`       | `CHOICE`  | One of its [Choices](#choices), spelled as listed.     |
-| `5`-`255` | reserved  | A client treats an unknown Type as `WORD`.             |
+| `5`-`255` | reserved  | A client treats an unknown Type as `TEXT`.             |
 
 `PLAYER` is sent as `#id`, since names repeat and hold spaces.
 
@@ -147,19 +146,17 @@ arrives are sent again after it.
 
 ## The line a client sends
 
-`/`, the Name, then each argument, separated by single spaces:
+`/`, the Name, then each argument, separated by single spaces. An argument that
+holds a space is wrapped in double quotes, which piqueserver and LSD both read as
+one argument:
 
 ```
-/kick #7 spawn camping
+/kick #7 "spawn camping"
 ```
 
-for a command `kick` with params `PLAYER player` and `WORD reason` flagged
-`REST`. It goes out however the client normally sends chat.
-
-A client adds no quotes or escapes. Each server splits the line itself, so a
-`REST` argument reaches the command as that server splits it. Servers cap a chat
-line, piqueserver at 108 characters, so a client caps a `REST` prompt to what
-fits.
+for a command `kick` with params `PLAYER player` and `TEXT reason`. It goes out
+however the client normally sends chat. Servers cap a chat line, piqueserver at
+108 characters, so a client caps a prompt to what fits.
 
 The commands are advisory. A client **must not** refuse to send a command that is not
 on it, or an argument that does not fit its type, since the server may accept
@@ -178,8 +175,7 @@ the client logs it rather than disconnecting. A list is refused when:
 * A Help or param Name behind the `0xff` prefix is not well-formed UTF-8.
 * A Name, Alias or Choice holds a character outside those in [Names](#names).
 * A Name or Alias appears twice in the list, as either.
-* A required param follows an `OPTIONAL` one, or a param other than the last,
-  or one that is not a `WORD`, is `REST`.
+* A required param follows an `OPTIONAL` one.
 * A `CHOICE` param has no choices, or a param of another type has some.
 
 ## Connection state
