@@ -106,7 +106,9 @@ as the vanilla guns do and as servers count ammunition.
 Each firearm slot keeps its own magazine and reserve, and its counts travel in
 [Weapon State](#sub-id-2-weapon-state). A client asks to reload the slot it holds
 with [Weapon Reload](../protocol075.md#weapon-reload); switching to another slot
-cancels a reload in progress.
+cancels a reload in progress, unlike pyspades, which keeps reloading. The
+ammunition in [Player Properties](player-properties.md) is that of the slot the
+player holds.
 
 The three vanilla guns, in these terms:
 
