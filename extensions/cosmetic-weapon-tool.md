@@ -19,10 +19,10 @@ tools do.
 
 ## Sub ID 0: Look
 
-One player's looks. The server sends it to every client, for every player, after
-their [Create Player](../protocol075.md#create-player) or
-[Existing Player](../protocol075.md#existing-player) and again whenever it
-changes them. A server receiving one drops it.
+One player's looks. The server sends it to every client, for every player, once
+after their [Existing Player](../protocol075.md#existing-player) or first
+[Create Player](../protocol075.md#create-player), and then only when it changes
+them. A server receiving one drops it.
 
 | Field Name    | Field Type | Example | Notes                           |
 |---------------|------------|---------|---------------------------------|
