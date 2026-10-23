@@ -55,37 +55,33 @@ without resending the Loadout.
 
 ## Models
 
-Model `0` is always the vanilla look of the slot's tool. The other values depend
-on the tool, and a client draws one it lacks, or one meant for another tool, as
-`0`.
+One list for every slot: any slot can be drawn as any model, whatever its tool.
+`0` is the vanilla look of the slot's tool; `1` to `7` are the tools every
+OpenSpades-family client already has; the rest are new, and a client without
+one draws it as its fallback.
 
-### Guns
-
-| Value     | Model       | Looks and animates like                           |
-|-----------|-------------|---------------------------------------------------|
-| `1`       | Bolt-action | A long rifle whose bolt is worked between rounds. |
-| `2`       | Pistol      | A handgun, held in one hand.                      |
-| `3`       | Machine gun | A heavy belt-fed gun.                             |
-| `4`       | SMG         | The vanilla SMG.                                  |
-| `5`       | Shotgun     | The vanilla shotgun.                              |
-| `6`       | DMR         | A scoped semi-automatic marksman rifle.           |
-| `7`       | Launcher    | A tube that fires rockets, see below.             |
-| `8`-`255` | reserved    |                                                   |
-
-`SMG` and `Shotgun` let any gun look like those vanilla guns, whatever it is
-underneath.
+| Value     | Model          | Looks and animates like                           | Fallback |
+|-----------|----------------|---------------------------------------------------|----------|
+| `0`       | Vanilla        | The slot's own tool.                              |          |
+| `1`       | Spade          | The vanilla spade.                                |          |
+| `2`       | Pickaxe        | A pick, swung like the spade.                     | Spade    |
+| `3`       | Block          | The vanilla block.                                |          |
+| `4`       | Grenade        | The vanilla grenade.                              |          |
+| `5`       | Rifle          | The vanilla rifle.                                |          |
+| `6`       | SMG            | The vanilla SMG.                                  |          |
+| `7`       | Shotgun        | The vanilla shotgun.                              |          |
+| `8`       | Bolt-action    | A long rifle whose bolt is worked between rounds. | Rifle    |
+| `9`       | Pistol         | A handgun, held in one hand.                      | Rifle    |
+| `10`      | Machine gun    | A heavy belt-fed gun.                             | SMG      |
+| `11`      | DMR            | A scoped semi-automatic marksman rifle.           | Rifle    |
+| `12`      | Launcher       | A tube that fires rockets, see below.             | Shotgun  |
+| `13`      | Stick grenade  | A grenade on a wooden handle.                     | Grenade  |
+| `14`      | Smoke canister | A cylinder, as a smoke grenade.                   | Grenade  |
+| `15`      | Rocket         | A finned rocket.                                  | Grenade  |
+| `16`-`255`| reserved       |                                                   | Vanilla  |
 
 An animation between rounds, such as working a bolt, lasts the time between
 rounds of the gun underneath.
-
-### Grenades
-
-| Value     | Model          | Looks like                               |
-|-----------|----------------|------------------------------------------|
-| `1`       | Stick grenade  | A grenade on a wooden handle.            |
-| `2`       | Smoke canister | A cylinder, as a smoke grenade.          |
-| `3`       | Rocket         | A finned rocket.                         |
-| `4`-`255` | reserved       |                                          |
 
 A thrown grenade keeps the look of the slot that threw it, colour included, so a server
 can make any grenade it wants: a red smoke canister, a white flash, a green gas.
@@ -95,13 +91,6 @@ A [Grenade Packet](../protocol075.md#grenade-packet) the server sends for a
 player holding a slot whose model is `Launcher` is drawn as a `Rocket`,
 tinted as that slot. This lets a server fire rockets from a launcher; they still
 fly as grenades do.
-
-### Spades
-
-| Value     | Model   | Looks like                     |
-|-----------|---------|--------------------------------|
-| `1`       | Pickaxe | A pick, swung like the spade.  |
-| `2`-`255` | reserved |                               |
 
 A model is the tool's look, animation, sounds and kill icon. Clients without
 the extension draw the vanilla tools.
