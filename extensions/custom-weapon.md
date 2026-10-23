@@ -108,7 +108,8 @@ Each firearm slot keeps its own magazine and reserve, and its counts travel in
 with [Weapon Reload](../protocol075.md#weapon-reload); switching to another slot
 cancels a reload in progress, unlike pyspades, which keeps reloading. The
 ammunition in [Player Properties](player-properties.md) is that of the slot the
-player holds.
+player holds; its counts are bytes, so they are capped at `255`, and an infinite
+count is sent as `255`.
 
 The three vanilla guns, in these terms:
 
