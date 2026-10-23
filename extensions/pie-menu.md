@@ -29,15 +29,16 @@ Server to client only; a server that receives one drops it.
 |---------------|------------|---------|---------------------------------------|
 | Packet ID     | UByte      | `0x71`  | Always `0x71`.                        |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.       |
-| Pie Count     | UByte      | `4`     | Pies that follow, `0`-`10`.           |
+| Pie Count     | UByte      | `4`     | Pies that follow.                     |
 | Pies          | Pie[]      |         | The remaining bytes, see [Pie](#pie). |
 
 Theme, Text, Label and Tooltip are of type **String**: NUL-terminated, as
 elsewhere in the protocol, and encoded the way a
 [Chat Message](../protocol075.md#chat-message) does: Code Page 437, or UTF-8
 behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md). A client draws them as
-it draws chat, colour codes included. Each limit below is in bytes, counting a
-`0xff` prefix but not the NUL.
+it draws chat, colour codes included. No string has a length limit of its own;
+a client may cut what it draws, and the server treats a line that is too long as
+it treats any over-long chat.
 
 ### Pie
 
@@ -47,7 +48,7 @@ One ring, captioned in the middle by its theme.
 |------------------|------------|------------|-----------------------------------------|
 | Contexts         | UByte      | `0b011`    | Where it is offered, see [Contexts](#contexts). |
 | Theme Message ID | UByte      | `0`        | Reserved. Must be `0`; a client ignores it. |
-| Theme            | String     | `"Social"` | The centre caption, up to `32` bytes. Empty means none. |
+| Theme            | String     | `"Social"` | The centre caption. Empty means none. |
 | Slices           | Slice[6]   |            | Exactly six, see [Slice](#slice).       |
 
 There is no slice count: a server wanting fewer fills the spare slices with
@@ -82,9 +83,9 @@ menu, and no other context's pies stand in.
 | Action       | UByte      | `1`       | See [Actions](#actions).                   |
 | Message ID   | UByte      | `0`       | Reserved. Must be `0`; a client ignores it. |
 | Flags        | UByte      | `0b0`     | See below.                                 |
-| Text         | String     | `"/apoc"` | What it sends, up to `255` bytes.          |
-| Label        | String     | `"Nuke"`  | What it draws, up to `48` bytes. Empty means draw the Text. |
-| Tooltip      | String     | `"Calls in an airstrike"` | Up to `128` bytes. Empty means none. |
+| Text         | String     | `"/apoc"` | What it sends.                             |
+| Label        | String     | `"Nuke"`  | What it draws. Empty means draw the Text. |
+| Tooltip      | String     | `"Calls in an airstrike"` | Empty means none. |
 
 A client shows the Tooltip while the slice is highlighted and never sends it.
 Where and how it is drawn is the client's business, and a client may leave
@@ -170,9 +171,7 @@ accuracy when the client's map has drifted from the server's.
 
 Only the Text is expanded; Theme, Label and Tooltip are shown as sent. The
 client expands once, immediately before sending, and never re-scans the result,
-so a name that looks like a token is not one. The Text limit counts the bytes in
-the packet, before expansion; an expanded line longer than that is treated by the
-server as any over-long chat.
+so a name that looks like a token is not one.
 
 ### Language
 
@@ -215,7 +214,6 @@ the client logs it rather than disconnecting. A Menu is refused when:
 
 * A record or a string runs past the end of the packet, or bytes remain after
   the last pie.
-* Pie Count is outside its range, or a string is longer than its limit.
 * A string behind the `0xff` prefix is not well-formed UTF-8.
 
 ## Connection state
