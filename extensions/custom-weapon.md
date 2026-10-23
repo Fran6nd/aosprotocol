@@ -234,7 +234,11 @@ without the extension get Weapon Reload as today, its byte counts capped at
   keep their own.
 
 Clients without the extension see only base packets: the vanilla weapon above,
-and Set Tool as the server translates it.
+and Set Tool as the server translates it. BetterSpades counts down other
+players' rounds with the vanilla weapon's magazine and stops drawing their shots
+at `0`, so a larger magazine goes silent early there; a server may send such
+clients a Weapon Reload for that player each time a vanilla magazine's worth is
+fired.
 
 ## Connection state
 
