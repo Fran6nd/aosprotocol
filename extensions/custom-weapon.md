@@ -127,9 +127,11 @@ These are the vanilla guns' own values and work as the vanilla clients use them.
   offset of up to `2 × Spread` on each axis. Aiming down the sights halves it,
   and so does crouching with a `STEADIED` firearm, as ZeroSpades and BetterSpades
   do for every vanilla gun but the shotgun.
-* **Recoil Up.** Each round raises the view by this many radians.
-* **Recoil Side.** Each round turns the view sideways by up to this many
-  radians, alternating sides as the vanilla guns do.
+* **Recoil Up** and **Recoil Side** are the constants the vanilla clients
+  scale per round: Recoil Up raises the view, in radians, and Recoil Side is
+  multiplied by the clients' alternating wave before it turns the view. Both are
+  doubled while walking without aiming or in the air, and halved while
+  crouching, as for the vanilla guns.
 
 ### Models
 
