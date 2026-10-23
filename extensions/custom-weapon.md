@@ -101,7 +101,8 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 | 2-7 | reserved           | Must be `0`. Clients **must** ignore unknown bits. |
 
 Every firearm fires for as long as primary fire is held, one round per Interval,
-as the vanilla guns do and as servers count ammunition.
+as the vanilla guns do. piqueserver times the vanilla SMG at `0.11` seconds
+rather than `0.1`, which is part of the drift Weapon State corrects.
 
 Each firearm slot keeps its own magazine and reserve, and its counts travel in
 [Weapon State](#sub-id-2-weapon-state). A client asks to reload the slot it holds
