@@ -179,7 +179,6 @@ the client logs it rather than disconnecting. A list is refused when:
 * A Help or param Name behind the `0xff` prefix is not well-formed UTF-8.
 * A Name, Alias or Choice holds a character outside those in [Names](#names).
 * A Name or Alias appears twice in the list, as either.
-* A required param follows an `OPTIONAL` one.
 * A `CHOICE` param has no choices, or a param of another type has some.
 
 ## Connection state
