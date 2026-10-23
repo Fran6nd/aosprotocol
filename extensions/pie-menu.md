@@ -53,8 +53,8 @@ One ring, captioned in the middle by its theme.
 There is no slice count: a server wanting fewer fills the spare slices with
 [`NONE`](#actions), and one wanting more uses another pie.
 
-Pies are offered in the order sent, within each context. Which opens first is the
-client's business.
+Pies are offered in the order sent, within each context, and the first opens
+first. A client may instead reopen the pie last used in that context.
 
 ### Contexts
 
