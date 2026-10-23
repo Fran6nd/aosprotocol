@@ -49,7 +49,7 @@ limit of its own.
 | Name        | String     | `"teleport"`         | Without the `/`, not empty, see [Names](#names). |
 | Alias Count | UByte      | `1`                  | Aliases that follow.                  |
 | Aliases     | String[]   | `"tp"`               | Other names for the same command.     |
-| Help        | String     | `"Moves a player"`   | No line breaks; a client may cut it. |
+| Help        | String     | `"Moves a player"`   | Drawn as chat is drawn. |
 | Param Count | UByte      | `2`                  | Params that follow.                   |
 | Params      | Param[]    |                      | See [Param](#param).                  |
 
