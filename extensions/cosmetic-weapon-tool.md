@@ -99,8 +99,10 @@ while the launcher is held, an airstrike included, so a server that does not
 want rockets there sends those for no player. A look changes nothing, so the
 gun underneath still fires as its base weapon unless the server stops it.
 
-A model is the tool's look, animation, sounds and kill icon. Clients without
-the extension draw the vanilla tools.
+A model is the tool's look, animation, sounds and kill icon. The kill icon is
+that of the slot the killer holds when [Kill Action](../protocol075.md#kill-action)
+arrives, or of their grenade slot for a grenade kill. Clients without the
+extension draw the vanilla tools.
 
 ## Connection state
 
