@@ -148,7 +148,8 @@ These are the vanilla guns' own values and work as the vanilla clients use them.
 | `6`-`255` | reserved    |                                                  | Rifle               |
 
 A Model is the firearm's look, animation, sounds, scope and kill icon, nothing
-else: how it fires comes from the other fields. A client draws a model it lacks
+else: how it fires comes from the other fields. Its animation between rounds,
+such as working a bolt or a pump, lasts the firearm's Interval. A client draws a model it lacks
 as the one in the last column.
 
 ## Sub ID 1: Hold
