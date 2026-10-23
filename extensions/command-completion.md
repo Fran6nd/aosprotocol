@@ -114,9 +114,9 @@ stop them typing something else.
 
 ### Names
 
-A command Name or Alias is lowercase: `a`-`z`, `0`-`9`, `_`, `-`, `.` and `+`.
-A Choice is printable ASCII, `0x21`-`0x7e`, except `"`, `'` and `\`, which
-servers treat as quoting.
+A command Name or Alias holds no space and does not start with `/`; servers
+match it whatever its case. A Choice is any String, and is quoted when sent if it
+holds a space.
 
 ## Sub ID 1: Remove
 
@@ -177,7 +177,6 @@ the client logs it rather than disconnecting. A list is refused when:
   the last command.
 * A count or a length is outside the range in its Notes.
 * A Help or param Name behind the `0xff` prefix is not well-formed UTF-8.
-* A Name, Alias or Choice holds a character outside those in [Names](#names).
 * A Name or Alias appears twice in the list, as either.
 * A `CHOICE` param has no choices, or a param of another type has some.
 
