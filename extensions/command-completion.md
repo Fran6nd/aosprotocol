@@ -4,7 +4,7 @@ The server tells the client which chat commands it accepts and what each one
 takes, so that a client can complete them as they are typed, show their help,
 and ask for a missing argument.
 
-Commands stay `/` [Chat Messages](../protocol075.md#chat-message). The list only
+Commands stay `/` [Chat Messages](../protocol075.md#chat-message). The extension only
 describes them, and the server parses and checks them as before.
 
 | ------------: | ------------- |
@@ -18,12 +18,16 @@ describes them, and the server parses and checks them as before.
 | Sub ID | Name     | Direction        | Size |
 |--------|----------|------------------|------|
 | 0      | Commands | Server -> Client | 3+   |
+| 1      | Remove   | Server -> Client | 3+   |
+| 2      | Clear    | Server -> Client | 2    |
 
-Server to client only; a server that receives one drops it.
+Server to client only; a server that receives one drops it. The client's
+commands start empty, and these three change them.
 
 ## Sub ID 0: Commands
 
-Replaces the client's whole command list.
+Adds each command listed, or replaces the one of the same Name. Commands not
+listed are left as they are.
 
 | Field Name    | Field Type | Example | Notes                                         |
 |---------------|------------|---------|-----------------------------------------------|
@@ -52,8 +56,8 @@ bytes, counting a `0xff` prefix but not the NUL.
 Each Alias is a String like the Name. A client completes an alias like the
 command, and lists the command once.
 
-Commands are listed in the order the server prefers to show them. A server lists
-only the commands this player may run now, and sends the list again when that
+A client shows commands in the order they were first added. A server lists only
+the commands this player may run now, and adds or removes some when that
 changes, say after a login.
 
 ### Param
@@ -107,14 +111,35 @@ A command Name or Alias is lowercase: `a`-`z`, `0`-`9`, `_`, `-`, `.` and `+`.
 A Choice is printable ASCII, `0x21`-`0x7e`, except `"`, `'` and `\`, which
 servers treat as quoting.
 
-### Language
+## Sub ID 1: Remove
+
+Removes the commands named, each by its Name. A name the client does not have is
+ignored.
+
+| Field Name    | Field Type | Example    | Notes                           |
+|---------------|------------|------------|---------------------------------|
+| Packet ID     | UByte      | `0x78`     | Always `0x78`.                  |
+| Sub Packet ID | UByte      | `1`        | Always `1` for this sub-packet. |
+| Name Count    | UByte      | `1`        | Names that follow.              |
+| Names         | String[]   | `"kick"`   | Command Names, without the `/`. |
+
+## Sub ID 2: Clear
+
+Removes every command, for example after a logout.
+
+| Field Name    | Field Type | Example | Notes                           |
+|---------------|------------|---------|---------------------------------|
+| Packet ID     | UByte      | `0x78`  | Always `0x78`.                  |
+| Sub Packet ID | UByte      | `2`     | Always `2` for this sub-packet. |
+
+## Language
 
 Help and param Names **should** be in the player's User locale, from a
 [Version Response (Extended)](../protocol075.md#version-response-extended-ep):
 the server matches the language and region, then the language alone, then falls
 back to its own default, which it also uses with no locale. Command Names,
-Aliases and Choices are never translated. A list sent before the locale arrives
-is sent again after it.
+Aliases and Choices are never translated. Commands sent before the locale
+arrives are sent again after it.
 
 ## The line a client sends
 
@@ -132,10 +157,10 @@ A client adds no quotes or escapes. Each server splits the line itself, so a
 line, piqueserver at 108 characters, so a client caps a `REST` prompt to what
 fits.
 
-The list is advisory. A client **must not** refuse to send a command that is not
+The commands are advisory. A client **must not** refuse to send a command that is not
 on it, or an argument that does not fit its type, since the server may accept
-commands it does not list. A client that has received no list, or an empty one,
-behaves as it would without the extension.
+commands it does not list. A client that has no commands behaves as it would
+without the extension.
 
 ## Validation
 
@@ -155,8 +180,8 @@ the client logs it rather than disconnecting. A list is refused when:
 
 ## Connection state
 
-The list belongs to the connection, not to the world.
-[Map Start](../protocol075.md#map-start-075) does not clear it. A server whose
-commands change with the map sends a new list.
+The commands belong to the connection, not to the world.
+[Map Start](../protocol075.md#map-start-075) does not clear them. A server whose
+commands change with the map updates them.
 
 See [Extensions](extension.md) for how the extension is negotiated.
