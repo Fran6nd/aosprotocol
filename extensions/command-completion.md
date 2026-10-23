@@ -168,15 +168,15 @@ without the extension.
 
 ## Validation
 
-A client parses the whole packet before applying any of it, and **a list is
-applied whole or not at all**. Where one is refused the previous list stands and
-the client logs it rather than disconnecting. A list is refused when:
+A client parses the whole packet before applying any of it. It refuses the
+packet only when a record or a string runs past the end of the packet, or bytes
+remain after the last one; its commands then stay as they were, and it logs the
+packet rather than disconnecting.
 
-* A record or a string runs past the end of the packet, or bytes remain after
-  the last command.
-* A Help or param Name behind the `0xff` prefix is not well-formed UTF-8.
-* A Name or Alias appears twice in the list, as either.
-* A `CHOICE` param has no choices, or a param of another type has some.
+Otherwise a bad command is skipped and the others are applied. A command is bad
+when its Name is empty, a String behind the `0xff` prefix is not well-formed
+UTF-8, or a `CHOICE` param has no choices. A Name or Alias that another command
+already has belongs to the one added last.
 
 ## Connection state
 
