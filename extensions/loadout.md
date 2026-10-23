@@ -1,7 +1,7 @@
 # Loadout
 
 The server sets what a player carries in hand: which tools, in which order, and
-how many blocks and grenades. A loadout can be a spade and a block, a grenade
+how many of each. A loadout can be a spade and a block, a grenade
 and an empty hand, or a rifle, a shotgun and a spade. Each tool behaves as its
 base tool does.
 
@@ -15,7 +15,7 @@ base tool does.
 
 | Sub ID | Name    | Direction         | Size |
 |--------|---------|-------------------|------|
-| 0      | Loadout | Server -> Client  | 8+   |
+| 0      | Loadout | Server -> Client  | 5+   |
 | 1      | Hold    | Client <-> Server | 5    |
 
 ## Sub ID 0: Loadout
@@ -28,24 +28,10 @@ that each can draw what others hold. A server receiving one drops it.
 | Packet ID     | UByte      | `0x7B`  | Always `0x7B`.                          |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.         |
 | Player ID     | UByte      | `7`     | Whose loadout this is.                  |
-| Flags         | UByte      | `0b00`  | See below.                              |
-| Blocks        | UByte      | `50`    | Blocks after a [Restock](../protocol075.md#restock). |
-| Grenades      | UByte      | `3`     | Grenades after a Restock.               |
 | Slot Count    | LE UShort  | `3`     | Slots that follow.                      |
 | Slots         | Slot[]     |         | See [Slot](#slot).                      |
 
-| Bit | Name                | Meaning                                              |
-|-----|---------------------|------------------------------------------------------|
-| 0   | `INFINITE_BLOCKS`   | Placing a block never uses one up.                   |
-| 1   | `INFINITE_GRENADES` | Throwing a grenade never uses one up.                |
-| 2   | `INFINITE_RESERVE`  | Reloading a gun never uses up its reserve.           |
-| 3-7 | reserved            | Must be `0`. Clients **must** ignore unknown bits.   |
-
-With an infinite flag the matching count is ignored, a reload is always
-allowed, and the client shows no count.
-
-Blocks and grenades are one pool each, shared by every slot that uses them, as
-in the base game. The server sends a player's Loadout after their
+The server sends a player's Loadout after their
 [Create Player](../protocol075.md#create-player) or
 [Existing Player](../protocol075.md#existing-player), and again whenever it
 changes it, each time followed by a [Hold](#sub-id-1-hold). A new Loadout takes
@@ -53,10 +39,26 @@ effect at once and starts full.
 
 ### Slot
 
+Always three bytes, whatever the Tool, so a client skips a slot it does not
+know.
+
 | Field Name | Field Type | Example | Notes                                        |
 |------------|------------|---------|----------------------------------------------|
 | Tool       | UByte      | `2`     | See below.                                   |
-| Weapon     | UByte      | `1`     | Only when Tool is `2`: `0` rifle, `1` SMG, `2` shotgun, as in [Change Weapon](../protocol075.md#change-weapon). |
+| Flags      | UByte      | `0b0`   | Bit `0` `INFINITE`: the slot's count is never used up. Bits `1`-`7` must be `0` and are ignored. |
+| Value      | UByte      | `1`     | Depends on the Tool, see below.              |
+
+| Tool    | Value                                                                  |
+|---------|------------------------------------------------------------------------|
+| Gun     | The weapon: `0` rifle, `1` SMG, `2` shotgun, as in [Change Weapon](../protocol075.md#change-weapon). |
+| Block   | Blocks after a [Restock](../protocol075.md#restock).                    |
+| Grenade | Grenades after a Restock.                                              |
+| Others  | `0`, ignored.                                                          |
+
+Each slot keeps its own count, so a loadout can carry three frag grenades and
+two smoke canisters. With `INFINITE` the count is ignored and the client shows
+none; on a gun it is the reserve that is never used up, so a reload is always
+allowed.
 
 | Value     | Tool       | Primary fire                               |
 |-----------|------------|--------------------------------------------|
