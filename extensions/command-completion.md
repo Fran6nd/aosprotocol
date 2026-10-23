@@ -159,8 +159,7 @@ one argument:
 ```
 
 for a command `kick` with params `PLAYER player` and `TEXT reason`. It goes out
-however the client normally sends chat. Servers cap a chat line, piqueserver at
-108 characters, so a client caps a prompt to what fits.
+however the client normally sends chat.
 
 The commands are advisory. A client **must not** refuse to send a command that is not
 on it, or an argument that does not fit its type, since the server may accept
