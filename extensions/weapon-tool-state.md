@@ -88,12 +88,6 @@ Switching away from a gun cancels its reload on both sides. Only OpenSpades
 does so today: other clients and the servers let the reload run on, so this is
 new behaviour for them.
 
-Jitter can make a magazine reload end on the client a moment before the
-server's. A fire press that reaches the server in the last moment of such a
-reload, as long as the server allows, counts rounds from the reload's end rather
-than being refused. During the shotgun's reload a press stops the reload, as in
-every client.
-
 ## Connection state
 
 The counts belong to the player and last until
