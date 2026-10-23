@@ -14,7 +14,7 @@ grenade and an empty hand, or a rifle, a shotgun and a spade.
 
 | Sub ID | Name       | Direction         | Size |
 |--------|------------|-------------------|------|
-| 0      | Loadout    | Server -> Client  | 6+   |
+| 0      | Loadout    | Server -> Client  | 7+   |
 | 1      | Hold       | Client <-> Server | 4    |
 | 2      | Weapon State | Client <-> Server | 7  |
 
@@ -29,10 +29,17 @@ receiving one drops it.
 | Packet ID     | UByte      | `0x79`  | Always `0x79`.                          |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet.         |
 | Player ID     | UByte      | `7`     | Whose loadout this is.                  |
+| Flags         | UByte      | `0b00`  | See below.                              |
 | Blocks        | UByte      | `50`    | Blocks after a [Restock](../protocol075.md#restock). |
 | Grenades      | UByte      | `3`     | Grenades after a Restock.               |
 | Slot Count    | UByte      | `3`     | Slots that follow.                      |
 | Slots         | Slot[]     |         | See [Slot](#slot).                      |
+
+| Bit | Name                | Meaning                                         |
+|-----|---------------------|-------------------------------------------------|
+| 0   | `INFINITE_BLOCKS`   | Placing a block never uses one up.              |
+| 1   | `INFINITE_GRENADES` | Throwing a grenade never uses one up.           |
+| 2-7 | reserved            | Must be `0`. Clients **must** ignore unknown bits. |
 
 Blocks and grenades are one pool each, shared by every slot that uses them, as
 in the base game. A Restock refills them to these counts and refills every
@@ -85,7 +92,8 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 | Bit | Name       | Meaning                                         |
 |-----|------------|-------------------------------------------------|
 | 0   | `STEADIED` | Crouching halves the spread.                    |
-| 1-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits. |
+| 1   | `INFINITE_RESERVE` | Reloading never uses up the reserve.    |
+| 2-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits. |
 
 Every firearm fires for as long as primary fire is held, one round per Interval,
 as the vanilla guns do and as servers count ammunition.
