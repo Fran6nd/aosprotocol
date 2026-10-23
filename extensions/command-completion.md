@@ -68,7 +68,7 @@ changes, say after a login.
 
 | Field Name   | Field Type | Example    | Notes                                         |
 |--------------|------------|------------|-----------------------------------------------|
-| Type         | UByte      | `3`        | See [Types](#types).                          |
+| Type         | UByte      | `1`        | See [Types](#types).                          |
 | Flags        | UByte      | `0b000`    | See below.                                    |
 | Name         | String     | `"player"` | What a prompt or a hint calls it, `1`-`24` bytes. |
 | Choice Count | UByte      | `0`        | `0` unless Type is `CHOICE`, then `1`-`32`.   |
@@ -87,11 +87,13 @@ Arguments are positional.
 | Value     | Name      | The client sends                                       |
 |-----------|-----------|--------------------------------------------------------|
 | `0`       | `TEXT`    | Any text, quoted if it holds a space.                  |
-| `1`       | `INTEGER` | A decimal integer, `-` allowed.                        |
-| `2`       | `NUMBER`  | A decimal number, `-` and one `.` allowed.             |
-| `3`       | `PLAYER`  | `#` and the player id in decimal, as in `#7`.          |
-| `4`       | `CHOICE`  | One of its [Choices](#choices), spelled as listed.     |
-| `5`-`255` | reserved  | A client treats an unknown Type as `TEXT`.             |
+| `1`       | `PLAYER`  | `#` and the player id in decimal, as in `#7`.          |
+| `2`       | `CHOICE`  | One of its [Choices](#choices), spelled as listed.     |
+| `3`-`255` | reserved  | A client treats an unknown Type as `TEXT`.             |
+
+There is no number type: the arguments servers take that are not words are
+durations such as `30min` or `perma`, which no number type fits. A toggle is a
+`CHOICE` of `on` and `off`.
 
 `PLAYER` is sent as `#id`, since names repeat and hold spaces.
 
