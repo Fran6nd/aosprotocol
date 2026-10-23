@@ -15,7 +15,7 @@ tools do.
 
 | Sub ID | Name | Direction        | Size |
 |--------|------|------------------|------|
-| 0      | Look | Server -> Client | 4+   |
+| 0      | Look | Server -> Client | 5+   |
 
 ## Sub ID 0: Look
 
@@ -29,21 +29,29 @@ changes them. A server receiving one drops it.
 | Packet ID     | UByte      | `0x7A`  | Always `0x7A`.                  |
 | Sub Packet ID | UByte      | `0`     | Always `0` for this sub-packet. |
 | Player ID     | UByte      | `7`     | Whose looks these are.          |
-| Entry Count   | UByte      | `2`     | Entries that follow.            |
+| Entry Count   | LE UShort  | `2`     | Entries that follow.            |
 | Entries       | Entry[]    |         | See below.                      |
 
 | Entry Field | Field Type | Example | Notes                                        |
 |-------------|------------|---------|----------------------------------------------|
-| Slot        | UByte      | `3`     | Which slot, see below.                       |
+| Slot        | LE UShort  | `3`     | Which slot, see [Slots](#slots).             |
 | Model       | UByte      | `2`     | See [Models](#models).                       |
 | Flags       | UByte      | `0b1`   | Bit `0` `TINTED`: draw the tool in Colour. Bits `1`-`7` must be `0` and are ignored. |
 | Colour      | UByte[3]   |         | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). Used only with `TINTED`. |
 
-Slots are numbered as in
-[Weapon and Tool State](weapon-tool-state.md#slots): without a
-[Loadout](loadout.md) the four base tools, so the gun is slot `2` and the grenade
-slot `3`; with one, its slots. A slot with no entry keeps its vanilla look, and
-a Look replaces the player's previous one whole.
+### Slots
+
+A look is set on a slot, and the slot's mechanics come from elsewhere. Without
+a [Loadout](loadout.md) a player has four slots, one per base tool: slot `n` is
+the tool `n` of [Set Tool](../protocol075.md#set-tool), so the gun is slot `2`
+and the grenade slot `3`. With a Loadout, its slots, in its order: a rifle in
+slot `3` can look like a rifle and another rifle in slot `4` like a pistol.
+
+A slot with no entry keeps its vanilla look, and a Look replaces the player's
+previous one whole. The server sends a player's Loadout before their Look; a
+new Loadout resets every look to vanilla until the next Look, and an entry for a
+slot the player does not have is ignored. A Look can change a skin at any time
+without resending the Loadout.
 
 ## Models
 
@@ -79,12 +87,12 @@ rounds of the gun underneath.
 | `3`       | Rocket         | A finned rocket.                         |
 | `4`-`255` | reserved       |                                          |
 
-A thrown grenade keeps its thrower's look in flight, colour included, so a server
+A thrown grenade keeps the look of the slot that threw it, colour included, so a server
 can make any grenade it wants: a red smoke canister, a white flash, a green gas.
 Its explosion is the base grenade's whatever the look.
 
 A [Grenade Packet](../protocol075.md#grenade-packet) the server sends for a
-player holding a gun slot whose model is `Launcher` is drawn as a `Rocket`,
+player holding a slot whose model is `Launcher` is drawn as a `Rocket`,
 tinted as that slot. This lets a server fire rockets from a launcher; they still
 fly as grenades do.
 
