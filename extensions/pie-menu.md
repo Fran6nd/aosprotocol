@@ -143,9 +143,9 @@ A `%` followed by anything else, or by nothing, is reserved, and version 1 leave
 it as it is. An empty token leaves its argument missing, so `/votekick %p` with
 no player aimed at sends `/votekick `, not `/votekick #`.
 
-**The aim** is a ray from the camera the player was viewing through, their eyes
-while playing, or the free camera or the followed view while spectating, along
-its view direction. It has no length limit; a server that wants one applies it
+**The aim** is a ray from the camera being drawn, along its view direction:
+the player's own view while alive, and whatever view the client shows while dead
+or spectating, a free camera or a followed player. It has no length limit; a server that wants one applies it
 to what it receives.
 
 * **The player aimed at**, `%p`, is the first player the aim meets before any
