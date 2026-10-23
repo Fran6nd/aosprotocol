@@ -48,7 +48,9 @@ firearm.
 The server sends a player's Loadout after their
 [Create Player](../protocol075.md#create-player) or
 [Existing Player](../protocol075.md#existing-player), and again whenever it
-changes it; the new one takes effect at once, and the player holds slot `0`.
+changes it, each time followed by a [Hold](#sub-id-1-hold) for the slot the player
+holds. A new Loadout takes effect at once. A Create Player refills the loadout,
+as a Restock does.
 
 ### Slot
 
