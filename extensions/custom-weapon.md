@@ -41,6 +41,8 @@ receiving one drops it.
 | 1   | `INFINITE_GRENADES` | Throwing a grenade never uses one up.           |
 | 2-7 | reserved            | Must be `0`. Clients **must** ignore unknown bits. |
 
+With an infinite flag, the matching count is ignored and the client shows none.
+
 Blocks and grenades are one pool each, shared by every slot that uses them, as
 in the base game. A Restock refills them to these counts and refills every
 firearm's reserve, leaving its magazine as it is, as in the base game.
@@ -94,7 +96,7 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 
 | Bit | Name               | Meaning                                     |
 |-----|--------------------|---------------------------------------------|
-| 0   | `INFINITE_RESERVE` | Reloading never uses up the reserve.        |
+| 0   | `INFINITE_RESERVE` | Reloading never uses up the reserve. Reserve is ignored, a reload is always allowed, and the client shows no reserve. |
 | 1   | `STEADIED`         | Crouching halves the spread.                |
 | 2-7 | reserved           | Must be `0`. Clients **must** ignore unknown bits. |
 
