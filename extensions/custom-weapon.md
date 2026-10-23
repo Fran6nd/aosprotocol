@@ -91,10 +91,11 @@ The values of [Set Tool](../protocol075.md#set-tool), and one more.
 | Recoil Up    | LE Float   | `0.05`   | See [Aim](#aim).                                     |
 | Recoil Side  | LE Float   | `0.0001` | See [Aim](#aim).                                     |
 
-| Bit | Name       | Meaning                                         |
-|-----|------------|-------------------------------------------------|
-| 0   | `INFINITE_RESERVE` | Reloading never uses up the reserve.    |
-| 1-7 | reserved   | Must be `0`. Clients **must** ignore unknown bits. |
+| Bit | Name               | Meaning                                     |
+|-----|--------------------|---------------------------------------------|
+| 0   | `INFINITE_RESERVE` | Reloading never uses up the reserve.        |
+| 1   | `STEADIED`         | Crouching halves the spread.                |
+| 2-7 | reserved           | Must be `0`. Clients **must** ignore unknown bits. |
 
 Every firearm fires for as long as primary fire is held, one round per Interval,
 as the vanilla guns do and as servers count ammunition.
@@ -108,8 +109,8 @@ The three vanilla guns, in these terms:
 
 | Gun     | Model | Flags | Reload | Magazine | Reserve | Pellets | Block Damage | Interval | Reload Time | Spread  | Recoil Up | Recoil Side |
 |---------|-------|-------|--------|----------|---------|---------|--------------|----------|-------------|---------|-----------|-------------|
-| Rifle   | `0`   | `0`   | `0`    | `10`     | `50`    | `1`     | `50`         | `0.5`    | `2.5`       | `0.006` | `0.05`    | `0.0001`    |
-| SMG     | `1`   | `0`   | `0`    | `30`     | `120`   | `1`     | `34`         | `0.1`    | `2.5`       | `0.012` | `0.0125`  | `0.00005`   |
+| Rifle   | `0`   | `2`   | `0`    | `10`     | `50`    | `1`     | `50`         | `0.5`    | `2.5`       | `0.006` | `0.05`    | `0.0001`    |
+| SMG     | `1`   | `2`   | `0`    | `30`     | `120`   | `1`     | `34`         | `0.1`    | `2.5`       | `0.012` | `0.0125`  | `0.00005`   |
 | Shotgun | `2`   | `0`   | `1`    | `6`      | `48`    | `8`     | `34`         | `1.0`    | `0.5`       | `0.024` | `0.1`     | `0.0002`    |
 
 Damage to players stays the server's: the client reports hits with the
@@ -122,7 +123,9 @@ the guns.
 These are the vanilla guns' own values and work as the vanilla clients use them.
 
 * **Spread.** Each pellet flies along the player's view direction plus a random
-  offset of up to `2 × Spread` on each axis. Aiming down the sights halves it.
+  offset of up to `2 × Spread` on each axis. Aiming down the sights halves it,
+  and so does crouching with a `STEADIED` firearm, as ZeroSpades and BetterSpades
+  do for every vanilla gun but the shotgun.
 * **Recoil Up.** Each round raises the view by this many radians.
 * **Recoil Side.** Each round turns the view sideways by up to this many
   radians, alternating sides as the vanilla guns do.
