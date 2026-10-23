@@ -226,11 +226,11 @@ counts rounds from the reload's end rather than being refused. During a
 one-round-at-a-time reload a press stops the reload, as in every client.
 
 **Replies and relays.** To clients with the extension the server answers a
-Weapon Reload with Weapon State, not Weapon Reload. To the other clients it
-sends its own Weapon State when a reload starts and ends, for their animation,
+Weapon Reload with Weapon State, not Weapon Reload. To the other clients with
+the extension it sends its own Weapon State when a reload starts and ends, for their animation,
 and never relays a client's claims; they may ignore the counts. Clients
-without the extension get Weapon Reload as today, its byte counts capped at
-`255`.
+without the extension get Weapon Reload as today, with Magazine and Reserve
+capped at `255`.
 
 ## Base packets
 
