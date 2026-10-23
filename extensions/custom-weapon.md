@@ -194,8 +194,10 @@ it was asked for starts or ends, a Restock, a pickup, a new Loadout, and to a
 joining client.
 
 The server's Weapon State carries the Sequence of the last claim it received
-for that slot. The client adopts it as the state at that claim: the magazine it
-keeps is the server's less the rounds it has fired since.
+for that slot, and describes the slot as it was at that claim, with only the
+server's own changes since applied: a reload, a Restock, a pickup. Rounds fired
+after the claim are left out. The client adopts it and takes off the rounds it
+has fired since that claim, so none is counted twice.
 
 **A press during the server's reload.** The client's reload can end a moment
 before the server's. A fire press that reaches the server in the last `0.5`
