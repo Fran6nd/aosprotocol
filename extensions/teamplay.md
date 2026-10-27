@@ -253,15 +253,14 @@ asks for a ping, so a ping can come from a key bind or a
 /pingmark <x> <y> <z> [reason...]
 ```
 
-`x`, `y` and `z` are the position, in the same coordinates as the Ping packet,
-written in base 10 with `.` as the decimal point; whole numbers name a block,
-as the Pie Menu's `%b` does. The rest of the line is the Reason, and may be
-left out.
+`x`, `y` and `z` are integers naming a block by its position in the
+[map file](../mapformat.md), as the Pie Menu's `%b` does. The rest of the line
+is the Reason, and may be left out.
 
-The server handles it as a client -> server Ping carrying that position and
+The server handles it as a client -> server Ping carrying that block's position and
 Reason, under the same rules: the `PING` bit, the rate limit, the checks on the
 position and the label, and who receives the relay. It answers in chat when it
-refuses, including when the line does not start with three numbers, as when
+refuses, including when the line does not start with three integers, as when
 a slice's `%b` met no block.
 
 ## Sub ID 2: ESP Mark
