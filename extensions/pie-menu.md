@@ -126,13 +126,16 @@ does.
 
 The Text of a slice may name what the menu was opened on.
 
-| Token | Expands to          | Example                                     | Type                                                                                     | Empty when             |
-|-------|---------------------|---------------------------------------------|------------------------------------------------------------------------------------------|------------------------|
-| `%p`  | The player aimed at | `#7`                                        | `#` then an integer, the player id                                                      | No player is aimed at. |
-| `%b`  | The block aimed at  | `257 298 40`                                | 3 integers: `x y z`                                                                      | No block is aimed at.  |
-| `%h`  | The point aimed at  | `256.37 298.02 40.00`                       | 3 decimal numbers: `x y z` with at least 2 decimal places                                | Nothing is aimed at.   |
-| `%r`  | The camera ray      | `255.50 300.12 40.25 0.7071 -0.7071 0.0000` | 6 decimal numbers: the position `x y z` with at least 2 decimal places, then the direction `dx dy dz` with at least 4 | Never.      |
-| `%%`  | A percent sign      | `%`                                         |                                                                                          | Never.                 |
+| Token | Expands to | Type | Example | Empty when | Typical use |
+|-------|------------|------|---------|------------|-------------|
+| `%p`  | The player aimed at: the first player the aim meets before any block. | `#` then an integer, the player id. | `#7` | No player is aimed at. | A command on a player: `/votekick %p`. |
+| `%b`  | The block aimed at: the first solid block the aim meets. Players do not hide it. | 3 integers: `x y z`. | `257 298 40` | No block is aimed at. | A command on a block. |
+| `%h`  | The point aimed at: where the aim first meets a block or a player. | 3 decimals: `x y z`, at least 2 decimal places. | `256.37 298.02 40.00` | Nothing is aimed at. | A command on a place: `/pingmark %h`. |
+| `%r`  | The camera ray: the aim itself, the camera position then the view direction, a vector of length `1`. A server normalises it again before use. | 6 decimals: `x y z`, at least 2 decimal places, then `dx dy dz`, at least 4. | `255.50 300.12 40.25 0.7071 -0.7071 0.0000` | Never. | The server casts the ray on its own map: a spectator edit mode with `/place %r`, or accuracy when the client's map has drifted. |
+| `%%`  | A percent sign. | | `%` | Never. | |
+
+All positions and directions are in the base protocol's
+[coordinates](../protocol075.md#about-coordinates), so `dz` above `0` looks down.
 
 A `%` followed by anything else, or by nothing, is reserved, and version 1 leaves
 it as it is. An empty token leaves its argument missing, so `/votekick %p` with
@@ -143,28 +146,11 @@ the player's own view while alive, and whatever view the client shows while dead
 or spectating, a free camera or a followed player. It has no length limit; a server that wants one applies it
 to what it receives.
 
-* **The player aimed at**, `%p`, is the first player the aim meets before any
-  block.
-* **The block aimed at**, `%b`, is the first solid block the aim meets. Players do
-  not hide it.
-* **The point aimed at**, `%h`, is where the aim first meets a block or a
-  player, in the same [coordinates](../protocol075.md#about-coordinates).
-* **The camera ray**, `%r`, is the aim itself: the camera position, then the view
-  direction, a vector of length `1` in the same
-  [coordinates](../protocol075.md#about-coordinates), so `dz` above `0` looks
-  down. A server normalises it again before use.
-
 **Types.** The values of a token are separated by single spaces.
 
 * An **integer** is written in base 10, with no sign, leading zeros or padding.
 * A **decimal** number has at least the decimal places its row gives, `.` as
   the decimal point whatever the locale, and no exponent.
-
-`%b` suits a simple command on a block, and `%h` one on a place, such as a
-ping. `%r` lets the server cast the ray against its own
-map: a spectator edit mode, building and digging from the free camera with
-`/place %r`, since a server never otherwise learns where a spectator looks; or
-accuracy when the client's map has drifted from the server's.
 
 Only the Text is expanded; Theme, Label and Tooltip are shown as sent. The
 client expands once, immediately before sending, and never re-scans the result,
