@@ -114,7 +114,7 @@ capability on LSD.
 | `/follow`    |         | `[player]` | Respawns you near a squadmate.                       |(✓)|   |       |
 | `/airstrike` | `/a`    |            | Calls an airstrike earned by a streak.               |(✓)|   |       |
 | `/drop`      |         |            | Drops the intel you carry.                           |   |(✓)|       |
-| `/ping`      |         | `<x> <y> <z> [reason...]` | Marks a place, as a [Teamplay](extensions/teamplay.md#the-ping-command) ping. Comes with the extension. |   |   |       |
+| `/pingmark`  |         | `<x> <y> <z> [reason...]` | Marks a place, as a [Teamplay](extensions/teamplay.md#the-pingmark-command) ping. Comes with the extension. |   |   |       |
 
 ### Moderation
 

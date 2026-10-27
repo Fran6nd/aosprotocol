@@ -243,14 +243,14 @@ Follows [Colours](#colours), and **only the server sets it** — whatever a clie
 puts in the three bytes is ignored. A server with no opinion sends the team
 colour of the player who pinged.
 
-### The ping command
+### The pingmark command
 
 A server with this extension also registers a [command](../commands.md) that
 asks for a ping, so a ping can come from a key bind or a
 [Pie Menu](pie-menu.md) slice as a plain chat line:
 
 ```
-/ping <x> <y> <z> [reason...]
+/pingmark <x> <y> <z> [reason...]
 ```
 
 `x`, `y` and `z` are the position, in the same coordinates as the Ping packet,
@@ -261,8 +261,8 @@ left out.
 The server handles it as a client -> server Ping carrying that position and
 Reason, under the same rules: the `PING` bit, the rate limit, the checks on the
 position and the label, and who receives the relay. It answers in chat when it
-refuses. A `/ping` that does not start with three numbers is not this command,
-so the round-trip `/ping [player]` that servers already have keeps working.
+refuses, including when the line does not start with three numbers, as when
+a slice's `%b` met no block.
 
 ## Sub ID 2: ESP Mark
 

@@ -110,7 +110,8 @@ should keep control bytes out of a Text: a client may re-encode it, and
 `0x01`-`0x1f` mean symbols in Code Page 437 but colours in UTF-8.
 
 To mark a place on the world, a slice sends the [Teamplay](teamplay.md)
-[`/ping`](teamplay.md#the-ping-command) command, such as `/ping %b Enemy`.
+[`/pingmark`](teamplay.md#the-pingmark-command) command, such as
+`/pingmark %b Enemy`.
 
 ### Blank slices
 
