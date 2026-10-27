@@ -263,6 +263,10 @@ position and the label, and who receives the relay. It answers in chat when it
 refuses, including when the line does not start with three integers, as when
 a slice's `%b` met no block.
 
+Any player may send it, whether or not their client negotiated this extension.
+The relay is a Ping packet, so it reaches only clients that did; a player whose
+client did not sees nothing of their own ping.
+
 ## Sub ID 2: ESP Mark
 
 Marks one player as visible through walls to whoever receives the packet. Unlike
