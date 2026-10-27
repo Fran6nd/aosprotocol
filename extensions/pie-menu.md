@@ -59,17 +59,19 @@ first. A client may instead reopen the pie last used in that context.
 
 ### Contexts
 
-The [player aimed at](#substitutions), or none, decides which pies are offered.
+What the [aim](#substitutions) meets first, a block, a player or nothing,
+decides which pies are offered.
 A bitmask, so a pie that suits more than one context is sent once.
 
 | Bit | Name        | Offered when the menu opens on                     |
 |-----|-------------|----------------------------------------------------|
-| 0   | `WORLD`     | Terrain, the sky, or nothing in particular.        |
+| 0   | `BLOCK`     | A block.                                           |
 | 1   | `TEAMMATE`  | A player on the opening player's own team.         |
 | 2   | `ENEMY`     | A player on the other team.                        |
 | 3   | `SPECTATOR` | Anything, while the opening player is a spectator. |
 | 4   | `DEAD`      | Anything, while the opening player is dead.        |
-| 5-7 | reserved    | Must be `0`. Clients **must** ignore unknown bits. |
+| 5   | `SKY`       | Nothing: the aim meets no block and no player.     |
+| 6-7 | reserved    | Must be `0`. Clients **must** ignore unknown bits. |
 
 A spectator is offered `SPECTATOR` pies alone, and a player who is dead and
 waiting to respawn `DEAD` pies alone, such as a choice of where to spawn. A staff member spectating from a
