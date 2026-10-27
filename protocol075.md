@@ -526,8 +526,8 @@ initial data packet, but as what's sent varies greatly depending on the
 gamemode, it is documented separately.
 
 ## TC State
-The [State Data](#state-data) tail for game mode `1`: the territories, or
-command posts.
+The [State Data](#state-data) tail for game modes `1` and `2`: the
+territories, or command posts.
 
 | ----------: | ------------------------ |
 | Packet ID   | none                     |
@@ -590,16 +590,50 @@ the packet after the gamemode ID portion.
 |-----------|--------------------------|-------------------------|
 | 0         | Capture the Flag (CTF)   | [CTF State](#ctf-state) |
 | 1         | Territory Control (TC)   | [TC State](#tc-state)   |
-| 2-255     | undefined                | A server never sends it |
+| 2         | [Player versus Environment (PvE)](#pve) | [TC State](#tc-state)   |
+| 3-255     | undefined                | A server never sends it |
 
-These are the only two modes on the wire. Every other mode a server runs, such
-as team deathmatch, arena or babel, is a server script that presents itself as
-CTF or TC and sends that mode's state. The mode name a server reports to the master server list is
-separate and never reaches the client.
+Every other mode a server runs, such as team deathmatch, arena or babel, is a
+server script that presents itself as CTF or TC and sends that mode's state. The
+mode name a server reports to the master server list is separate and never
+reaches the client.
 
 A client that receives another value cannot tell how long the tail is: ZeroSpades
 and OpenSpades read it as TC, and BetterSpades logs an unknown mode and reads no
 state.
+
+#### PvE
+
+Players fight bots. Team 1 is the players and team 2 is the bots: every player
+on team 2 is a bot to the client, whoever controls it. Spectators (team `255`)
+are unchanged.
+
+The tail is a [TC State](#tc-state), so a client that reads an unknown mode as TC
+still parses it. The territories are the objective:
+
+- With a count of `0` there is none, and the game is a deathmatch against the
+  bots.
+- With territories it plays like TC, such as players holding command posts
+  against the bots.
+
+PvE has no CTF form: the tail cannot carry intel, bases or team scores, and a
+client reading a CTF State as TC would misparse it. A CTF server with bots
+sends mode `0` and is a normal team game to every client.
+
+A client that supports PvE:
+
+- Lists only team 1 on the scoreboard, and spectators as it normally does.
+- Shows no join or leave message for team 2: no "joined" for a
+  [Create Player](#create-player) or [Existing Player](#existing-player) on team
+  2, and no "left" for its [Player Left](#player-left).
+- Still shows team 2 in the kill feed, both killing and killed.
+- May draw team 2 in a style picked by the team 2 name in
+  [State Data](#state-data), such as zombies for `Zombies`. It compares the name
+  without case and without the trailing padding, and draws a name it does not
+  know with the normal player model.
+
+A client that does not support PvE plays it as a team game: both teams on the
+scoreboard, the normal player model, and join and leave messages for every bot.
 
 
 ## Kill Action
