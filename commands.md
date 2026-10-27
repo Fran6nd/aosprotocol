@@ -114,7 +114,6 @@ capability on LSD.
 | `/follow`    |         | `[player]` | Respawns you near a squadmate.                       |(✓)|   |       |
 | `/airstrike` | `/a`    |            | Calls an airstrike earned by a streak.               |(✓)|   |       |
 | `/drop`      |         |            | Drops the intel you carry.                           |   |(✓)|       |
-| `/pingmark`  |         | `<x> <y> <z> [reason...]` | Marks a place, as a [Teamplay](extensions/teamplay.md#the-pingmark-command) ping. Comes with the extension. |   |   |       |
 
 ### Moderation
 
@@ -146,6 +145,15 @@ capability on LSD.
 | `/fog`         |              | `<r> <g> <b>`| Sets the fog colour. piqueserver also takes a hex colour. | ✓ | ✓ | ✓ |
 | `/savemap`     |              | `[name]`     | Saves the map as it stands. LSD requires the name. |(✓)|(✓)| ✓ |
 | `/disco`       |              |              | Toggles a flashing fog party.                |(✓)| ✓ | ✓     |
+
+### Extension commands
+
+These come with an extension rather than with a server, and exist only for
+players whose client negotiated it.
+
+| Command     | Arguments                 | Does                                  | Extension |
+|-------------|---------------------------|---------------------------------------|-----------|
+| `/pingmark` | `<x> <y> <z> [reason...]` | Marks a place in the world.           | [Teamplay](extensions/teamplay.md#the-pingmark-command) |
 
 ## Scripting gameplay with commands
 

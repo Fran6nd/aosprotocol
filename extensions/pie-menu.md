@@ -83,7 +83,7 @@ menu, and no other context's pies stand in.
 | Message ID   | UByte      | `0`       | Reserved. Must be `0`; a client ignores it. |
 | Flags        | UByte      | `0b0`     | See below.                                 |
 | Text         | String     | `"/apoc"` | What it sends, see [Sending](#sending).    |
-| Label        | String     | `"Nuke"`  | What it draws. Empty means draw the Text. |
+| Label        | String     | `"Nuke"`  | What it draws. Empty means draw the Text, unexpanded. |
 | Tooltip      | String     | `"Calls in an airstrike"` | Empty means none. |
 
 A client shows the Tooltip while the slice is highlighted and never sends it.
@@ -104,19 +104,20 @@ their words go.
 
 Choosing a slice sends its Text as a
 [Chat Message](../protocol075.md#chat-message), the way the client normally sends
-chat. The client interprets none of it: a Text that starts with `/` is a
+chat. Apart from the [substitutions](#substitutions), the client interprets
+none of it: a Text that starts with `/` is a
 [command](../commands.md) for the server to read, on either channel. A server
 should keep control bytes out of a Text: a client may re-encode it, and
 `0x01`-`0x1f` mean symbols in Code Page 437 but colours in UTF-8.
 
-To mark a place on the world, a slice sends the [Teamplay](teamplay.md)
+To mark a place in the world, a slice sends the [Teamplay](teamplay.md)
 [`/pingmark`](teamplay.md#the-pingmark-command) command, such as
-`/pingmark %b Enemy`.
+`/pingmark %h Enemy`.
 
 ### Blank slices
 
-A slice whose Text and Label are both empty is blank: the client draws nothing
-in it and it cannot be chosen, so aiming at it selects nothing, as the centre
+A slice whose Text and Label are both empty is blank, whatever its Tooltip: the
+client draws nothing in it and it cannot be chosen, so aiming at it selects nothing, as the centre
 does.
 
 ### Substitutions
@@ -127,6 +128,7 @@ The Text of a slice may name what the menu was opened on.
 |-------|---------------------|---------------------------------------------|------------------------------------------------------------------------------------------|------------------------|
 | `%p`  | The player aimed at | `#7`                                        | `#` then an integer, the player id                                                      | No player is aimed at. |
 | `%b`  | The block aimed at  | `257 298 40`                                | 3 integers: `x y z`                                                                      | No block is aimed at.  |
+| `%h`  | The point aimed at  | `256.37 298.02 40.00`                       | 3 decimal numbers: `x y z` with at least 2 decimal places                                | Nothing is aimed at.   |
 | `%r`  | The camera ray      | `255.50 300.12 40.25 0.7071 -0.7071 0.0000` | 6 decimal numbers: the position `x y z` with at least 2 decimal places, then the direction `dx dy dz` with at least 4 | Never.      |
 | `%%`  | A percent sign      | `%`                                         |                                                                                          | Never.                 |
 
@@ -143,6 +145,8 @@ to what it receives.
   block.
 * **The block aimed at**, `%b`, is the first solid block the aim meets. Players do
   not hide it.
+* **The point aimed at**, `%h`, is where the aim first meets a block or a
+  player, in the same [coordinates](../protocol075.md#about-coordinates).
 * **The camera ray**, `%r`, is the aim itself: the camera position, then the view
   direction, a vector of length `1` in the same
   [coordinates](../protocol075.md#about-coordinates), so `dz` above `0` looks
@@ -154,7 +158,8 @@ to what it receives.
 * A **decimal** number has at least the decimal places its row gives, `.` as
   the decimal point whatever the locale, and no exponent.
 
-`%b` suits a simple command. `%r` lets the server cast the ray against its own
+`%b` suits a simple command on a block, and `%h` one on a place, such as a
+ping. `%r` lets the server cast the ray against its own
 map: a spectator edit mode, building and digging from the free camera with
 `/place %r`, since a server never otherwise learns where a spectator looks; or
 accuracy when the client's map has drifted from the server's.
