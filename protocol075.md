@@ -627,10 +627,16 @@ A client that supports PvE:
   [Create Player](#create-player) or [Existing Player](#existing-player) on team
   2, and no "left" for its [Player Left](#player-left).
 - Still shows team 2 in the kill feed, both killing and killed.
-- May draw team 2 in a style picked by the team 2 name in
-  [State Data](#state-data), such as zombies for `Zombies`. It compares the name
-  without case and without the trailing padding, and draws a name it does not
-  know with the normal player model.
+- May draw team 2 in a theme picked by the team 2 name in
+  [State Data](#state-data). It lowercases the name and drops the trailing
+  padding before comparing, and draws a name not listed below with the normal
+  player model.
+
+| Team 2 name         | Theme   | Look                        |
+|---------------------|---------|-----------------------------|
+| `zombie`, `zombies` | Zombies | Rotting skin, torn uniform. |
+
+So `Zombie`, `ZOMBIES` and `zombies` all draw zombies.
 
 A client that does not support PvE plays it as a team game: both teams on the
 scoreboard, the normal player model, and join and leave messages for every bot.
