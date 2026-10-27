@@ -219,10 +219,9 @@ Server handling of a client -> server Ping:
 
 * The server **should** rate-limit requests; at most one per player per second is
   a sane default.
-* The server identifies the target by raycasting from the client's position
-  through their crosshair direction, using the X/Y/Z the client sent to check
-  that the two agree and to confirm line-of-sight, rather than trusting the
-  client to name it.
+* The server checks that the player has line of sight to the X/Y/Z the client
+  sent, from the player's own position. It does not require the position to lie
+  along their orientation: a client may aim from a third-person camera.
 * The server **must** validate the coordinates against its own state for that
   player — at least the map bounds of 512 x 512 x 64, and the player's actual
   position — and **should** reject pings to positions that diverge significantly
