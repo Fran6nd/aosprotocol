@@ -950,6 +950,7 @@ registered so far.
 | 0    | [Player Properties](extensions/player-properties.md) | `HAS_PACKETS` | Sends additional player attributes from the server to the client |
 | 0x20 | [Damage Markers](extensions/damage-markers.md)       | `HAS_PACKETS` | Tells the client how much damage a hit did and who took it       |
 | 48   | [Teamplay](extensions/teamplay.md)                   | `HAS_PACKETS` | The features a team needs to play together                       |
+| 0x31 | [Pie Menu](extensions/pie-menu.md)                   | `HAS_PACKETS` | The server defines the client's radial quick menu                |
 | 0x32 | [Flashlight](extensions/flashlight.md)               | `HAS_PACKETS` | A light a player carries, switched by the server, seen by all    |
 | 0x33 | [Daytime and Weather](extensions/daytime-weather.md) | `HAS_PACKETS` | The time of day and the weather, set by the server               |
 | 192  | [Player Limit](extensions/player-limit.md)           | `PACKETLESS`  | Support for up to 255 players                                    |

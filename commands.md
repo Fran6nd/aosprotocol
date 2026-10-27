@@ -146,6 +146,15 @@ capability on LSD.
 | `/savemap`     |              | `[name]`     | Saves the map as it stands. LSD requires the name. |(✓)|(✓)| ✓ |
 | `/disco`       |              |              | Toggles a flashing fog party.                |(✓)| ✓ | ✓     |
 
+### Extension commands
+
+These come with an extension rather than with a server, and exist only for
+players whose client negotiated it.
+
+| Command     | Arguments                 | Does                                  | Extension |
+|-------------|---------------------------|---------------------------------------|-----------|
+| `/pingmark` | `<x> <y> <z> [reason...]` | Marks a place in the world.           | [Teamplay](extensions/teamplay.md#the-pingmark-command) |
+
 ## Scripting gameplay with commands
 
 What makes a script's command feel native rather than bolted on:

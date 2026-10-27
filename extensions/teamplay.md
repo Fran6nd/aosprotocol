@@ -243,6 +243,31 @@ Follows [Colours](#colours), and **only the server sets it** — whatever a clie
 puts in the three bytes is ignored. A server with no opinion sends the team
 colour of the player who pinged.
 
+### The pingmark command
+
+A server with this extension also registers a [command](../commands.md) that
+asks for a ping, so a ping can come from a key bind or a
+[Pie Menu](pie-menu.md) slice as a plain chat line:
+
+```
+/pingmark <x> <y> <z> [reason...]
+```
+
+`x`, `y` and `z` are the position, in the same coordinates as the Ping packet,
+written in base 10 with `.` as the decimal point, as the Pie Menu's `%h` gives
+them. The rest of the line is the Reason, and may be left out; the server reads
+it as it reads any command argument, so it may not arrive exactly as typed.
+
+The server handles it as a client -> server Ping carrying that position and
+Reason, under the same rules: the `PING` bit, the rate limit, the checks on the
+position and the label, and who receives the relay. It answers in chat when it
+refuses, including when the line does not start with three numbers, as when
+a slice's `%h` met nothing.
+
+Like the rest of this extension, the command exists only for players whose
+client negotiated it; for anyone else it is an unknown command. The relay is a
+Ping packet, so it reaches only those clients too.
+
 ## Sub ID 2: ESP Mark
 
 Marks one player as visible through walls to whoever receives the packet. Unlike
