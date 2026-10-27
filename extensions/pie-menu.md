@@ -2,8 +2,8 @@
 
 A pie menu is a ring that opens around the crosshair while a key is held. It is
 divided into wedges, and a player picks one by flicking the aim towards it and
-releasing the key. Each wedge sends one thing: a chat line, a ping on the world,
-or a command for the server to read.
+releasing the key. Each wedge sends one chat line, often a
+[command](../commands.md) for the server to read.
 
 One ring is a **pie** and one wedge is a **slice**. The point of the extension is
 that the server chooses what is on offer, since it knows its mode, its commands
@@ -51,8 +51,8 @@ One ring, captioned in the middle by its theme.
 | Theme            | String     | `"Social"` | The centre caption. Empty means none. |
 | Slices           | Slice[6]   |            | Exactly six, see [Slice](#slice).       |
 
-There is no slice count: a server wanting fewer fills the spare slices with
-[`NONE`](#actions), and one wanting more uses another pie.
+There is no slice count: a server wanting fewer leaves the spare slices
+[blank](#blank-slices), and one wanting more uses another pie.
 
 Pies are offered in the order sent, within each context, and the first opens
 first. A client may instead reopen the pie last used in that context.
@@ -80,10 +80,9 @@ menu, and no other context's pies stand in.
 
 | Field Name   | Field Type | Example   | Notes                                      |
 |--------------|------------|-----------|--------------------------------------------|
-| Action       | UByte      | `1`       | See [Actions](#actions).                   |
 | Message ID   | UByte      | `0`       | Reserved. Must be `0`; a client ignores it. |
 | Flags        | UByte      | `0b0`     | See below.                                 |
-| Text         | String     | `"/apoc"` | What it sends.                             |
+| Text         | String     | `"/apoc"` | What it sends, see [Sending](#sending).    |
 | Label        | String     | `"Nuke"`  | What it draws. Empty means draw the Text. |
 | Tooltip      | String     | `"Calls in an airstrike"` | Empty means none. |
 
@@ -101,35 +100,23 @@ tooltips out.
 the [`ENEMY`](#contexts) context decides which pies are offered, never where
 their words go.
 
-### Actions
+### Sending
 
-| Value     | Name      | Choosing the slice sends                                   |
-|-----------|-----------|------------------------------------------------------------|
-| `0`       | `NONE`    | Nothing. The slice cannot be chosen.                       |
-| `1`       | `CHAT`    | Text, as a [Chat Message](../protocol075.md#chat-message). |
-| `2`       | `PING`    | A [Teamplay Ping](teamplay.md#sub-id-1-ping), Text as its Reason. |
-| `3`       | `COMMAND` | Text, as a [Chat Message](../protocol075.md#chat-message), meant as a command. |
-| `4`-`255` | reserved  | A client treats an unknown Action as `NONE`.               |
+Choosing a slice sends its Text as a
+[Chat Message](../protocol075.md#chat-message), the way the client normally sends
+chat. The client interprets none of it: a Text that starts with `/` is a
+[command](../commands.md) for the server to read, on either channel. A server
+should keep control bytes out of a Text: a client may re-encode it, and
+`0x01`-`0x1f` mean symbols in Code Page 437 but colours in UTF-8.
 
-The Action is also what a client styles a slice by. Whatever a slice sends goes
-out as the client normally sends chat. A server should keep control bytes out of
-a Text: a client may re-encode it, and `0x01`-`0x1f` mean symbols in Code Page
-437 but colours in UTF-8.
+To mark a place on the world, a slice sends the [Teamplay](teamplay.md)
+[`/ping`](teamplay.md#the-ping-command) command, such as `/ping %b Enemy`.
 
-**`PING`** marks the point the [aim](#substitutions) met, with the Text decoded
-to UTF-8 as its Reason, which may be empty for a neutral marker. It needs
-[Teamplay](teamplay.md) negotiated with its `PING` bit set, a living player, and
-an aim that met a block or a player. Failing any of these, the client sends the
-Text as chat instead, so only the marker is lost.
+### Blank slices
 
-**`COMMAND`** is sent exactly as `CHAT` is, `GLOBAL` included; servers find a
-command by its leading `/` on either channel. It exists so that a client can
-style a command apart from a line of chat. The client interprets none of it.
-
-**`NONE`** cannot be chosen: aiming at it selects nothing, as the centre does. It
-may still carry a Label to show something, such as `Airstrikes: 2` beside the
-slice that calls one. How it looks is the client's business, but a client must
-not make it choosable.
+A slice whose Text and Label are both empty is blank: the client draws nothing
+in it and it cannot be chosen, so aiming at it selects nothing, as the centre
+does.
 
 ### Substitutions
 
