@@ -526,8 +526,8 @@ initial data packet, but as what's sent varies greatly depending on the
 gamemode, it is documented separately.
 
 ## TC State
-The [State Data](#state-data) tail for game modes `1` and `2`: the
-territories, or command posts.
+The [State Data](#state-data) tail for game mode `1`: the territories, or
+command posts.
 
 | ----------: | ------------------------ |
 | Packet ID   | none                     |
@@ -590,56 +590,16 @@ the packet after the gamemode ID portion.
 |-----------|--------------------------|-------------------------|
 | 0         | Capture the Flag (CTF)   | [CTF State](#ctf-state) |
 | 1         | Territory Control (TC)   | [TC State](#tc-state)   |
-| 2         | [Player versus Environment (PvE)](#pve) | [TC State](#tc-state)   |
-| 3-255     | undefined                | A server never sends it |
+| 2-255     | undefined                | A server never sends it |
 
-Every other mode a server runs, such as team deathmatch, arena or babel, is a
-server script that presents itself as CTF or TC and sends that mode's state. The
-mode name a server reports to the master server list is separate and never
-reaches the client.
+These are the only two modes on the wire. Every other mode a server runs, such
+as team deathmatch, arena or babel, is a server script that presents itself as
+CTF or TC and sends that mode's state. The mode name a server reports to the master server list is
+separate and never reaches the client.
 
 A client that receives another value cannot tell how long the tail is: ZeroSpades
 and OpenSpades read it as TC, and BetterSpades logs an unknown mode and reads no
 state.
-
-#### PvE
-
-Players fight bots. Team 1 is the players and team 2 is the bots: every player
-on team 2 is a bot to the client, whoever controls it. Spectators (team `255`)
-are unchanged.
-
-The tail is a [TC State](#tc-state), so a client that reads an unknown mode as TC
-still parses it. The territories are the objective:
-
-- With a count of `0` there is none, and the game is a deathmatch against the
-  bots.
-- With territories it plays like TC, such as players holding command posts
-  against the bots.
-
-PvE has no CTF form: the tail cannot carry intel, bases or team scores, and a
-client reading a CTF State as TC would misparse it. A CTF server with bots
-sends mode `0` and is a normal team game to every client.
-
-A client that supports PvE:
-
-- Lists only team 1 on the scoreboard, and spectators as it normally does.
-- Shows no join or leave message for team 2: no "joined" for a
-  [Create Player](#create-player) or [Existing Player](#existing-player) on team
-  2, and no "left" for its [Player Left](#player-left).
-- Still shows team 2 in the kill feed, both killing and killed.
-- May draw team 2 in a theme picked by the team 2 name in
-  [State Data](#state-data). It lowercases the name and drops the trailing
-  padding before comparing, and draws a name not listed below with the normal
-  player model.
-
-| Team 2 name         | Theme   | Look                        |
-|---------------------|---------|-----------------------------|
-| `zombie`, `zombies` | Zombies | Rotting skin, torn uniform. |
-
-So `Zombie`, `ZOMBIES` and `zombies` all draw zombies.
-
-A client that does not support PvE plays it as a team game: both teams on the
-scoreboard, the normal player model, and join and leave messages for every bot.
 
 
 ## Kill Action
@@ -991,6 +951,7 @@ registered so far.
 | 0x20 | [Damage Markers](extensions/damage-markers.md)       | `HAS_PACKETS` | Tells the client how much damage a hit did and who took it       |
 | 48   | [Teamplay](extensions/teamplay.md)                   | `HAS_PACKETS` | The features a team needs to play together                       |
 | 0x32 | [Flashlight](extensions/flashlight.md)               | `HAS_PACKETS` | A light a player carries, switched by the server, seen by all    |
+| 0x3C | [Team Flags](extensions/team-flags.md)               | `HAS_PACKETS` | Hides a team from the scoreboard, join messages or kill feed     |
 | 192  | [Player Limit](extensions/player-limit.md)           | `PACKETLESS`  | Support for up to 255 players                                    |
 | 193  | [Message Types](extensions/message-types.md)         | `PACKETLESS`  | Additional message types such as warnings and statuses           |
 | 194  | [Kick Reason](extensions/kick-reason.md)             | `PACKETLESS`  | Repurposes the chat to send a disconnect reason text             |
