@@ -78,7 +78,7 @@ weapon.
 
 | Value | Name         | Look                                       |
 |-------|--------------|--------------------------------------------|
-| 80    | Turret       | A gun on a tripod, which may differ by the player's weapon. |
+| 80    | Turret       | A gun on a tripod.                         |
 | 81    | Projector    | A lamp on a tripod. It gives no light.     |
 | 82    | Dish Antenna | A parabolic dish on a tripod.              |
 | 83    | Mast Antenna | A straight mast on a base.                 |
