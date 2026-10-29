@@ -56,7 +56,9 @@ weapon. A client draws an outfit it has no art for as `0`.
 | 25     | Turret      | The held weapon on a team-coloured tripod, pointing where the player aims. |
 | 26     | Block Stack | Three blocks stacked, in the player's held block colour. No team colour, hides the held tool or weapon. |
 | 27     | Projector   | A lamp on a team-coloured tripod, pointing where the player aims. Hides the held tool or weapon, and gives no light. |
-| 28-254 | reserved    | Drawn as `0`.                                                        |
+| 28     | Dish Antenna | A parabolic dish on a team-coloured tripod, pointing where the player aims. Hides the held tool or weapon. |
+| 29     | Mast Antenna | A straight mast on a team-coloured base. Hides the held tool or weapon. |
+| 30-254 | reserved    | Drawn as `0`.                                                        |
 | 255    | Team        | The player's [team outfit](#sub-id-1-team-outfits).                  |
 
 ## Sub ID 0: Set Outfit
