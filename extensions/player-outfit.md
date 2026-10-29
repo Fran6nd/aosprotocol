@@ -71,15 +71,14 @@ support a page with the generic alone. A generic it has no art for is drawn as
 | 37    | T-rex   | Green scales, small arms, big jaw.         |
 | 38    | Banana  | A yellow banana with the face cut out.     |
 
-### Page 3: Tripods
+### Page 3: Turrets
 
-A tripod outfit stands on a team-coloured tripod in place of the body, pointing
-where the player aims.
+A turret stands on a team-coloured tripod in place of the body, pointing where the
+player aims.
 
-| Value | Name      | Look                                              |
-|-------|-----------|---------------------------------------------------|
-| 48    | Turret    | The held weapon on a tripod.                      |
-| 49    | Projector | A lamp on a tripod. It is drawn, it gives no light. |
+| Value | Name   | Look                         |
+|-------|--------|------------------------------|
+| 48    | Turret | The held weapon on a tripod. |
 
 ### Page 4: Disguises
 
@@ -88,6 +87,14 @@ A disguise has no team colour and hides the held tool or weapon.
 | Value | Name        | Look                                                         |
 |-------|-------------|--------------------------------------------------------------|
 | 64    | Block Stack | Three blocks stacked, in the player's held block colour.     |
+
+### Page 5: Lights
+
+A light hides the held tool or weapon. It is drawn, it gives no light.
+
+| Value | Name      | Look                                                        |
+|-------|-----------|-------------------------------------------------------------|
+| 80    | Projector | A lamp on a team-coloured tripod, pointing where the player aims. |
 
 ### Reserved
 
