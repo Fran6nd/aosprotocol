@@ -18,19 +18,20 @@ A cosmetic outfit for each player.
 ## Outfit
 
 An outfit changes how a player looks, and nothing else: hits, collision and
-everything else are those of the normal player. An outfit is drawn in solid
-voxels and shows the player's team colour where it can be seen from a distance,
-unless its page says otherwise. The held tool or weapon is drawn as it is, unless
-the page says otherwise.
+everything else are those of the normal player. It follows the player's stance,
+so a crouching player's outfit is drawn crouching, and their corpse wears it. The
+first-person view does not change.
 
-An outfit may have its own sounds. A client that gives one outfit its own sounds
-gives every outfit theirs.
+An outfit is coloured in the player's team colour where the normal model's
+uniform is, unless its page says otherwise. An outfit may hide the held tool or
+weapon.
 
-Outfits come in pages of 16. The first outfit of each page is its generic one. A
-client draws an outfit it has no art for as its page's generic, and a generic it
-has no art for as `0`. A client can support a page by drawing only its generic.
+Outfits come in pages of 16. The first outfit of each page is its generic one,
+which a client draws for any outfit of that page it has no art for, so it can
+support a page with the generic alone. A generic it has no art for is drawn as
+`0`.
 
-### Page 0: Humans
+### Page 0: Characters
 
 | Value | Name      | Look                              |
 |-------|-----------|-----------------------------------|
@@ -72,12 +73,13 @@ has no art for as `0`. A client can support a page by drawing only its generic.
 
 ### Page 3: Turrets
 
-A turret stands on a tripod in place of the body, and its barrel points where the
-player aims. It is not drawn holding a tool or weapon.
+A turret is a gun on a team-coloured tripod in place of the body, pointing where
+the player aims. It hides the held tool or weapon. The generic turret mounts the
+held weapon; the others mount their own gun whatever the player holds.
 
 | Value | Name             | Look                                   |
 |-------|------------------|----------------------------------------|
-| 48    | Turret           | A gun on a tripod.                     |
+| 48    | Turret           | The held weapon on a tripod.           |
 | 49    | Rifle Turret     | A rifle on a tripod.                   |
 | 50    | SMG Turret       | A short gun with a drum magazine.      |
 | 51    | Sniper Turret    | A long barrel with a scope.            |
@@ -85,7 +87,7 @@ player aims. It is not drawn holding a tool or weapon.
 
 ### Page 4: Disguises
 
-A disguise is drawn without the team colour and without a tool or weapon.
+A disguise has no team colour and hides the held tool or weapon.
 
 | Value | Name        | Look                                                         |
 |-------|-------------|--------------------------------------------------------------|
@@ -93,8 +95,8 @@ A disguise is drawn without the team colour and without a tool or weapon.
 
 ### Reserved
 
-Every value from `0` to `254` not listed above is reserved and drawn as its
-page's generic. `255` is the player's [team outfit](#sub-id-1-team-outfits).
+Values not listed above are reserved. `255` is the player's
+[team outfit](#sub-id-1-team-outfits).
 
 ## Sub ID 0: Set Outfit
 
@@ -113,9 +115,8 @@ client draws a player in the outfit it holds when they are created and never
 waits for one.
 
 [Player Left](../protocol075.md#player-left) resets the id to `255`, and
-[Map Start](../protocol075.md#map-start-075) resets every id. The server sends
-Existing Player for every player after Map Start anyway, and sends their Set
-Outfit with it.
+[Map Start](../protocol075.md#map-start-075) resets every id, since the server
+introduces every player again after it.
 
 ## Sub ID 1: Team Outfits
 
@@ -137,6 +138,7 @@ may send it again at any time.
 | Outfit     | UByte      | `16`    | `0` to `254`, see [Outfit](#outfit). |
 
 Each Team Outfits replaces the previous one and takes effect when it arrives. A
-team it does not list wears `0`. It lasts for the connection.
+team it does not list, or any team before the first Team Outfits, wears `0`. It
+lasts for the connection.
 
 See [Extensions](extension.md) for how the extension is negotiated.
