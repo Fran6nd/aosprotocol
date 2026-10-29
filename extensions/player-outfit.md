@@ -73,17 +73,12 @@ support a page with the generic alone. A generic it has no art for is drawn as
 
 ### Page 3: Turrets
 
-A turret is a gun on a team-coloured tripod in place of the body, pointing where
-the player aims. It hides the held tool or weapon. The generic turret mounts the
-held weapon; the others mount their own gun whatever the player holds.
+A turret stands on a team-coloured tripod in place of the body, pointing where the
+player aims.
 
-| Value | Name             | Look                                   |
-|-------|------------------|----------------------------------------|
-| 48    | Turret           | The held weapon on a tripod.           |
-| 49    | Rifle Turret     | A rifle on a tripod.                   |
-| 50    | SMG Turret       | A short gun with a drum magazine.      |
-| 51    | Sniper Turret    | A long barrel with a scope.            |
-| 52    | Grenade Turret   | A wide tube with a grenade belt.       |
+| Value | Name   | Look                         |
+|-------|--------|------------------------------|
+| 48    | Turret | The held weapon on a tripod. |
 
 ### Page 4: Disguises
 
