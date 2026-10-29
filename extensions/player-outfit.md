@@ -73,12 +73,12 @@ Some themes have a range of their own, with room left to grow.
 ### Deployables
 
 A deployable stands on a team-coloured tripod or base in place of the body. One
-on a tripod points where the player aims. A deployable other than the Turret
-hides the held tool or weapon.
+on a tripod points where the player aims. A deployable hides the held tool or
+weapon.
 
 | Value | Name         | Look                                       |
 |-------|--------------|--------------------------------------------|
-| 80    | Turret       | The held weapon on a tripod.               |
+| 80    | Turret       | A gun on a tripod, which may differ by the player's weapon. |
 | 81    | Projector    | A lamp on a tripod. It gives no light.     |
 | 82    | Dish Antenna | A parabolic dish on a tripod.              |
 | 83    | Mast Antenna | A straight mast on a base.                 |
