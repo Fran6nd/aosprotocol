@@ -71,14 +71,15 @@ support a page with the generic alone. A generic it has no art for is drawn as
 | 37    | T-rex   | Green scales, small arms, big jaw.         |
 | 38    | Banana  | A yellow banana with the face cut out.     |
 
-### Page 3: Turrets
+### Page 3: Tripods
 
-A turret stands on a team-coloured tripod in place of the body, pointing where the
-player aims.
+A tripod outfit stands on a team-coloured tripod in place of the body, pointing
+where the player aims.
 
-| Value | Name   | Look                         |
-|-------|--------|------------------------------|
-| 48    | Turret | The held weapon on a tripod. |
+| Value | Name      | Look                                              |
+|-------|-----------|---------------------------------------------------|
+| 48    | Turret    | The held weapon on a tripod.                      |
+| 49    | Projector | A lamp on a tripod. It is drawn, it gives no light. |
 
 ### Page 4: Disguises
 
