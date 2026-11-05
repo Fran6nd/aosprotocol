@@ -20,10 +20,10 @@ SMG, shotgun and grenade.
 | 0      | Class      | Server -> Client  | 8+   |
 | 1      | Loadout    | Server -> Client  | 5+   |
 | 2      | Hold       | Client <-> Server | 4    |
-| 3      | Ammo       | Server -> Client  | 6    |
+| 3      | Ammo       | Server -> Client  | 5    |
 | 4      | Modifier   | Server -> Client  | 21   |
 | 5      | Projectile | Client <-> Server | 33   |
-| 6      | Detonate   | Server -> Client  | 16   |
+| 6      | Detonate   | Server -> Client  | 17   |
 | 7      | Kill Item  | Server -> Client  | 5+   |
 
 A server using this extension plays only with clients that have it. A client
@@ -40,7 +40,7 @@ behind the `0xff` prefix of [UTF-8 Chat](utf-8-chat.md).
 Every slot holds one item. Its numbers are fixed by this table; the server
 changes them only through a slot's [Count and Reserve](#slot) and a
 [Modifier](#sub-id-4-modifier). An item outside the table is held as an empty
-hand. A server sends a client only the items of the version it announced.
+hand.
 
 | Value | Item                  | Kind       |
 |-------|-----------------------|------------|
@@ -79,8 +79,11 @@ fire is held. Pressing primary fire cancels a reload. Secondary fire aims.
 
 The damage a Hit or an explosion deals to a player is the server's choice, as
 it is today. Spread, recoil and block damage are in the terms of the 0.75 game:
-spread is added to each axis of the unnormalised aim, recoil is the vertical and
-horizontal kick, and block damage is what each pellet takes off a block's
+spread is added to each axis of the unnormalised aim, and recoil turns the aim
+up and sideways as Voxlap does: the sideways kick is scaled by a triangle wave
+running from `-255.5` to `255.5` and back every 1024 ms, both are doubled while
+walking without aiming and while airborne, and halved while crouching. Block
+damage is what each pellet takes off a block's
 health, which the client counts. The first three rows are the base weapons'
 values.
 
@@ -95,8 +98,7 @@ values.
 
 * **Pistol**: a handgun held in one hand.
 * **Bolt-action rifle**: the bolt is worked after each round, and its
-  animation fills the Fire interval. It is loaded one round at a time. Aiming
-  may zoom further than with other guns.
+  animation fills the Fire interval. It is loaded one round at a time.
 * **Double-barrel shotgun**: each round is one barrel. The gun breaks open to
   reload both barrels at once.
 
@@ -156,8 +158,9 @@ primary fire is held and its fuse runs from the cook.
 A projectile without `IMPACT` bounces as the base grenade does and detonates at
 the end of its fuse, on each side's own clock, as today.
 
-An `IMPACT` projectile, and every rocket, detonates at the first block or
-player hitbox it touches, or at the end of its fuse. Only the server decides
+An `IMPACT` projectile, and every rocket, detonates where the server judges it
+hit something, or at the end of its fuse: always at the first block it
+touches, and at a player if the server checks players. Only the server decides
 where: it sends a [Detonate](#sub-id-6-detonate). A client that sees the
 projectile touch something stops drawing it there, and draws its detonation
 only when the Detonate arrives, at the Detonate's position.
@@ -203,13 +206,13 @@ the slots it spawns with, for the client to show before the player spawns.
 | Class         | UByte      | `2`                                 | `0`-`2`: the Weapon ID that picks it in Change Weapon. |
 | Flags         | UByte      | `0b0`                               | Bit `0` `LOCKED`: shown, but cannot be picked. Bit `1` `HIDDEN`: not shown, and cannot be picked. Bits `2`-`7` must be `0` and are ignored. |
 | Name          | String     | `"Breacher"`                        | Replaces Rifle, SMG or Shotgun in the class menu. |
-| Description   | String     | `"Clears rooms. Short range only."` | Shown with the class. May hold line breaks. |
+| Description   | String     | `"Clears rooms. Short range only."` | Shown with the class. A line break is `\n`. |
 | Slot Count    | UByte      | `4`                                 | Slots that follow.                          |
 | Slots         | Slot[]     |                                     | See [Slot](#slot).                          |
 
 The client shows a team's classes with their items and counts, so a player sees
 what each class carries before choosing. A class the server has sent no Class
-for cannot be picked.
+for is `HIDDEN`.
 
 The server sends every Class before [State Data](../protocol075.md#state-data),
 and a new one whenever it changes a class, at any time. A new Class replaces the
@@ -269,7 +272,9 @@ slot beyond the loadout, or for a slot with nothing left to use, is refused:
 the server sends the slot actually held back to the sender.
 
 The server can switch a player at any time by sending a Hold for them to
-everyone, the player included. The player's client switches as if it had asked.
+everyone, the player included. The player's client switches and sends the same
+Hold back, which the server does not relay. Until that echo arrives the server judges the player's Hits by the
+slot they held before, since those were sent before the client switched.
 
 Switching away cancels a reload, on both sides, and the server sends the player
 an [Ammo](#sub-id-3-ammo) for the slot left, since their client may have
@@ -284,7 +289,6 @@ player only, and the client adopts it.
 |---------------|------------|---------|----------------------------------------|
 | Packet ID     | UByte      | `0x7B`  | Always `0x7B`.                         |
 | Sub Packet ID | UByte      | `3`     | Always `3` for this sub-packet.        |
-| Player ID     | UByte      | `7`     | The receiving player.                  |
 | Slot          | UByte      | `2`     | An index into the player's slots.      |
 | Count         | UByte      | `8`     | The magazine, or the blocks or throwables left. `255` is infinite. |
 | Reserve       | UByte      | `40`    | The rounds beyond the magazine. `255` is infinite. |
@@ -319,18 +323,19 @@ interval.
 | Spread        | LE Float   | `0`     | Multiplies the slot's spread. `0` is a perfect aim. |
 | Recoil        | LE Float   | `1`     | Multiplies the slot's recoil.                     |
 | Lasts         | UByte      | `2`     | `0` until replaced, `1` until the player dies, `2` for Duration. |
-| Duration      | LE Float   | `10`    | Seconds from arrival, with Lasts `2`; ignored otherwise. |
+| Duration      | LE Float   | `10`    | Seconds, with Lasts `2`; ignored otherwise. |
 
-Each factor must be finite and not negative; a Modifier that breaks this is
-ignored. A factor that does not apply to the item, such as the spread of a
+Each factor must be finite and not negative, and Fire Interval greater than
+`0`; a Modifier that breaks this is ignored. A factor that does not apply to the item, such as the spread of a
 grenade, is ignored.
 
 A slot has at most one modifier, and a new Modifier replaces it; `255` replaces
 every slot's. A Modifier whose factors are all `1` clears it. A modifier also
-ends with a new [Loadout](#sub-id-1-loadout); with Lasts `1`, at the player's
-[Kill Action](../protocol075.md#kill-action); and with Lasts `2`, when its
-Duration runs out, on each side's own clock. With Lasts `0` it survives deaths
-and lasts until the server replaces or clears it.
+ends with a new [Loadout](#sub-id-1-loadout), and with Lasts `1` at the
+player's [Kill Action](../protocol075.md#kill-action). Otherwise it survives
+deaths and lasts until the server replaces or clears it. With Lasts `2` the
+server clears it once Duration has passed on its own clock; the client uses
+Duration only to show the time left, and keeps the modifier until it is cleared.
 
 The server counts rounds and checks fire rate with the modifier applied.
 
@@ -362,6 +367,10 @@ The server checks it as it checks a Grenade Packet, against the slot held and
 its count, then simulates it and relays it to the other clients. They take its
 look, physics and detonation from the slot of the thrower's loadout.
 
+A Projectile the server refuses is relayed to no one. The server sends the
+thrower a [Detonate](#sub-id-6-detonate) marked `DUD` for it, and an
+[Ammo](#sub-id-3-ammo) for the slot.
+
 A base Grenade Packet sent by the server, such as an airstrike, is a frag
 grenade.
 
@@ -375,6 +384,7 @@ The server detonates a projectile.
 | Sub Packet ID | UByte      | `6`     | Always `6` for this sub-packet.         |
 | Player ID     | UByte      | `7`     | Who fired it.                           |
 | Projectile ID | UByte      | `12`    | As in its [Projectile](#sub-id-5-projectile). |
+| Flags         | UByte      | `0b0`   | Bit `0` `DUD`: remove it without a detonation. Bits `1`-`7` must be `0` and are ignored. |
 | X position    | LE Float   | `0`     | Where it detonates.                     |
 | Y position    | LE Float   | `0`     |                                         |
 | Z position    | LE Float   | `0`     |                                         |
@@ -382,7 +392,7 @@ The server detonates a projectile.
 The server sends it to every client, the thrower included,
 for every `IMPACT` projectile and rocket, and for any projectile it detonates
 before its fuse ends. The client detonates the projectile there, whether or not
-it is still drawing it. A Detonate for a projectile the client has already
+it is still drawing it, or with `DUD` removes it without a detonation. A Detonate for a projectile the client has already
 detonated is ignored.
 
 ## Sub ID 7: Kill Item
@@ -420,9 +430,6 @@ only. A Kill Action without one shows the icon of its kill type, as today.
   magazines.
 * **Grenade Packet** from a client is ignored; it sends a
   [Projectile](#sub-id-5-projectile).
-* A server that also has [Player Properties](player-properties.md) fills
-  Magazine Ammo and Reserve Ammo from the held slot, and Blocks and Grenades
-  from the first block and throwable slots, `255` for infinite.
 
 ## Validation
 
