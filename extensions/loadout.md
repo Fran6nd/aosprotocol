@@ -3,9 +3,9 @@
 The server names and describes the three classes, decides which items each
 player carries and in which slots, and can retune a slot's fire interval,
 spread and recoil while the game runs. It adds a pistol, a bolt-action rifle, a
-double-barrelled shotgun, a grenade launcher, a rocket launcher, a smoke
-grenade, a custom grenade and an empty hand to the base spade, block, rifle,
-SMG, shotgun and grenade.
+double-barrelled shotgun, a belt-fed machine gun, a grenade launcher, a rocket
+launcher, a smoke grenade, a custom grenade and an empty hand to the base
+spade, block, rifle, SMG, shotgun and grenade.
 
 | ------------: | ------------- |
 | Extension ID: | `0x3B`        |
@@ -53,6 +53,7 @@ hand.
 | 19    | Pistol                | Gun        |
 | 20    | Bolt-action rifle     | Gun        |
 | 21    | Double-barrel shotgun | Gun        |
+| 22    | Machine gun           | Gun        |
 | 32    | Grenade launcher      | Launcher   |
 | 33    | Rocket launcher       | Launcher   |
 | 48    | Frag grenade          | Throwable  |
@@ -95,12 +96,15 @@ values.
 | Pistol                | 0.25 s        | 8        | 40      | 1.5 s, whole      | 1       | 0.010  | 0.03      | 0.0001      | 25           |
 | Bolt-action rifle     | 1.25 s        | 5        | 25      | 0.6 s, per round  | 1       | 0.002  | 0.1       | 0.0002      | 50           |
 | Double-barrel shotgun | 0.2 s         | 2        | 24      | 2.0 s, whole      | 8       | 0.030  | 0.15      | 0.0003      | 34           |
+| Machine gun           | 0.12 s        | 100      | 100     | 5.0 s, whole      | 1       | 0.016  | 0.02      | 0.0001      | 40           |
 
 * **Pistol**: a handgun held in one hand.
 * **Bolt-action rifle**: the bolt is worked after each round, and its
   animation fills the Fire interval. It is loaded one round at a time.
 * **Double-barrel shotgun**: each round is one barrel. The gun breaks open to
   reload both barrels at once.
+* **Machine gun**: a heavy belt-fed gun. Its magazine is the belt, and a reload
+  opens the cover and lays in a new one.
 
 A reload starts when the client sends a
 [Weapon Reload](../protocol075.md#weapon-reload), and does nothing when the
