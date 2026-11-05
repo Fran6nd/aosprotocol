@@ -82,6 +82,18 @@ Damage follows the base game, as LSD deals it:
   [Block Action](../protocol075.md#block-action) does, and is a `GRENADE`
   kill.
 
+The default classes are the base game's, for both teams, each with its items'
+default counts and no flags:
+
+| Class | Name    | Description                         | Slots                                        |
+|-------|---------|-------------------------------------|----------------------------------------------|
+| 0     | Rifle   | `"Accurate at range. Slow to fire."` | Spade, Block 50, Rifle 10 + 50, Frag grenade 3 |
+| 1     | SMG     | `"Fast to fire. Best up close."`    | Spade, Block 50, SMG 30 + 120, Frag grenade 3  |
+| 2     | Shotgun | `"Eight pellets. Short range only."` | Spade, Block 50, Shotgun 6 + 48, Frag grenade 3 |
+
+The slots are in the base game's tool order, so the usual keys `1` to `4` pick
+the spade, block, gun and grenade.
+
 ### Tools
 
 * **Empty hand**: nothing in hand. Primary fire punches: a melee
@@ -239,7 +251,8 @@ the slots it spawns with, for the client to show before the player spawns.
 
 The client shows a team's classes with their items and counts, so a player sees
 what each class carries before choosing. A class the server has sent no Class
-for is `HIDDEN`.
+for is its [default](#defaults); a server that wants it gone sends it
+`HIDDEN`.
 
 The server sends every Class before [State Data](../protocol075.md#state-data),
 and a new one whenever it changes a class, at any time. A new Class replaces the
