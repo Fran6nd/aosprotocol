@@ -172,7 +172,9 @@ primary fire is held and its fuse runs from the cook.
 
 * **Smoke grenade**: the cloud is centred where it detonates, grows to a
   radius of 5 blocks over 2 s, stays 20 s, then fades over 5 s. It hides what
-  is behind it and does nothing else.
+  is behind it and does nothing else. The smoke is the slot's Colour, opaque
+  whatever the colour, so a server can hand out red, green or white smoke. The
+  default is grey, `128, 128, 128`. The canister carries a band of that colour.
 * **Custom grenade**: a grenade in the slot's Colour, called by the slot's
   Name in the HUD and the kill feed. It does nothing on its own: on its
   [Detonate](#sub-id-6-detonate) the server applies whatever effect it chose,
@@ -205,7 +207,7 @@ carries.
 | Flags      | UByte      | `0b1`          | Bit `0` `IMPACT`: a launcher round or throwable detonates on impact. Bits `1`-`7` must be `0` and are ignored. |
 | Count      | UByte      | `1`            | A gun's or launcher's magazine; how many blocks or throwables are carried. `255` is infinite. Ignored for the spade and empty hand. |
 | Reserve    | UByte      | `0`            | A gun's or launcher's rounds beyond the magazine. `255` is infinite. `0` and ignored for other items. |
-| Colour     | UByte[3]   |                | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). The smoke and custom grenades' colour; ignored for other items. |
+| Colour     | UByte[3]   |                | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). The smoke grenade's smoke and the custom grenade's colour; ignored for other items. |
 | Name       | String     | `"Medic gas"`  | The custom grenade's name. Empty for other items, and ignored. |
 
 The [Items](#items) tables give the default Count and Reserve; the server writes
