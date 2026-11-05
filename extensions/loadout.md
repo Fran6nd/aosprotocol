@@ -61,14 +61,35 @@ hand.
 | 50    | Custom grenade        | Throwable  |
 | other | reserved              |            |
 
+### Defaults
+
+Every value below is the item's default, damage included, and every server
+starts from it, so that an item plays the same on every server and players
+learn it once. A server changes counts through a [Slot](#slot) and firing
+through a [Modifier](#sub-id-4-modifier), which the client shows. Damage is
+dealt by the server alone, as today; one that departs from the defaults should
+say so to its players.
+
+Damage follows the base game, as LSD deals it:
+
+* A Hit on a teammate does nothing. Legs take the damage of arms.
+* A Hit to the head is a `HEADSHOT` kill, a melee Hit a `MELEE` kill, any
+  other Hit a `WEAPON` kill.
+* An **explosion** deals `4096` divided by the squared distance in blocks to
+  each living player within 16 blocks on every axis, with no block in between,
+  to the enemy and to the thrower but not to the thrower's teammates. It
+  removes the 3×3×3 blocks around it, as a base grenade's
+  [Block Action](../protocol075.md#block-action) does, and is a `GRENADE`
+  kill.
+
 ### Tools
 
 * **Empty hand**: nothing in hand. Primary fire punches: a melee
   [Hit](../protocol075.md#hit-packet) at the spade's reach, once every 0.5 s,
-  that neither digs nor damages blocks. A punch kill is a `MELEE` kill.
-  Secondary fire does nothing.
-* **Spade** and **Block**: as in the base game. Melee Hits are valid only with
-  a spade or an empty hand held.
+  that neither digs nor damages blocks. It deals 20 damage. Secondary fire does
+  nothing.
+* **Spade** and **Block**: as in the base game. A spade Hit deals 80 damage.
+  Melee Hits are valid only with a spade or an empty hand held.
 
 ### Guns
 
@@ -78,8 +99,8 @@ fire is pressed, then one per Fire interval while it is held, as the base guns
 do: there is no semi-automatic mode, since servers count rounds from how long
 fire is held. Pressing primary fire cancels a reload. Secondary fire aims.
 
-The damage a Hit or an explosion deals to a player is the server's choice, as
-it is today. Spread, recoil and block damage are in the terms of the 0.75 game:
+Damage is per pellet. Spread, recoil and block damage are in the terms of the
+0.75 game:
 spread is added to each axis of the unnormalised aim, and recoil turns the aim
 up and sideways as Voxlap does: the sideways kick is scaled by a triangle wave
 running from `-255.5` to `255.5` and back every 1024 ms, both are doubled while
@@ -88,15 +109,15 @@ damage is what each pellet takes off a block's
 health, which the client counts. The first three rows are the base weapons'
 values.
 
-| Gun                   | Fire interval | Magazine | Reserve | Reload            | Pellets | Spread | Recoil up | Recoil side | Block damage |
-|-----------------------|---------------|----------|---------|-------------------|---------|--------|-----------|-------------|--------------|
-| Rifle                 | 0.5 s         | 10       | 50      | 2.5 s, whole      | 1       | 0.006  | 0.05      | 0.0001      | 50           |
-| SMG                   | 0.1 s         | 30       | 120     | 2.5 s, whole      | 1       | 0.012  | 0.0125    | 0.00005     | 34           |
-| Shotgun               | 1.0 s         | 6        | 48      | 0.5 s, per round  | 8       | 0.024  | 0.1       | 0.0002      | 34           |
-| Pistol                | 0.25 s        | 8        | 40      | 1.5 s, whole      | 1       | 0.010  | 0.03      | 0.0001      | 25           |
-| Bolt-action rifle     | 1.25 s        | 5        | 25      | 0.6 s, per round  | 1       | 0.002  | 0.1       | 0.0002      | 50           |
-| Double-barrel shotgun | 0.2 s         | 2        | 24      | 2.0 s, whole      | 8       | 0.030  | 0.15      | 0.0003      | 34           |
-| Machine gun           | 0.12 s        | 100      | 100     | 5.0 s, whole      | 1       | 0.016  | 0.02      | 0.0001      | 40           |
+| Gun                   | Fire interval | Magazine | Reserve | Reload            | Pellets | Spread | Recoil up | Recoil side | Head | Torso | Arms, legs | Block damage |
+|-----------------------|---------------|----------|---------|-------------------|---------|--------|-----------|-------------|------|-------|------------|--------------|
+| Rifle                 | 0.5 s         | 10       | 50      | 2.5 s, whole      | 1       | 0.006  | 0.05      | 0.0001      | 100  | 49    | 33         | 50           |
+| SMG                   | 0.1 s         | 30       | 120     | 2.5 s, whole      | 1       | 0.012  | 0.0125    | 0.00005     | 75   | 29    | 18         | 34           |
+| Shotgun               | 1.0 s         | 6        | 48      | 0.5 s, per round  | 8       | 0.024  | 0.1       | 0.0002      | 37   | 27    | 16         | 34           |
+| Pistol                | 0.25 s        | 8        | 40      | 1.5 s, whole      | 1       | 0.010  | 0.03      | 0.0001      | 75   | 34    | 25         | 25           |
+| Bolt-action rifle     | 1.25 s        | 5        | 25      | 0.6 s, per round  | 1       | 0.002  | 0.1       | 0.0002      | 100  | 75    | 50         | 50           |
+| Double-barrel shotgun | 0.2 s         | 2        | 24      | 2.0 s, whole      | 8       | 0.030  | 0.15      | 0.0003      | 37   | 27    | 16         | 34           |
+| Machine gun           | 0.12 s        | 100      | 100     | 5.0 s, whole      | 1       | 0.016  | 0.02      | 0.0001      | 75   | 32    | 20         | 40           |
 
 * **Pistol**: a handgun held in one hand.
 * **Bolt-action rifle**: the bolt is worked after each round, and its
@@ -134,7 +155,8 @@ A thrown grenade leaves at speed `1`.
 * **Rocket launcher**: single shot. Its rocket flies straight at a constant
   speed, and always detonates on impact.
 
-Both detonate as a frag grenade does, at the end of their fuse at the latest.
+Both detonate as a frag grenade does, with its
+[explosion](#defaults), at the end of their fuse at the latest.
 
 ### Throwables
 
@@ -144,7 +166,7 @@ primary fire is held and its fuse runs from the cook.
 
 | Throwable      | Count | Fuse                     | Detonation                                                                    |
 |----------------|-------|--------------------------|-------------------------------------------------------------------------------|
-| Frag grenade   | 3     | 3 s, or 5 s with IMPACT  | As the base grenade: the server deals damage and breaks blocks.               |
+| Frag grenade   | 3     | 3 s, or 5 s with IMPACT  | An [explosion](#defaults), as the base grenade.                               |
 | Smoke grenade  | 2     | 2 s, or 5 s with IMPACT  | A cloud in the slot's Colour, see below. No damage, no blocks broken.         |
 | Custom grenade | 1     | 3 s, or 5 s with IMPACT  | A small burst in the slot's Colour. What else happens is the server's effect. |
 
@@ -162,9 +184,8 @@ primary fire is held and its fuse runs from the cook.
 A projectile without `IMPACT` bounces as the base grenade does and detonates at
 the end of its fuse, on each side's own clock, as today.
 
-An `IMPACT` projectile, and every rocket, detonates where the server judges it
-hit something, or at the end of its fuse: always at the first block it
-touches, and at a player if the server checks players. Only the server decides
+An `IMPACT` projectile, and every rocket, detonates at the first block or
+player hitbox it touches, or at the end of its fuse. Only the server decides
 where: it sends a [Detonate](#sub-id-6-detonate). A client that sees the
 projectile touch something stops drawing it there, and draws its detonation
 only when the Detonate arrives, at the Detonate's position.
@@ -187,7 +208,7 @@ carries.
 | Colour     | UByte[3]   |                | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). The smoke and custom grenades' colour; ignored for other items. |
 | Name       | String     | `"Medic gas"`  | The custom grenade's name. Empty for other items, and ignored. |
 
-The [Items](#items) tables give the usual Count and Reserve; the server writes
+The [Items](#items) tables give the default Count and Reserve; the server writes
 the values it wants. A slot starts full: its magazine holds Count rounds and its
 reserve Reserve.
 
