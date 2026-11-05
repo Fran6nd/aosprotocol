@@ -3,9 +3,9 @@
 The server names and describes the three classes, decides which items each
 player carries and in which slots, and can retune a slot's fire interval,
 spread and recoil while the game runs. It adds a pistol, a bolt-action rifle, a
-double-barrelled shotgun, a belt-fed machine gun, a grenade launcher, a rocket
-launcher, a smoke grenade, a custom grenade and an empty hand to the base
-spade, block, rifle, SMG, shotgun and grenade.
+double-barrelled shotgun, a belt-fed machine gun, a heal pistol, a grenade
+launcher, a rocket launcher, a smoke grenade, a custom grenade, a bandage and
+an empty hand to the base spade, block, rifle, SMG, shotgun and grenade.
 
 | ------------: | ------------- |
 | Extension ID: | `0x3B`        |
@@ -47,6 +47,7 @@ hand.
 | 0     | Empty hand            | Tool       |
 | 1     | Spade                 | Tool       |
 | 2     | Block                 | Tool       |
+| 3     | Bandage               | Tool       |
 | 16    | Rifle                 | Gun        |
 | 17    | SMG                   | Gun        |
 | 18    | Shotgun               | Gun        |
@@ -54,6 +55,7 @@ hand.
 | 20    | Bolt-action rifle     | Gun        |
 | 21    | Double-barrel shotgun | Gun        |
 | 22    | Machine gun           | Gun        |
+| 23    | Heal pistol           | Gun        |
 | 32    | Grenade launcher      | Launcher   |
 | 33    | Rocket launcher       | Launcher   |
 | 48    | Frag grenade          | Throwable  |
@@ -72,7 +74,11 @@ say so to its players.
 
 Damage follows the base game, as LSD deals it:
 
-* A Hit on a teammate does nothing. Legs take the damage of arms.
+* A Hit on a teammate does nothing, except the heal pistol's. Legs take the
+  damage of arms.
+* **Healing** raises HP by its amount, up to 100. The server sends the healed
+  player a [Set HP](../protocol075.md#set-hp) with the new HP; a client draws
+  no hurt for a Set HP that raises its HP.
 * A Hit to the head is a `HEADSHOT` kill, a melee Hit a `MELEE` kill, any
   other Hit a `WEAPON` kill.
 * An **explosion** deals `4096` divided by the squared distance in blocks to
@@ -102,6 +108,12 @@ the spade, block, gun and grenade.
   nothing.
 * **Spade** and **Block**: as in the base game. A spade Hit deals 80 damage.
   Melee Hits are valid only with a spade or an empty hand held.
+* **Bandage**: heals its holder. Holding primary fire for 2 s uses one bandage
+  and heals 30; releasing or switching sooner uses none. It cannot be used at
+  full HP. The server times the hold from
+  [Weapon Input](../protocol075.md#weapon-input), as it times a gun's fire,
+  then sends the Set HP and an [Ammo](#sub-id-3-ammo). Count 2 by default.
+  Secondary fire does nothing.
 
 ### Guns
 
@@ -130,6 +142,7 @@ values.
 | Bolt-action rifle     | 1.25 s        | 5        | 25      | 0.6 s, per round  | 1       | 0.002  | 0.1       | 0.0002      | 100  | 75    | 50         | 50           |
 | Double-barrel shotgun | 0.2 s         | 2        | 24      | 2.0 s, whole      | 8       | 0.030  | 0.15      | 0.0003      | 37   | 27    | 16         | 34           |
 | Machine gun           | 0.12 s        | 100      | 100     | 5.0 s, whole      | 1       | 0.016  | 0.02      | 0.0001      | 75   | 32    | 20         | 40           |
+| Heal pistol           | 0.5 s         | 10       | 50      | 2.0 s, whole      | 1       | 0.006  | 0.03      | 0.0001      | 0    | 0     | 0          | 0            |
 
 * **Pistol**: a handgun held in one hand.
 * **Bolt-action rifle**: the bolt is worked after each round, and its
@@ -138,6 +151,9 @@ values.
   reload both barrels at once.
 * **Machine gun**: a heavy belt-fed gun. Its magazine is the belt, and a reload
   opens the cover and lays in a new one.
+* **Heal pistol**: fires healing darts. A Hit on a teammate heals them 20,
+  whatever the body part; a Hit on an enemy, or on a block, does nothing. It
+  cannot heal its holder.
 
 A reload starts when the client sends a
 [Weapon Reload](../protocol075.md#weapon-reload), and does nothing when the
@@ -217,7 +233,7 @@ carries.
 |------------|------------|----------------|------------------------------------------|
 | Item       | UByte      | `50`           | See [Items](#items).                     |
 | Flags      | UByte      | `0b1`          | Bit `0` `IMPACT`: a launcher round or throwable detonates on impact. Bits `1`-`7` must be `0` and are ignored. |
-| Count      | UByte      | `1`            | A gun's or launcher's magazine; how many blocks or throwables are carried. `255` is infinite. Ignored for the spade and empty hand. |
+| Count      | UByte      | `1`            | A gun's or launcher's magazine; how many blocks, bandages or throwables are carried. `255` is infinite. Ignored for the spade and empty hand. |
 | Reserve    | UByte      | `0`            | A gun's or launcher's rounds beyond the magazine. `255` is infinite. `0` and ignored for other items. |
 | Colour     | UByte[3]   |                | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). The smoke grenade's smoke and the custom grenade's colour; ignored for other items. |
 | Name       | String     | `"Medic gas"`  | The custom grenade's name. Empty for other items, and ignored. |
@@ -229,7 +245,8 @@ reserve Reserve.
 An infinite magazine never empties and is never reloaded; a
 [Weapon Reload](../protocol075.md#weapon-reload) for it is ignored. An infinite
 reserve is never used up, so a reload is always allowed. An infinite count of
-blocks or throwables never runs out. A client shows none of these counts.
+blocks, bandages or throwables never runs out. A client shows none of these
+counts.
 
 ## Sub ID 0: Class
 
@@ -330,7 +347,7 @@ player only, and the client adopts it.
 | Packet ID     | UByte      | `0x7B`  | Always `0x7B`.                         |
 | Sub Packet ID | UByte      | `3`     | Always `3` for this sub-packet.        |
 | Slot          | UByte      | `2`     | An index into the player's slots.      |
-| Count         | UByte      | `8`     | The magazine, or the blocks or throwables left. `255` is infinite. |
+| Count         | UByte      | `8`     | The magazine, or the blocks, bandages or throwables left. `255` is infinite. |
 | Reserve       | UByte      | `40`    | The rounds beyond the magazine. `255` is infinite. |
 
 The client counts what it uses on its own, and the server corrects it. The
@@ -344,8 +361,8 @@ client is off.
 An infinite count sent here lasts until the next Ammo, Loadout or respawn: a
 server can give infinite rounds for a while without changing the slot.
 
-A [Restock](../protocol075.md#restock) refills every slot's reserve, blocks and
-throwables, but not magazines, as the base Restock does, and needs no Ammo.
+A [Restock](../protocol075.md#restock) refills every slot's reserve, blocks,
+bandages and throwables, but not magazines, as the base Restock does, and needs no Ammo.
 
 ## Sub ID 4: Modifier
 
@@ -463,10 +480,10 @@ only. A Kill Action without one shows the icon of its kill type, as today.
 * **Weapon Input** fires the held slot.
 * **Hit Packet** is checked against the held slot's item. A Hit while holding a
   launcher, a throwable or a block is ignored, and so is any Hit but a melee
-  one while holding an empty hand.
+  one while holding an empty hand. Any Hit while holding a bandage is ignored.
 * **Weapon Reload** from the client reloads the held slot, and is answered with
   an [Ammo](#sub-id-3-ammo).
-* **Restock** refills every slot's reserve, blocks and throwables, not
+* **Restock** refills every slot's reserve, blocks, bandages and throwables, not
   magazines.
 * **Grenade Packet** from a client is ignored; it sends a
   [Projectile](#sub-id-5-projectile).
