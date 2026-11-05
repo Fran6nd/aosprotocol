@@ -64,33 +64,34 @@ hand. A server sends a client only the items of the version it announced.
 
 * **Empty hand**: nothing in hand. Primary fire punches: a melee
   [Hit](../protocol075.md#hit-packet) at the spade's reach, once every 0.5 s,
-  that neither digs nor damages blocks. Its damage is the server's, usually
-  less than the spade's, and a punch kill is a `MELEE` kill. Secondary fire
-  does nothing.
+  that neither digs nor damages blocks. A punch kill is a `MELEE` kill.
+  Secondary fire does nothing.
 * **Spade** and **Block**: as in the base game. Melee Hits are valid only with
   a spade or an empty hand held.
 
 ### Guns
 
 Guns cast rays as the base guns do and report hits with the
-[Hit Packet](../protocol075.md#hit-packet). Each fires while primary fire is
-held, one round per Fire interval, as the base guns do: there is no
-semi-automatic mode, since servers count rounds from how long fire is held.
-Secondary fire aims. The server takes a Hit's damage from the item held when
-it arrives.
+[Hit Packet](../protocol075.md#hit-packet). Each fires a round when primary
+fire is pressed, then one per Fire interval while it is held, as the base guns
+do: there is no semi-automatic mode, since servers count rounds from how long
+fire is held. Pressing primary fire cancels a reload. Secondary fire aims.
 
-Spread, recoil and damage are in the terms of the 0.75 game: spread is added to
-each axis of the unnormalised aim, recoil is the vertical and horizontal kick,
-and damage is per pellet. The first three rows are the base weapons' values.
+The damage a Hit or an explosion deals to a player is the server's choice, as
+it is today. Spread, recoil and block damage are in the terms of the 0.75 game:
+spread is added to each axis of the unnormalised aim, recoil is the vertical and
+horizontal kick, and block damage is what each pellet takes off a block's
+health, which the client counts. The first three rows are the base weapons'
+values.
 
-| Gun                   | Fire interval | Magazine | Reserve | Reload            | Pellets | Spread | Recoil up | Recoil side | Head | Torso | Arms, legs | Block |
-|-----------------------|---------------|----------|---------|-------------------|---------|--------|-----------|-------------|------|-------|------------|-------|
-| Rifle                 | 0.5 s         | 10       | 50      | 2.5 s, whole      | 1       | 0.006  | 0.05      | 0.0001      | 100  | 49    | 33         | 50    |
-| SMG                   | 0.1 s         | 30       | 120     | 2.5 s, whole      | 1       | 0.012  | 0.0125    | 0.00005     | 75   | 29    | 18         | 34    |
-| Shotgun               | 1.0 s         | 6        | 48      | 0.5 s, per round  | 8       | 0.024  | 0.1       | 0.0002      | 37   | 27    | 16         | 34    |
-| Pistol                | 0.25 s        | 8        | 40      | 1.5 s, whole      | 1       | 0.010  | 0.03      | 0.0001      | 60   | 25    | 18         | 25    |
-| Bolt-action rifle     | 1.25 s        | 5        | 25      | 0.6 s, per round  | 1       | 0.002  | 0.1       | 0.0002      | 100  | 80    | 50         | 50    |
-| Double-barrel shotgun | 0.2 s         | 2        | 24      | 2.0 s, whole      | 8       | 0.030  | 0.15      | 0.0003      | 37   | 27    | 16         | 34    |
+| Gun                   | Fire interval | Magazine | Reserve | Reload            | Pellets | Spread | Recoil up | Recoil side | Block damage |
+|-----------------------|---------------|----------|---------|-------------------|---------|--------|-----------|-------------|--------------|
+| Rifle                 | 0.5 s         | 10       | 50      | 2.5 s, whole      | 1       | 0.006  | 0.05      | 0.0001      | 50           |
+| SMG                   | 0.1 s         | 30       | 120     | 2.5 s, whole      | 1       | 0.012  | 0.0125    | 0.00005     | 34           |
+| Shotgun               | 1.0 s         | 6        | 48      | 0.5 s, per round  | 8       | 0.024  | 0.1       | 0.0002      | 34           |
+| Pistol                | 0.25 s        | 8        | 40      | 1.5 s, whole      | 1       | 0.010  | 0.03      | 0.0001      | 25           |
+| Bolt-action rifle     | 1.25 s        | 5        | 25      | 0.6 s, per round  | 1       | 0.002  | 0.1       | 0.0002      | 50           |
+| Double-barrel shotgun | 0.2 s         | 2        | 24      | 2.0 s, whole      | 8       | 0.030  | 0.15      | 0.0003      | 34           |
 
 * **Pistol**: a handgun held in one hand.
 * **Bolt-action rifle**: the bolt is worked after each round, and its
@@ -99,9 +100,13 @@ and damage is per pellet. The first three rows are the base weapons' values.
 * **Double-barrel shotgun**: each round is one barrel. The gun breaks open to
   reload both barrels at once.
 
-A **whole** reload refills the magazine from the reserve at its end. A **per
-round** reload loads one round each time and continues until the magazine is
-full or the reserve empty, and firing interrupts it, as the base shotgun does.
+A reload starts when the client sends a
+[Weapon Reload](../protocol075.md#weapon-reload), and does nothing when the
+magazine is full or the reserve empty. A **whole** reload moves rounds from the
+reserve into the magazine once its time has passed. A **per round** reload
+moves one round each time its time passes, and goes on until the magazine is
+full or the reserve empty, as the base shotgun does. Pressing primary fire or
+switching slots cancels either.
 
 ### Launchers
 
@@ -159,8 +164,7 @@ only when the Detonate arrives, at the Detonate's position.
 
 Damage and broken blocks are always the server's, sent as
 [Set HP](../protocol075.md#set-hp), [Kill Action](../protocol075.md#kill-action)
-and [Block Action](../protocol075.md#block-action) as today. A server may scale
-any damage in this page.
+and [Block Action](../protocol075.md#block-action) as today.
 
 ## Slot
 
@@ -267,8 +271,9 @@ the server sends the slot actually held back to the sender.
 The server can switch a player at any time by sending a Hold for them to
 everyone, the player included. The player's client switches as if it had asked.
 
-Switching away cancels a reload, on both sides, and a cooked throwable is
-dropped as in the base game.
+Switching away cancels a reload, on both sides, and the server sends the player
+an [Ammo](#sub-id-3-ammo) for the slot left, since their client may have
+counted the reload as done. A cooked throwable is dropped as in the base game.
 
 ## Sub ID 3: Ammo
 
@@ -287,15 +292,16 @@ player only, and the client adopts it.
 The client counts what it uses on its own, and the server corrects it. The
 server answers a [Weapon Reload](../protocol075.md#weapon-reload) with an Ammo
 for the held slot when the reload ends, or after each round of a per-round
-reload, instead of a Weapon Reload. It still relays the Weapon Reload to the
-other clients, as today, for the sound. It also sends an Ammo when it changes a count itself, such as a pickup,
-and may send one whenever the client is off.
+reload, instead of a Weapon Reload. It relays the Weapon Reload to the other
+clients when the reload starts, as today, for the sound. It also sends an Ammo
+when it changes a count itself, such as a pickup, and may send one whenever the
+client is off.
 
 An infinite count sent here lasts until the next Ammo, Loadout or respawn: a
 server can give infinite rounds for a while without changing the slot.
 
-A [Restock](../protocol075.md#restock) refills every slot of the player, and
-needs no Ammo.
+A [Restock](../protocol075.md#restock) refills every slot's reserve, blocks and
+throwables, but not magazines, as the base Restock does, and needs no Ammo.
 
 ## Sub ID 4: Modifier
 
@@ -410,7 +416,8 @@ only. A Kill Action without one shows the icon of its kill type, as today.
   one while holding an empty hand.
 * **Weapon Reload** from the client reloads the held slot, and is answered with
   an [Ammo](#sub-id-3-ammo).
-* **Restock** refills every slot.
+* **Restock** refills every slot's reserve, blocks and throwables, not
+  magazines.
 * **Grenade Packet** from a client is ignored; it sends a
   [Projectile](#sub-id-5-projectile).
 * A server that also has [Player Properties](player-properties.md) fills
