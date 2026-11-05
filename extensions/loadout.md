@@ -155,6 +155,18 @@ values.
   whatever the body part; a Hit on an enemy, or on a block, does nothing. It
   cannot heal its holder.
 
+#### Suppressor
+
+Any gun whose slot is `SILENCED` carries a suppressor, drawn on its barrel by
+every client. Its shots sound suppressed, are heard by other players only
+within 32 blocks, and show no muzzle flash and no tracer. Nothing else
+changes: damage, spread, recoil and fire interval stay the gun's. A server that
+wants a trade-off uses a [Modifier](#sub-id-4-modifier).
+
+The suppressor only changes what honest clients draw and play: every client
+still receives the shooter's position and
+[Weapon Input](../protocol075.md#weapon-input).
+
 A reload starts when the client sends a
 [Weapon Reload](../protocol075.md#weapon-reload), and does nothing when the
 magazine is full or the reserve empty. A **whole** reload moves rounds from the
@@ -232,7 +244,7 @@ carries.
 | Field Name | Field Type | Example        | Notes                                    |
 |------------|------------|----------------|------------------------------------------|
 | Item       | UByte      | `50`           | See [Items](#items).                     |
-| Flags      | UByte      | `0b1`          | Bit `0` `IMPACT`: a launcher round or throwable detonates on impact. Bits `1`-`7` must be `0` and are ignored. |
+| Flags      | UByte      | `0b1`          | Bit `0` `IMPACT`: a launcher round or throwable detonates on impact. Bit `1` `SILENCED`: a gun carries a [suppressor](#suppressor). Each is ignored on items it does not apply to. Bits `2`-`7` must be `0` and are ignored. |
 | Count      | UByte      | `1`            | A gun's or launcher's magazine; how many blocks, bandages or throwables are carried. `255` is infinite. Ignored for the spade and empty hand. |
 | Reserve    | UByte      | `0`            | A gun's or launcher's rounds beyond the magazine. `255` is infinite. `0` and ignored for other items. |
 | Colour     | UByte[3]   |                | Blue, green, red, as in [Set Colour](../protocol075.md#set-colour). The smoke grenade's smoke and the custom grenade's colour; ignored for other items. |
@@ -303,10 +315,16 @@ The server sends a player's Loadout before the
 again whenever it changes their slots, at any time. At a spawn it is usually the
 slots of the player's class, but the server may give any.
 
-A new Loadout takes effect at once: every slot starts full, reloads and cooking
-stop, and every [Modifier](#sub-id-4-modifier) is cleared. The player then
-holds slot `0` until a [Hold](#sub-id-2-hold) says otherwise; a server that
-changes a living player's loadout sends a Hold after it.
+A new Loadout takes effect at once. A slot that holds the same Item as the slot
+of the same number before keeps its counts, its reload and its
+[Modifier](#sub-id-4-modifier), and takes its new Flags, Colour and Name: this
+is how a server adds a suppressor or recolours smoke mid-game. Its counts are
+cut down to the new Count and Reserve if they are over them. Every other slot
+starts full, and its reload, cooking and modifier end.
+
+The player keeps holding the same slot number if its Item is unchanged, and
+otherwise holds slot `0` until a [Hold](#sub-id-2-hold) says otherwise; a
+server that changes the held slot's item sends a Hold after the Loadout.
 
 A respawn refills every slot. The player spawns holding their first gun or
 launcher slot, or slot `0` when there is none.
@@ -358,7 +376,8 @@ clients when the reload starts, as today, for the sound. It also sends an Ammo
 when it changes a count itself, such as a pickup, and may send one whenever the
 client is off.
 
-An infinite count sent here lasts until the next Ammo, Loadout or respawn: a
+An infinite count sent here lasts until the next Ammo, a Loadout that changes
+the slot's Item, or a respawn: a
 server can give infinite rounds for a while without changing the slot.
 
 A [Restock](../protocol075.md#restock) refills every slot's reserve, blocks,
@@ -388,7 +407,8 @@ grenade, is ignored.
 
 A slot has at most one modifier, and a new Modifier replaces it; `255` replaces
 every slot's. A Modifier whose factors are all `1` clears it. A modifier also
-ends with a new [Loadout](#sub-id-1-loadout), and with Lasts `1` at the
+ends when a [Loadout](#sub-id-1-loadout) changes its slot's Item, and with
+Lasts `1` at the
 player's [Kill Action](../protocol075.md#kill-action). Otherwise it survives
 deaths and lasts until the server replaces or clears it. With Lasts `2` the
 server clears it once Duration has passed on its own clock; the client uses
