@@ -88,7 +88,7 @@ weapon.
 | Value  | Name     | Look                                                |
 |--------|----------|-----------------------------------------------------|
 | 96–253 | reserved |                                                     |
-| 254    | Default  | Whatever the client draws when the server has no say, such as a skin its user or the player picked. `0` if it has none. |
+| 254    | Client   | The client's own choice, such as a skin its user or the player picked, coloured as the client likes; `0` if it has none. |
 | 255    | Team     | The player's [team outfit](#sub-id-1-team-outfits). |
 
 ## Sub ID 0: Set Outfit
@@ -105,7 +105,8 @@ A client draws what it is sent: an outfit copied from another player does not
 follow that player afterwards.
 
 The outfit belongs to the player id and takes effect when it arrives. A player
-with no Set Outfit wears `255` in their own colour. The server sends a player's
+with no Set Outfit wears `255` in their own colour, so a server that sends
+nothing leaves every player in `254`. The server sends a player's
 Set Outfit before the [Create Player](../protocol075.md#create-player) or
 [Existing Player](../protocol075.md#existing-player) that introduces them, so a
 client draws a player in the outfit it holds when they are created and never
@@ -117,9 +118,9 @@ introduces every player again after it.
 
 ## Sub ID 1: Team Outfits
 
-The outfit of each team's players whose outfit is `255`. The server sends it
-before the Create Player or Existing Player that introduces the first player, and
-may send it again at any time.
+The outfit of each team's players whose outfit is `255`. A server that sends it
+sends the first before the Create Player or Existing Player that introduces the
+first player, and may send it again at any time.
 
 | Field Name    | Field Type        | Example | Notes                           |
 |---------------|-------------------|---------|---------------------------------|
